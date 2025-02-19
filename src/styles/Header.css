@@ -1,0 +1,31 @@
+.header-alt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  margin-left: -50px;
+}
+.logo img {
+  height: 50px;
+  margin-right: 10px;
+  margin-bottom: -16px;
+}
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #4CAF50;
+  font-family: 'Arial', sans-serif;
+}
+

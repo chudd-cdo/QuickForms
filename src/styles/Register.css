@@ -1,0 +1,129 @@
+/* Full page styling */
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #e9f8e1;
+}
+
+/* Registration box */
+.register-box {
+  background: rgba(255, 255, 255, 0.9); /* Slight transparency */
+  padding: 40px;
+  margin-top: 100px;
+  border-radius: 15px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  width: 600px;
+  text-align: center;
+  position: relative;
+
+  /* Background Image */
+  background: url('../assets/b1.png') center/cover no-repeat;
+  background-blend-mode: overlay;
+  background-color: rgba(255, 255, 255, 0.774); /* White overlay effect */
+}
+
+/* Title */
+.register-title {
+  font-size: 26px;
+  font-weight: bold;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+.sub-text {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.sub-text a {
+  color: #4CAF50;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.sub-text a:hover {
+  text-decoration: underline;
+}
+
+/* Form grid for two-column layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* Labels above inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+  text-align: left;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  background: rgba(220, 220, 220, 0.8);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  position: relative;
+}
+
+.input-container .icon {
+  color: #4CAF50;
+  font-size: 18px;
+  margin-right: 10px;
+}
+/* Separator (vertical bar) */
+/* Separator (vertical bar) */
+.separator {
+  color: gray;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+/* Input field */
+.input-container input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  padding: 5px;
+}
+
+/* Password visibility toggle */
+.toggle-password {
+  position: absolute;
+  right: 15px;
+  cursor: pointer;
+  color: gray;
+}
+
+/* Sign-Up Button */
+.register-button {
+  background: #4CAF50;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 40%;
+  margin-top: 15px;
+  transition: 0.3s;
+}
+
+.register-button:hover {
+  background: #45a049;
+}
