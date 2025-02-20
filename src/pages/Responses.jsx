@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import { useNavigate, BrowserRouter as Router } from "react-router-dom";
 import "../styles/Responses.css";
+import Header from "../components/Header1"; // Import the Header
+
 import {
   FaRegFileAlt,
   FaTrash,
@@ -88,7 +90,7 @@ const Responses = () => {
           <FaRegFileAlt className="icon" />
           <span>Responses</span>
         </div>
-        <div className="menu-item">
+        <div className="menu-item" onClick={() => navigate("/notifications")}>
           <FaBell className="icon" />
           <span>Notifications</span>
         </div>

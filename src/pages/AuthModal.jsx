@@ -1,66 +1,62 @@
 import React, { useState } from "react";
-import { FaUser, FaLock, FaEnvelope } from "react-icons/fa";
+import { FaUser, FaLock, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // Import navigation hook
 import "../styles/AuthModal.css";
 
 function AuthModal({ isLogin, closeModal, setIsLogin }) {
+  const navigate = useNavigate(); // React Router navigation hook
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [name, setName] = useState(""); // Needed for signup
   const [password, setPassword] = useState("");
+  const [dob, setDob] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const endpoint = isLogin ? "login" : "register";
-    const bodyData = isLogin ? { email, password } : { name, email, password };
-
-    const response = await fetch(`http://localhost:8000/api/${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bodyData),
-    });
-
-    const data = await response.json();
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      window.location.href = "/dashboard";
-    } else {
-      alert(`${isLogin ? "Login" : "Registration"} failed`);
-    }
+    navigate("/dashboard"); // Navigate to the dashboard immediately
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
         <span className="close-button" onClick={closeModal}>&times;</span>
-        <h2>{isLogin ? "Log In" : "Sign Up"}</h2>
-        <p className="sub-text">{isLogin ? "Sign in to continue." : "Create an account to get started."}</p>
+        <h2 className="modal-title">{isLogin ? "Log In" : "Create New Account"}</h2>
+        <p className="modal-subtext">{isLogin ? "Sign In to continue." : "Already Registered? Log In here."}</p>
 
         <form onSubmit={handleSubmit}>
           {!isLogin && (
             <div className="input-container">
               <FaUser className="icon" />
-              <input type="text" placeholder="Your Name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
           )}
+
           <div className="input-container">
             <FaEnvelope className="icon" />
-            <input type="email" placeholder="Your Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
+
           <div className="input-container">
             <FaLock className="icon" />
             <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
-          <button type="submit" className="login-button">{isLogin ? "Log In" : "Sign Up"}</button>
+
+          {!isLogin && (
+            <div className="input-container">
+              <FaCalendarAlt className="icon" />
+              <input type="date" placeholder="Date of Birth" value={dob} onChange={(e) => setDob(e.target.value)} required />
+            </div>
+          )}
+
+          <button type="submit" className="auth-button">{isLogin ? "Log In" : "Sign Up"}</button>
         </form>
 
-        {isLogin ? (
-          <p className="switch-text">
-            Don't have an account? <span onClick={() => setIsLogin(false)}>Register</span>
-          </p>
-        ) : (
-          <p className="switch-text">
-            Already have an account? <span onClick={() => setIsLogin(true)}>Log In</span>
-          </p>
-        )}
+        <p className="switch-text">
+          {isLogin ? "Forgot Password?" : ""}
+        </p>
+
+        <p className="switch-text">
+          {isLogin ? "Sign Up" : "Log In"} <span onClick={() => setIsLogin(!isLogin)}>{isLogin ? "Sign Up" : "Log In"}</span>
+        </p>
       </div>
     </div>
   );

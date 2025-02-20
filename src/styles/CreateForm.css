@@ -1,0 +1,181 @@
+/* Layout */
+.create-form-container {
+    display: flex;
+    height: 100vh;
+    background-color: #ecf7ec;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background-color: #d2f3d3;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .user-avatar {
+    font-size: 32px;
+    margin-right: 10px;
+  }
+  
+  .user-profile-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user-profile-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .user-profile-info span {
+    font-size: 12px;
+    color: #777;
+  }
+  
+  .create-btn {
+    background: #238c23;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+  
+  nav p {
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  nav p:hover {
+    background: #b4e2b5;
+    border-radius: 5px;
+  }
+  
+  .logout {
+    margin-top: auto;
+    color: red;
+  }
+  
+  /* Form Content */
+  .form-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  /* Header */
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f9f5;
+    padding: 10px 20px;
+    border-bottom: 2px solid #d2f3d3;
+  }
+  
+  .form-title {
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    background: transparent;
+    width: auto;
+  }
+  
+  .header-icons {
+    display: flex;
+    align-items: center;
+  }
+  
+  .icon {
+    font-size: 20px;
+    margin: 0 10px;
+    cursor: pointer;
+  }
+  
+  .publish-btn {
+    background: #238c23;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Form Settings */
+  .form-settings {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 15px 0;
+  }
+  
+  .form-description {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 5px;
+  }
+  
+  /* Questions */
+  .question-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .question-label {
+    font-weight: bold;
+  }
+  
+  .question-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .question-type {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .question-actions {
+    margin-left: 10px;
+  }
+  
+  .delete {
+    color: red;
+    cursor: pointer;
+  }
+  
+  /* Add Question */
+  .add-question-btn {
+    background: #238c23;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  

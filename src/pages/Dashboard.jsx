@@ -102,48 +102,51 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Dashboard Sidebar */}
-      <div className="dashboard-sidebar">
-        <h2>Dashboard</h2>
-        <button className="create-form" onClick={handleCreateNewForm}>
-          + Create new form
-        </button>
-        <div className="recent-forms">
-          <h3>Recent Forms</h3>
-          <div className={`forms-list ${showRecentForms ? "scrollable" : ""}`}>
-            {recentForms.length > 0 ? (
-              recentForms.map((form) => (
-                <div key={form.id} className="form-item">
-                  📄 {form.name}
-                  <FaEllipsisV
-                    className="options-icon"
-                    onClick={() =>
-                      setMenuOpen(menuOpen === form.id ? null : form.id)
-                    }
-                  />
-                  {menuOpen === form.id && (
-                    <div className="dropdown-menu">
-                      <div onClick={() => handleRenameForm(form.id)}>
-                        <FaPencilAlt /> Rename
-                      </div>
-                      <div onClick={() => handleOpenForm(form.id)}>
-                        <FaEye /> Open/Edit
-                      </div>
-                      <div onClick={() => handleDeleteForm(form.id)}>
-                        <FaTimes /> Delete
-                      </div>
-                    </div>
-                  )}
+    
+        <div className="dashboard-sidebar">
+          <h2>Dashboard</h2>
+          <button
+            className="create-form"
+            onClick={() => navigate("/create-form")}
+          >
+            + Create new form
+          </button>
+          <div className="recent-forms">
+            <h3>Recent Forms</h3>
+            <div className={`forms-list ${showRecentForms ? "scrollable" : ""}`}>
+          {recentForms.length > 0 ? (
+            recentForms.map((form) => (
+              <div key={form.id} className="form-item">
+            📄 {form.name}
+            <FaEllipsisV
+              className="options-icon"
+              onClick={() =>
+                setMenuOpen(menuOpen === form.id ? null : form.id)
+              }
+            />
+            {menuOpen === form.id && (
+              <div className="dropdown-menu">
+                <div onClick={() => handleRenameForm(form.id)}>
+              <FaPencilAlt /> Rename
                 </div>
-              ))
-            ) : (
-              <p>No forms available</p>
+                <div onClick={() => handleOpenForm(form.id)}>
+              <FaEye /> Open/Edit
+                </div>
+                <div onClick={() => handleDeleteForm(form.id)}>
+              <FaTimes /> Delete
+                </div>
+              </div>
             )}
-          </div>
-          <a
-            href="#"
-            className="see-all"
-            onClick={(event) => {
+              </div>
+            ))
+          ) : (
+            <p>No forms available</p>
+          )}
+            </div>
+            <a
+          href="#"
+          className="see-all"
+          onClick={(event) => {
               event.preventDefault();
               setShowRecentForms(!showRecentForms);
             }}

@@ -1,17 +1,16 @@
 .header-alt {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 50px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
   .logo-container {
     display: flex;
     align-items: center;
@@ -31,3 +30,25 @@
    
   }
   
+  .user-profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 20px;
+  }
+
+  .user-profile-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .user-profile-info span {
+    font-size: 12px;
+    color: #777;
+  }
+
+  .user-avatar {
+    font-size: 24px;
+    margin-left: 10px;
+  }

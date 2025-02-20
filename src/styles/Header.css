@@ -10,22 +10,38 @@
   padding: 15px 50px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  height: 70px; /* Adjusted height */
 }
 
 .logo-container {
   display: flex;
   align-items: center;
-  margin-left: -50px;
+  margin-left: 0; /* Remove negative margin */
 }
-.logo img {
+
+.logo {
   height: 50px;
   margin-right: 10px;
-  margin-bottom: -16px;
 }
+
 .title {
-  font-size: 28px;
+  font-size: 24px; /* Adjusted for better spacing */
   font-weight: bold;
   color: #4CAF50;
   font-family: 'Arial', sans-serif;
 }
+.divider {
+  margin-right: 10px;
+  font-size: 16px;
+  color: black;
+}
 
+.user-icon {
+  font-size: 30px; /* Adjust the size of the avatar */
+  margin-left: 5px; /* Adjust the spacing */
+  color: green;
+}
+/* Ensure the main content does not get overlapped by the fixed header */
+.main-content {
+  padding-top: 90px; /* Adjusted to match header height */
+}
