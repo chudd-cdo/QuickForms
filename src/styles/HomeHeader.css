@@ -1,0 +1,81 @@
+/* Home Header Styles */
+.home-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px; /* Increased for better spacing */
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Logo Section */
+.home-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.home-logo {
+  height: 50px;
+  margin-right: 10px;
+}
+
+.home-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #08d10f;
+  font-family: Arial, sans-serif;
+}
+
+/* Navigation Section */
+.home-nav {
+  display: flex;
+  align-items: center;
+  margin-right: 80px;
+}
+
+.home-auth-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  
+}
+
+.home-nav-link {
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.home-nav-link:hover {
+  color: #4CAF50;
+}
+
+.home-divider {
+  font-size: 16px;
+  color: black;
+}
+
+/* User Icon */
+.home-user-icon {
+  font-size: 30px;
+  margin-left: 10px;
+  color: black;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.home-user-icon:hover {
+  color: #2E7D32;
+}
+
+/* Prevent Content Overlap */
+.home-main-content {
+  padding-top: 90px;
+}

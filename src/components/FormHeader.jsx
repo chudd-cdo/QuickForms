@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import { FaEye, FaSync } from "react-icons/fa";
-import "../styles/CreateForm.css";
+import React from "react";
+import "../styles/FormHeader.css";
+import logo from "../assets/chuddlogo.png";
+import { FaEye, FaEllipsisV } from "react-icons/fa";
 
 const FormHeader = ({ formTitle, setFormTitle }) => {
   return (
-    <header className="form-header">
-      <h1>
-        <img src="/logo.png" alt="Logo" className="logo-img" />
-        <input
-          type="text"
-          className="form-title"
-          value={formTitle}
-          onChange={(e) => setFormTitle(e.target.value)}
-        />
-      </h1>
-      <div className="header-icons">
-        <FaSync className="icon" />
-        <FaEye className="icon" />
-        <button className="publish-btn">Publish</button>
+    <header className="home-header">
+      <div className="home-logo-container">
+        <img src={logo} alt="SmartGForm Logo" className="home-logo" />
+        <span className="home-title">SmartGForm</span>
+      </div>
+
+      {/* Actions: Preview, Publish */}
+      <div className="form-header-right">
+        <button className="form-preview-btn">
+          <FaEye className="form-icon" /> Preview
+        </button>
+        <button className="form-publish-btn">Publish</button>
+        <FaEllipsisV className="form-icon form-more-options" />
       </div>
     </header>
   );

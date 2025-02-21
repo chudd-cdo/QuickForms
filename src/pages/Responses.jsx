@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate, BrowserRouter as Router } from "react-router-dom";
 import "../styles/Responses.css";
-import Header from "../components/Header1"; // Import the Header
+import Header from "../components/DashboardHeader"; // Import the Header
 
 import {
   FaRegFileAlt,

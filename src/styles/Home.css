@@ -79,7 +79,11 @@
   }
   
   .highlight {
-    color: #4CAF50;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: 0;
+    color: #008507;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
   
   .cta-button {

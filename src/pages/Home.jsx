@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import "../styles/Home.css";
-
 import bgImage from "../assets/b1.png";
 import { FaArrowRight } from "react-icons/fa";
 import AuthModal from "./AuthModal"; // Import the modal component
-import Header from "../components/Header";
+import Header from "../components/HomeHeader";
 
 
 
