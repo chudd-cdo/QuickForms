@@ -80,7 +80,7 @@ const Dashboard = () => {
           <FaHome className="icon" />
           <span>Dashboard</span>
         </div>
-        <div className="menu-item">
+        <div className="menu-item" onClick={() => navigate("/myforms")}>
           <FaWpforms className="icon" />
           <span>My Forms</span>
         </div>

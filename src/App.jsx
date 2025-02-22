@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import MyForms from "./pages/MyForms";
 import Responses from "./pages/Responses";
 import Notifications from "./pages/Notifications";
 import CreateForm from "./pages/CreateForm"; // ✅ Import CreateForm
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/myforms" element={<MyForms />} />
         <Route path="/responses" element={<Responses />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/create-form" element={<CreateForm />} /> {/* ✅ Route for CreateForm */}
