@@ -14,9 +14,22 @@ import {
   FaEdit,
 } from "react-icons/fa";
 
-const MyForms = () => {
+const MyForms = ({ forms, setForms }) => { 
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [formTitle, setFormTitle] = useState("");
+  const [formDescription, setFormDescription] = useState("");
+
+  // Function to truncate long names
+  const truncateText = (text, maxLength = 15) => {
+    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  };
+
+  const handleCreateForm = () => {
+    navigate("/create-form", {
+      state: { formTitle, formDescription },
+    });
+  };
 
   return (
     <div className="chudd-myforms-container">
@@ -80,26 +93,26 @@ const MyForms = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>
-                <FaEdit className="chudd-edit-icon" />
-                <FaTrash className="chudd-delete-icon" />
-                <span>CHUDD Survey</span>
-              </td>
-              <td>01/01/2025</td>
-              <td className="chudd-status-active">Activated</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td>
-                <FaEdit className="chudd-edit-icon" />
-                <FaTrash className="chudd-delete-icon" />
-                <span>CHUDD Survey 1</span>
-              </td>
-              <td>12/15/2024</td>
-              <td className="chudd-status-deactivated">Deactivated</td>
-              <td>126</td>
-            </tr>
+            {forms.length === 0 ? (
+              <tr>
+                <td colSpan="4" style={{ textAlign: "center" }}>No forms available</td>
+              </tr>
+            ) : (
+              forms.map((form) => (
+                <tr key={form.id}>
+                  <td>
+                    <FaEdit className="chudd-edit-icon" />
+                    <FaTrash className="chudd-delete-icon" />
+                    <span title={form.name}>{truncateText(form.name, 15)}</span>
+                  </td>
+                  <td>{form.dateCreated}</td>
+                  <td className={form.status === "Activated" ? "chudd-status-active" : "chudd-status-deactivated"}>
+                    {form.status}
+                  </td>
+                  <td>{form.responses}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -114,13 +127,22 @@ const MyForms = () => {
             </div>
             <div className="chudd-modal-body">
               <label>Form Name</label>
-              <input type="text" placeholder="Enter Form Name Here" />
+              <input
+                type="text"
+                placeholder="Enter Form Name Here"
+                value={formTitle}
+                onChange={(e) => setFormTitle(e.target.value)}
+              />
               <label>Form Description</label>
-              <textarea placeholder="Enter Description Here"></textarea>
+              <textarea
+                placeholder="Enter Description Here"
+                value={formDescription}
+                onChange={(e) => setFormDescription(e.target.value)}
+              ></textarea>
             </div>
             <div className="chudd-modal-footer">
               <button className="chudd-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="chudd-create" onClick={() => navigate("/create-form")}>Create</button>
+              <button className="chudd-create" onClick={handleCreateForm}>Create</button>
             </div>
           </div>
         </div>

@@ -5,13 +5,45 @@ import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa"
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const CreateForm = () => {
-  const [formTitle, setFormTitle] = useState("Untitled Form");
-  const [formDescription, setFormDescription] = useState("");
+const CreateForm = ({ onPublish }) => {
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialTitle = location.state?.formTitle || "Untitled Form";
+  const initialDescription = location.state?.formDescription || "";
+  const [formTitle, setFormTitle] = useState(initialTitle);
+  const [formDescription, setFormDescription] = useState(initialDescription);
+  const [status, setStatus] = useState("Activated"); // Default to "Activated"
+
   const [questions, setQuestions] = useState([
     { id: "1", title: "Question Title", type: "short", options: ["Option 1"] },
   ]);
+
+  
+
+
+  const handlePublish = () => {
+    if (!formTitle.trim()) {
+      alert("Please enter a form title before publishing.");
+      return;
+    }
+  
+    const newForm = {
+      id: Date.now(),
+      name: formTitle,
+      description: formDescription,
+      dateCreated: new Date().toLocaleDateString(),
+      status: status, // ✅ Use selected status
+      responses: 0,
+    };
+  
+    onPublish(newForm);
+    navigate("/myforms");
+  };
+  
+  
 
   const addQuestion = () => {
     setQuestions([
@@ -92,7 +124,8 @@ const CreateForm = () => {
       </aside>
 
       <div className="create-form-content">
-        <FormHeader formTitle={formTitle} setFormTitle={setFormTitle} />
+      <FormHeader formTitle={formTitle} setFormTitle={setFormTitle} onPublish={handlePublish} />
+
 
         <div className="create-form-settings">
           <div className="create-form-left">
@@ -113,14 +146,23 @@ const CreateForm = () => {
             />
           </div>
           <div className="create-form-actions">
-            <button className="create-user-icon-btn">
-              <FaUserPlus className="create-icon" />
-            </button>
-            <select className="create-form-dropdown">
-              <option>Activate</option>
-              <option>Deactivate</option>
-            </select>
-          </div>
+  
+ 
+  <select 
+    value={status} 
+    onChange={(e) => setStatus(e.target.value)}
+    className="create-form-dropdown"
+  >
+    <option value="Activated">Activated</option>
+    <option value="Deactivated">Deactivated</option>
+  </select>
+
+  <button className="create-user-icon-btn">
+    <FaUserPlus className="create-icon" />
+  </button>
+</div>
+
+
         </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>

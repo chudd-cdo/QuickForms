@@ -3,7 +3,7 @@ import "../styles/FormHeader.css";
 import logo from "../assets/chuddlogo.png";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 
-const FormHeader = ({ formTitle, setFormTitle }) => {
+const FormHeader = ({ formTitle, setFormTitle, onPublish }) => {
   return (
     <header className="home-header">
       <div className="home-logo-container">
@@ -16,7 +16,8 @@ const FormHeader = ({ formTitle, setFormTitle }) => {
         <button className="form-preview-btn">
           <FaEye className="form-icon" /> Preview
         </button>
-        <button className="form-publish-btn">Publish</button>
+        <button className="form-publish-btn" onClick={onPublish}>Publish</button>
+
         <FaEllipsisV className="form-icon form-more-options" />
       </div>
     </header>
