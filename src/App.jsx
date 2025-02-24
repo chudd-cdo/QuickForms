@@ -9,6 +9,7 @@ import CreateForm from "./pages/CreateForm";
 import HomeHeader from "./components/HomeHeader";
 import DashboardHeader from "./components/DashboardHeader";
 import FormHeader from "./components/FormHeader";
+import EditForm from "./pages/EditForm";
 
 function App() {
   const location = useLocation();
@@ -36,11 +37,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/myforms" element={<MyForms forms={forms} setForms={setForms} />} />
-
-
         <Route path="/responses" element={<Responses />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/create-form" element={<CreateForm onPublish={handlePublishForm} />} />
+        <Route path="/edit-form/:id" element={<EditForm />} />
       </Routes>
     </div>
   );
