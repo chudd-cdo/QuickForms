@@ -21,8 +21,20 @@ const CreateForm = ({ onPublish }) => {
   const [status, setStatus] = useState("Activated"); // Default to "Activated"
 
   const [questions, setQuestions] = useState([
-    { id: "1", title: "Question Title", type: "short", options: ["Option 1"] },
+    { id: "1", title: "Question Title", type: "short" },
   ]);
+
+
+  /*form: {
+    name: string;
+    description: string;
+    is_active: boolean;
+    question:[{
+      id: string;
+      title: string;
+      type: string;
+    }]
+  }*/
 
   
 
