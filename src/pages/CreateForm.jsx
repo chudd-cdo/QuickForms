@@ -6,6 +6,9 @@ import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+
 
 const CreateForm = ({ onPublish }) => {
 
@@ -24,24 +27,26 @@ const CreateForm = ({ onPublish }) => {
   
 
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!formTitle.trim()) {
       alert("Please enter a form title before publishing.");
       return;
     }
   
     const newForm = {
-      id: Date.now(),
       name: formTitle,
       description: formDescription,
-      dateCreated: new Date().toLocaleDateString(),
-      status: status, // ✅ Use selected status
-      responses: 0,
+      is_active: status === "Activated",
     };
   
-    onPublish(newForm);
-    navigate("/myforms");
+    try {
+      await axios.post("/forms", newForm);  // Send form data to backend
+      navigate("/myforms"); // Go back to MyForms after saving
+    } catch (error) {
+      console.error("Error publishing form:", error);
+    }
   };
+  
   
   
 

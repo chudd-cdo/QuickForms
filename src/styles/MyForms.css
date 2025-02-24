@@ -281,3 +281,16 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+.chudd-form-name {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Adjust spacing */
+}
+
+.chudd-edit-icon,
+.chudd-delete-icon,
+.chudd-archive-icon {
+  cursor: pointer;
+  font-size: 18px;
+}

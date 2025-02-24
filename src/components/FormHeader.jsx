@@ -5,10 +5,15 @@ import { FaEye, FaEllipsisV } from "react-icons/fa";
 
 const FormHeader = ({ formTitle, setFormTitle, onPublish }) => {
   return (
-    <header className="home-header">
-      <div className="home-logo-container">
-        <img src={logo} alt="SmartGForm Logo" className="home-logo" />
-        <span className="home-title">SmartGForm</span>
+    <header className="form-header">
+      <div className="form-header-left">
+        <img src={logo} alt="SmartGForm Logo" className="form-logo" />
+        <input 
+          type="text" 
+          className="form-header-title" 
+          value={formTitle} 
+          onChange={(e) => setFormTitle(e.target.value)}
+        />
       </div>
 
       {/* Actions: Preview, Publish */}
