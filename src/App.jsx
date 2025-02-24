@@ -10,7 +10,7 @@ import EditForm from "./pages/EditForm";
 import HomeHeader from "./components/HomeHeader";
 import DashboardHeader from "./components/DashboardHeader";
 import FormHeader from "./components/FormHeader";
-import EditHeader from "./components/EditHeader";
+import EditHeader from "./components/EditHeader"; 
 
 function App() {
   const location = useLocation();
@@ -22,13 +22,11 @@ function App() {
 
   return (
     <div>
-      {location.pathname === "/" ? (
-        <HomeHeader />
-      ) : location.pathname === "/create-form" ? (
-        <FormHeader />
-      ) : (
-        <DashboardHeader />
-      )}
+      {location.pathname === "/" && <HomeHeader />}
+      {location.pathname === "/dashboard" && <DashboardHeader />}
+      {location.pathname === "/myforms" && <DashboardHeader />}
+      {location.pathname === "/create-form" && <FormHeader />}
+      {location.pathname.startsWith("/edit-form/") && <EditHeader />}
 
       <Routes>
         <Route path="/" element={<Home />} />

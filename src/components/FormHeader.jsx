@@ -3,16 +3,16 @@ import "../styles/FormHeader.css";
 import logo from "../assets/chuddlogo.png";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 
-const FormHeader = ({ formTitle, setFormTitle, onPublish }) => {
+const FormHeader = ({ onPublish }) => {
   return (
     <header className="form-header">
       <div className="form-header-left">
         <img src={logo} alt="SmartGForm Logo" className="form-logo" />
-        <input 
-          type="text" 
-          className="form-header-title" 
-          value={formTitle} 
-          onChange={(e) => setFormTitle(e.target.value)}
+        <input
+          type="text"
+          className="form-header-title"
+          value="SmartGForm" // Fixed title
+          readOnly // Prevent editing
         />
       </div>
 

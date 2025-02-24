@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
-import FormHeader from "../components/FormHeader";
+import FormHeader from "../components/EditHeader";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -15,37 +15,37 @@ const EditForm = () => {
   
   const [formTitle, setFormTitle] = useState("Loading...");
   const [formDescription, setFormDescription] = useState("");
-  const [status, setStatus] = useState("Activated");
-  const [questions, setQuestions] = useState([]);
+  const [status, setStatus] = useState("Activated");    
 
-  useEffect(() => {
-    if (!formId) return; // Prevent fetching if no form ID
-  
-    setFormTitle("Loading..."); // Show loading before fetching
-  
-    const fetchFormData = async () => {
-      try {
-        const response = await axios.get(`/forms/${formId}`);
-        if (!response.data) {
-          console.error("No data received from API");
-          return;
-        }
-  
-        const { name, description, is_active, questions } = response.data;
-  
-        setFormTitle(name || "Untitled Form");
-        setFormDescription(description || "");
-        setStatus(is_active ? "Activated" : "Deactivated");
-        setQuestions(Array.isArray(questions) ? questions : []);
-  
-      } catch (error) {
-        console.error("Error fetching form data:", error);
-        setFormTitle("Error Loading Form");
-      }
-    };
-  
-    fetchFormData();
-  }, [formId, location.key]); // Refetch on navigation
+  const [questions, setQuestions] = useState([
+      { id: "1", title: "Question Title", type: "short", options: ["Option 1"] },
+    ]);
+    useEffect(() => {
+        if (!formId) return;
+      
+        const fetchFormData = async () => {
+          try {
+            const response = await axios.get(`/forms/${formId}`);
+            if (!response.data) {
+              console.error("No data received from API");
+              return;
+            }
+      
+            const { name, description, is_active, questions } = response.data;
+      
+            setFormTitle(name || "Untitled Form");
+            setFormDescription(description || "");
+            setStatus(is_active ? "Activated" : "Deactivated");
+            setQuestions(Array.isArray(questions) ? questions : []);
+          } catch (error) {
+            console.error("Error fetching form data:", error);
+            setFormTitle("Error Loading Form");
+          }
+        };
+      
+        fetchFormData();
+      }, [formId, location.key]);
+      
   
   const handleUpdate = async () => {
     if (!formTitle.trim()) {
@@ -54,19 +54,21 @@ const EditForm = () => {
     }
 
     const updatedForm = {
+      id: formId, // Ensure ID remains the same
       name: formTitle,
       description: formDescription,
-      is_active: status === "Activated",
       questions
     };
 
+
     try {
-      await axios.put(`/forms/${formId}`, updatedForm);
-      navigate("/myforms");
-    } catch (error) {
-      console.error("Error updating form:", error);
-    }
-  };
+        await axios.put(`/forms/${formId}`, updatedForm);
+  
+        navigate("/myforms", { state: { updatedForm } }); // Pass updated form back
+      } catch (error) {
+        console.error("Error saving form:", error);
+      }
+    };
 
   const addQuestion = () => {
     setQuestions([
