@@ -23,9 +23,8 @@ import {
 
 axios.defaults.baseURL = "http://localhost:8000/api";
 
-const MyForms = () => {
+const MyForms = ({ forms, setForms }) => {
   const navigate = useNavigate();
-  const [forms, setForms] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formTitle, setFormTitle] = useState("");
   const [formDescription, setFormDescription] = useState("");
@@ -45,11 +44,16 @@ const MyForms = () => {
     }
   };
 
+  const handleEdit = (id) => {
+    navigate(`/edit-form/${id}`);
+  };
+
   const handleCreateForm = () => {
     if (!formTitle.trim()) {
       alert("Please enter a form title.");
       return;
     }
+
 
     navigate("/create-form", { state: { formTitle, formDescription } });
 
@@ -57,6 +61,9 @@ const MyForms = () => {
     setFormTitle("");
     setFormDescription("");
   };
+
+ 
+
 
   const handleDeleteForm = async (id) => {
     try {
@@ -88,8 +95,7 @@ const MyForms = () => {
             ) : (
               <FaEdit
                 className="chudd-edit-icon"
-                onClick={() => navigate(`/edit-form/:id${row.original.id}`)}
-              />
+                onClick={() => handleEdit(row.original.id)} />
             )}
             {!archivedView && (
               <FaTrash

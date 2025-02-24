@@ -1,0 +1,181 @@
+/* Reset and Global Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-y: hidden;
+    -webkit-locale: "en"; /* Ensures locale consistency */
+}
+
+html {
+    display: block;
+}
+
+/* Shared Container Styles */
+.form-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background-color: #f8ffed;
+    padding: 15px;
+    height: 100vh;
+    border-radius: 10px;
+    border: 1px solid #cce5b8;
+    margin-top: 78px;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+/* Sidebar */
+.sidebar {
+    margin-top: 20px;
+    width: 250px;
+    background-color: #fdfdfd;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    align-items: center;
+    border: 1px solid black;
+    height: 100%;
+}
+
+/* User Profile */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.user-role {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.user-email {
+    font-size: 14px;
+    color: #555;
+    margin: 0;
+}
+
+.user-avatar {
+    font-size: 40px;
+    cursor: pointer;
+    margin-left: -50px;
+}
+
+/* Buttons */
+button {
+    padding: 10px;
+    background-color: #d8e6e7;
+    color: black;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    width: 100%;
+}
+
+/* Main Content */
+.form-content {
+    flex-grow: 1;
+    padding: 20px;
+    max-height: calc(100vh - 78px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* Form Settings */
+.form-settings {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f8ffed;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid black;
+    margin-bottom: 15px;
+}
+
+.form-left {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.form-label {
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.form-title-input, .form-description-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+/* Question Card */
+.question-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    gap: 10px;
+    position: relative;
+}
+
+/* Answer Inputs */
+.answer-container {
+    margin-top: 10px;
+}
+
+.answer-input, .answer-textarea {
+    width: 40%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Icons and Actions */
+.icon-delete {
+    color: black;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.icon-delete:hover {
+    color: red;
+    transform: scale(1.1);
+}
+
+/* Add Question Button */
+.add-question-btn {
+    background: white;
+    color: black;
+    border: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 20%;
+    margin: 10px auto;
+}
+
+.add-question-btn:hover {
+    color: #f3f3f3;
+}

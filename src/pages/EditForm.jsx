@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "../styles/CreateForm.css";
+import React, { useState, useEffect } from "react";
+import "../styles/EditForm.css";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
@@ -8,47 +8,65 @@ import FormHeader from "../components/FormHeader";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
-
-const CreateForm = ({ onPublish }) => {
-
+const EditForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const initialTitle = location.state?.formTitle || "Untitled Form";
-  const initialDescription = location.state?.formDescription || "";
-  const [formTitle, setFormTitle] = useState(initialTitle);
-  const [formDescription, setFormDescription] = useState(initialDescription);
-  const [status, setStatus] = useState("Activated"); // Default to "Activated"
-
-  const [questions, setQuestions] = useState([
-    { id: "1", title: "Question Title", type: "short", options: ["Option 1"] },
-  ]);
-
+  const formId = location.state?.formId || null;
   
+  const [formTitle, setFormTitle] = useState("Loading...");
+  const [formDescription, setFormDescription] = useState("");
+  const [status, setStatus] = useState("Activated");
+  const [questions, setQuestions] = useState([]);
 
-
-  const handlePublish = async () => {
+  useEffect(() => {
+    if (!formId) return; // Prevent fetching if no form ID
+  
+    setFormTitle("Loading..."); // Show loading before fetching
+  
+    const fetchFormData = async () => {
+      try {
+        const response = await axios.get(`/forms/${formId}`);
+        if (!response.data) {
+          console.error("No data received from API");
+          return;
+        }
+  
+        const { name, description, is_active, questions } = response.data;
+  
+        setFormTitle(name || "Untitled Form");
+        setFormDescription(description || "");
+        setStatus(is_active ? "Activated" : "Deactivated");
+        setQuestions(Array.isArray(questions) ? questions : []);
+  
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setFormTitle("Error Loading Form");
+      }
+    };
+  
+    fetchFormData();
+  }, [formId, location.key]); // Refetch on navigation
+  
+  const handleUpdate = async () => {
     if (!formTitle.trim()) {
-      alert("Please enter a form title before publishing.");
+      alert("Please enter a form title before updating.");
       return;
     }
-  
-    const newForm = {
+
+    const updatedForm = {
       name: formTitle,
       description: formDescription,
       is_active: status === "Activated",
+      questions
     };
-  
+
     try {
-      await axios.post("/forms", newForm);  // Send form data to backend
-      navigate("/myforms"); // Go back to MyForms after saving
+      await axios.put(`/forms/${formId}`, updatedForm);
+      navigate("/myforms");
     } catch (error) {
-      console.error("Error publishing form:", error);
+      console.error("Error updating form:", error);
     }
   };
-  
-  
-  
 
   const addQuestion = () => {
     setQuestions([
@@ -129,8 +147,7 @@ const CreateForm = ({ onPublish }) => {
       </aside>
 
       <div className="create-form-content">
-      <FormHeader formTitle={formTitle} setFormTitle={setFormTitle} onPublish={handlePublish} />
-
+        <FormHeader formTitle={formTitle} setFormTitle={setFormTitle} onPublish={handleUpdate} />
 
         <div className="create-form-settings">
           <div className="create-form-left">
@@ -151,23 +168,18 @@ const CreateForm = ({ onPublish }) => {
             />
           </div>
           <div className="create-form-actions">
-  
- 
-  <select 
-    value={status} 
-    onChange={(e) => setStatus(e.target.value)}
-    className="create-form-dropdown"
-  >
-    <option value="Activated">Activated</option>
-    <option value="Deactivated">Deactivated</option>
-  </select>
-
-  <button className="create-user-icon-btn">
-    <FaUserPlus className="create-icon" />
-  </button>
-</div>
-
-
+            <select 
+              value={status} 
+              onChange={(e) => setStatus(e.target.value)}
+              className="create-form-dropdown"
+            >
+              <option value="Activated">Activated</option>
+              <option value="Deactivated">Deactivated</option>
+            </select>
+            <button className="create-user-icon-btn">
+              <FaUserPlus className="create-icon" />
+            </button>
+          </div>
         </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -203,44 +215,6 @@ const CreateForm = ({ onPublish }) => {
                             <option value="multiple">Multiple Choice</option>
                             <option value="checkbox">Checkboxes</option>
                           </select>
-                        </div>
-
-                        <div className="create-answer-container">
-                          {question.type === "short" && (
-                            <input type="text" className="create-answer-input" placeholder="Type your answer here" />
-                          )}
-                          {question.type === "paragraph" && (
-                            <textarea className="create-answer-textarea" placeholder="Type your answer here"></textarea>
-                          )}
-                          {(question.type === "multiple" || question.type === "checkbox") && (
-                            <div>
-                              {question.options.map((option, oIndex) => (
-                                <div key={oIndex} className="option-group">
-                                  <input type={question.type === "multiple" ? "radio" : "checkbox"} name={`question-${question.id}`} />
-                                  <input type="text" className="create-answer-input" value={option} onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)} />
-                                  <IoRemoveCircleSharp className="create-icon-trash create-delete" onClick={() => {
-                                    const updatedQuestions = [...questions];
-                                    updatedQuestions[qIndex].options.splice(oIndex, 1);
-                                    setQuestions(updatedQuestions);
-                                  }} />
-                                </div>
-                              ))}
-                              <div className="option-group add-option" onClick={() => addOption(qIndex)}>
-                                <input type={question.type === "multiple" ? "radio" : "checkbox"} disabled />
-                                <span>Add option</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="create-question-actions">
-                          <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />
-                          <FaTrash className="create-icon create-delete" onClick={() => deleteQuestion(question.id)} />
-                          <label className="create-required-toggle">
-                            Required
-                            <input type="checkbox" className="toggle-input" />
-                            <span className="toggle-slider"></span>
-                          </label>
                         </div>
                       </div>
                     )}
