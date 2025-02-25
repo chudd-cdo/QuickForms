@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import api from "../api";
 import axios from "axios";
-import DashboardHeader from "../components/DashboardHeader";
 import {
   useReactTable,
   getCoreRowModel,
@@ -41,7 +41,7 @@ const MyForms = ({ forms, setForms }) => {
 
   const fetchForms = async () => {
     try {
-      const response = await axios.get("/forms");
+      const response = await api.get("/forms"); // No need to repeat baseURL
       setForms(response.data);
     } catch (error) {
       console.error("Error fetching forms", error);
@@ -182,7 +182,7 @@ const MyForms = ({ forms, setForms }) => {
           </div>
           <div className="chudd-actions">
             <FaArchive className="chudd-archive-icon" onClick={() => setArchivedView(!archivedView)} />
-            <button className="chudd-create-form" onClick={() => setShowModal(true)}>
+            <button className="chudd-create-form" onClick={() =>  navigate("/create-form")}>
               + Create new form
             </button>
           </div>
@@ -224,35 +224,7 @@ const MyForms = ({ forms, setForms }) => {
         </div>
       </div>
 
-      {showModal && (
-              <div className="chudd-modal-overlay">
-                <div className="chudd-modal">
-                  <div className="chudd-modal-header">
-                    <h2>Create new form</h2>
-                    <span className="chudd-close" onClick={() => setShowModal(false)}>&times;</span>
-                  </div>
-                  <div className="chudd-modal-body">
-                    <label>Form Name</label>
-                    <input
-                      type="text"
-                      placeholder="Enter Form Name Here"
-                      value={formTitle}
-                      onChange={(e) => setFormTitle(e.target.value)}
-                    />
-                    <label>Form Description</label>
-                    <textarea
-                      placeholder="Enter Description Here"
-                      value={formDescription}
-                      onChange={(e) => setFormDescription(e.target.value)}
-                    ></textarea>
-                  </div>
-                  <div className="chudd-modal-footer">
-                    <button className="chudd-cancel" onClick={() => setShowModal(false)}>Cancel</button>
-                    <button className="chudd-create" onClick={handleCreateForm}>Create</button>
-                  </div>
-                </div>
-              </div>
-            )}
+     
     </div>
   );
 };

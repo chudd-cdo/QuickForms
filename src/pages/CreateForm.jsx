@@ -1,119 +1,128 @@
 import React, { useState } from "react";
-import "../styles/CreateForm.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
-import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
 
-
-
-const CreateForm = ({ onPublish }) => {
-
+const CreateForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const initialTitle = location.state?.formTitle || "Untitled Form";
   const initialDescription = location.state?.formDescription || "";
+
   const [formTitle, setFormTitle] = useState(initialTitle);
   const [formDescription, setFormDescription] = useState(initialDescription);
-  const [status, setStatus] = useState("Activated"); // Default to "Activated"
+  const [status, setStatus] = useState("Activated");
+  const [questions, setQuestions] = useState([{ id: "1", title: "Question Title", type: "short", options: [] }]);
 
-  const [questions, setQuestions] = useState([
-    { id: "1", title: "Question Title", type: "short" },
-  ]);
-
-
-  /*form: {
-    name: string;
-    description: string;
-    is_active: boolean;
-    question:[{
-      id: string;
-      title: string;
-      type: string;
-    }]
-  }*/
-
+  // Type Mapping for Backend
+  const typeMapping = {
+    short: "text",
+    paragraph: "text",
+    multiple: "multiple_choice",
+    checkbox: "checkbox",
+    dropdown: "dropdown",
+  };
   
 
-
+  // Publish Form
   const handlePublish = async () => {
     if (!formTitle.trim()) {
       alert("Please enter a form title before publishing.");
       return;
     }
-  
+
     const newForm = {
       name: formTitle,
       description: formDescription,
       is_active: status === "Activated",
     };
-  
+
     try {
-      await axios.post("/forms", newForm);  // Send form data to backend
-      navigate("/myforms"); // Go back to MyForms after saving
+      const formResponse = await axios.post("http://localhost:8000/api/forms", newForm);
+      const formId = formResponse.data.id;
+
+      if (questions.length > 0) {
+        const formattedQuestions = questions.map((q) => ({
+          form_id: formId,
+          question_text: q.title,
+          question_type: typeMapping[q.type] || "text", // Ensure valid type
+          options: q.options.length > 0 ? q.options : null, // Ensure valid JSON structure
+        }));
+        
+
+        await axios.post("http://localhost:8000/api/questions", { questions: formattedQuestions });
+      }
+
+      navigate("/myforms");
     } catch (error) {
-      console.error("Error publishing form:", error);
+      console.error("Error publishing form:", error.response?.data || error);
     }
   };
-  
-  
-  
-
-  const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      { id: `${questions.length + 1}`, title: "New Question", type: "short", options: ["Option 1"] },
-    ]);
-  };
-
-  const deleteQuestion = (id) => {
-    setQuestions(questions.filter((q) => q.id !== id));
-  };
-
-  const duplicateQuestion = (index) => {
-    const questionToDuplicate = { ...questions[index], id: `${questions.length + 1}` };
-    setQuestions([...questions, questionToDuplicate]);
-  };
-
   const handleTitleChange = (index, value) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[index].title = value;
-    setQuestions(updatedQuestions);
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions[index].title = value;
+      return updatedQuestions;
+    });
+  };
+  const addOption = (questionIndex) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      
+      // Ensure the question has an 'options' array
+      if (!updatedQuestions[questionIndex].options) {
+        updatedQuestions[questionIndex].options = [];
+      }
+  
+      // Add a new option
+      updatedQuestions[questionIndex].options.push(`Option ${updatedQuestions[questionIndex].options.length + 1}`);
+      
+      return updatedQuestions;
+    });
+  };
+    
+
+  // Add Question
+  const addQuestion = () => {
+    setQuestions([...questions, { id: `${questions.length + 1}`, title: "New Question", type: "short", options: [] }]);
   };
 
-  const handleTypeChange = (index, newType) => {
-    const updatedQuestions = [...questions];
-    if (newType === "multiple" || newType === "checkbox") {
-      updatedQuestions[index].options = ["Option 1"];
-    }
-    updatedQuestions[index].type = newType;
-    setQuestions(updatedQuestions);
-  };
-
-  const handleOptionChange = (qIndex, oIndex, value) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[qIndex].options[oIndex] = value;
-    setQuestions(updatedQuestions);
-  };
-
-  const addOption = (qIndex) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[qIndex].options.push(`Option ${updatedQuestions[qIndex].options.length + 1}`);
-    setQuestions(updatedQuestions);
-  };
-
+  // Drag and Drop Handling
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-
     const reorderedQuestions = [...questions];
     const [movedItem] = reorderedQuestions.splice(result.source.index, 1);
     reorderedQuestions.splice(result.destination.index, 0, movedItem);
-
     setQuestions(reorderedQuestions);
   };
+  const deleteQuestion = (questionId) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.filter((question) => question.id !== questionId)
+    );
+  };
+  
+  
+
+  const handleTypeChange = (index, newType) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index].type = newType;
+  
+    // Ensure multiple-choice and checkbox types have options
+    if (newType === "multiple" || newType === "checkbox") {
+      if (!updatedQuestions[index].options || updatedQuestions[index].options.length === 0) {
+        updatedQuestions[index].options = ["Option 1"]; // Default option
+      }
+    } else {
+      updatedQuestions[index].options = []; // Clear options for non-multiple choice types
+    }
+  
+    setQuestions(updatedQuestions);
+  };
+  
 
   return (
     <div className="create-form-container">
@@ -238,9 +247,9 @@ const CreateForm = ({ onPublish }) => {
                                 </div>
                               ))}
                               <div className="option-group add-option" onClick={() => addOption(qIndex)}>
-                                <input type={question.type === "multiple" ? "radio" : "checkbox"} disabled />
-                                <span>Add option</span>
-                              </div>
+  <input type={question.type === "multiple" ? "radio" : "checkbox"} disabled />
+  <span>Add option</span>
+</div>
                             </div>
                           )}
                         </div>
