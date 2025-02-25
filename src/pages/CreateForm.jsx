@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
@@ -8,15 +8,27 @@ import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
 
 const CreateForm = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const initialTitle = location.state?.formTitle || "Untitled Form";
-  const initialDescription = location.state?.formDescription || "";
+  const initialTitle = "Untitled Form";
+  const initialDescription = "";
 
   const [formTitle, setFormTitle] = useState(initialTitle);
   const [formDescription, setFormDescription] = useState(initialDescription);
-  const [status, setStatus] = useState("Activated");
   const [questions, setQuestions] = useState([{ id: "1", title: "Question Title", type: "short", options: [] }]);
+  const [status, setStatus] = useState("Activated");
+
+  // Navigate to PreviewForm with the form data when Preview button is clicked
+
+  const handlePreview = () => {
+    const formData = {
+      title: formTitle,
+      description: formDescription,
+      questions,
+    };
+    navigate("/preview-form", { state: { form: formData } });
+  };
+  
+  
 
   // Type Mapping for Backend
   const typeMapping = {
@@ -26,6 +38,7 @@ const CreateForm = () => {
     checkbox: "checkbox",
     dropdown: "dropdown",
   };
+  
   
 
   // Publish Form
@@ -38,8 +51,9 @@ const CreateForm = () => {
     const newForm = {
       name: formTitle,
       description: formDescription,
-      is_active: status === "Activated",
+      is_active: status === "Activated", // Set is_active based on status
     };
+    
 
     try {
       const formResponse = await axios.post("http://localhost:8000/api/forms", newForm);
@@ -90,7 +104,16 @@ const CreateForm = () => {
   const addQuestion = () => {
     setQuestions([...questions, { id: `${questions.length + 1}`, title: "New Question", type: "short", options: [] }]);
   };
+  
 
+  const handleOptionChange = (questionIndex, optionIndex, value) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      updatedQuestions[questionIndex].options[optionIndex] = value;
+      return updatedQuestions;
+    });
+  };
+  
   // Drag and Drop Handling
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -150,7 +173,7 @@ const CreateForm = () => {
       </aside>
 
       <div className="create-form-content">
-      <FormHeader formTitle={formTitle} setFormTitle={setFormTitle} onPublish={handlePublish} />
+      <FormHeader onPreview={handlePreview} onPublish={handlePublish} />
 
 
         <div className="create-form-settings">

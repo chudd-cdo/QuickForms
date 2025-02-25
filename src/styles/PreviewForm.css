@@ -1,0 +1,111 @@
+/* PreviewFormUI.css */
+
+.preview-form-ui-container {
+  background: linear-gradient(135deg, #b0f2b6, #84e184);
+  padding: 20px;
+  min-height: 100vh;
+  margin-top: 100px;
+}
+
+.preview-header {
+  position: fixed;
+    top: 0;
+    left: 0;
+    width: 95%;
+    height: 70px; /* Increased for better spacing */
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.preview-header-left {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.preview-header-left h2 {
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.preview-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  margin-right: 100px;
+  
+  
+}
+
+.form-card {
+  background: #e6ffe6;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.form-question-card {
+  background: #d4fcd4;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.required-label {
+  color: red;
+  font-size: 0.9em;
+}
+
+button {
+  padding: 10px 20px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-info {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.user-avatar {
+  font-size: 2em;
+  color: white;
+}

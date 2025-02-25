@@ -3,7 +3,7 @@ import "../styles/FormHeader.css";
 import logo from "../assets/chuddlogo.png";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 
-const FormHeader = ({ onPublish }) => {
+const FormHeader = ({ onPreview, onPublish }) => {
   return (
     <header className="form-header">
       <div className="form-header-left">
@@ -11,17 +11,20 @@ const FormHeader = ({ onPublish }) => {
         <input
           type="text"
           className="form-header-title"
-          value="SmartGForm" // Fixed title
-          readOnly // Prevent editing
+          value="SmartGForm"
+          readOnly
         />
       </div>
 
       {/* Actions: Preview, Publish */}
       <div className="form-header-right">
-        <button className="form-preview-btn">
+        <button className="form-previewform-btn" onClick={onPreview}>
           <FaEye className="form-icon" /> Preview
         </button>
-        <button className="form-publish-btn" onClick={onPublish}>Publish</button>
+
+        <button className="form-publish-btn" onClick={onPublish}>
+          Publish
+        </button>
 
         <FaEllipsisV className="form-icon form-more-options" />
       </div>

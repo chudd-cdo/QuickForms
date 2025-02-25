@@ -6,11 +6,11 @@ import MyForms from "./pages/MyForms";
 import Responses from "./pages/Responses";
 import Notifications from "./pages/Notifications";
 import CreateForm from "./pages/CreateForm";
+import PreviewForm from "./pages/PreviewForm";
 import EditForm from "./pages/EditForm";
 import HomeHeader from "./components/HomeHeader";
 import DashboardHeader from "./components/DashboardHeader";
-import FormHeader from "./components/FormHeader";
-import EditHeader from "./components/EditHeader"; 
+import EditHeader from "./components/EditHeader";
 
 function App() {
   const location = useLocation();
@@ -25,9 +25,8 @@ function App() {
       {location.pathname === "/" && <HomeHeader />}
       {location.pathname === "/dashboard" && <DashboardHeader />}
       {location.pathname === "/myforms" && <DashboardHeader />}
-      {location.pathname === "/create-form" && <FormHeader />}
       {location.pathname.startsWith("/edit-form/") && <EditHeader />}
-
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -36,6 +35,8 @@ function App() {
         <Route path="/edit-form/:id" element={<EditForm forms={forms} setForms={setForms} />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/create-form" element={<CreateForm onPublish={handlePublishForm} />} />
+        <Route path="/preview-form" element={<PreviewForm forms={forms} />} />
+
       </Routes>
     </div>
   );
