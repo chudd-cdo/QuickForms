@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import {  useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
@@ -12,12 +12,21 @@ const CreateForm = () => {
   const initialTitle = "Untitled Form";
   const initialDescription = "";
 
-  const [formTitle, setFormTitle] = useState(initialTitle);
-  const [formDescription, setFormDescription] = useState(initialDescription);
-  const [questions, setQuestions] = useState([{ id: "1", title: "Question Title", type: "short", options: [] }]);
+  // Load state from localStorage
+  const [formTitle, setFormTitle] = useState(() => localStorage.getItem("formTitle") || initialTitle);
+  const [formDescription, setFormDescription] = useState(() => localStorage.getItem("formDescription") || initialDescription);
+  const [questions, setQuestions] = useState(() => {
+    const savedQuestions = localStorage.getItem("questions");
+    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [] }];
+  });
   const [status, setStatus] = useState("Activated");
 
-  // Navigate to PreviewForm with the form data when Preview button is clicked
+  // Save state to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("formTitle", formTitle);
+    localStorage.setItem("formDescription", formDescription);
+    localStorage.setItem("questions", JSON.stringify(questions));
+  }, [formTitle, formDescription, questions]);
 
   const handlePreview = () => {
     const formData = {

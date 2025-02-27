@@ -11,6 +11,8 @@ import EditForm from "./pages/EditForm";
 import HomeHeader from "./components/HomeHeader";
 import DashboardHeader from "./components/DashboardHeader";
 import EditHeader from "./components/EditHeader";
+import { FormProvider } from "./components/FormContext";
+
 
 function App() {
   const location = useLocation();
@@ -21,6 +23,7 @@ function App() {
   };
 
   return (
+    <FormProvider>
     <div>
       {location.pathname === "/" && <HomeHeader />}
       {location.pathname === "/dashboard" && <DashboardHeader />}
@@ -39,6 +42,7 @@ function App() {
 
       </Routes>
     </div>
+    </FormProvider>
   );
 }
 
