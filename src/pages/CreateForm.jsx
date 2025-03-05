@@ -2,26 +2,26 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
+import { FaUpload, FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
+import "../styles/CreateForm.css";
 
 const CreateForm = () => {
   const navigate = useNavigate();
   const initialTitle = "Untitled Form";
   const initialDescription = "";
 
-  // Load state from localStorage
   const [formTitle, setFormTitle] = useState(() => localStorage.getItem("formTitle") || initialTitle);
   const [formDescription, setFormDescription] = useState(() => localStorage.getItem("formDescription") || initialDescription);
   const [questions, setQuestions] = useState(() => {
     const savedQuestions = localStorage.getItem("questions");
-    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [] }];
+    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [], blob_data: null }];
   });
   const [status, setStatus] = useState("Activated");
 
-  // Save state to localStorage on change
+
   useEffect(() => {
     localStorage.setItem("formTitle", formTitle);
     localStorage.setItem("formDescription", formDescription);
@@ -29,132 +29,127 @@ const CreateForm = () => {
   }, [formTitle, formDescription, questions]);
 
   const handlePreview = () => {
-    const formData = {
-      title: formTitle,
-      description: formDescription,
-      questions,
-    };
-    navigate("/preview-form", { state: { form: formData } });
+    navigate("/preview-form", { state: { form: { title: formTitle, description: formDescription, questions } } });
   };
-  
-  
 
-  // Type Mapping for Backend
-  const typeMapping = {
-    short: "text",
-    paragraph: "text",
-    multiple: "multiple_choice",
-    checkbox: "checkbox",
-    dropdown: "dropdown",
-  };
-  
-  
-
-  // Publish Form
-  const handlePublish = async () => {
-    if (!formTitle.trim()) {
-      alert("Please enter a form title before publishing.");
-      return;
-    }
-
-    const newForm = {
-      name: formTitle,
-      description: formDescription,
-      is_active: status === "Activated", // Set is_active based on status
+ 
+    const typeMapping = {
+      short: "short",
+      paragraph: "paragraph",
+      multiple: "multiple_choice",
+      checkbox: "checkbox",
+      dropdown: "dropdown",
+      number: "number",
     };
     
-
-    try {
-      const formResponse = await axios.post("http://localhost:8000/api/forms", newForm);
-      const formId = formResponse.data.id;
-
-      if (questions.length > 0) {
-        const formattedQuestions = questions.map((q) => ({
-          form_id: formId,
-          question_text: q.title,
-          question_type: typeMapping[q.type] || "text", // Ensure valid type
-          options: q.options.length > 0 ? q.options : null, // Ensure valid JSON structure
-        }));
-        
-
-        await axios.post("http://localhost:8000/api/questions", { questions: formattedQuestions });
+    const handlePublish = async () => {
+      if (!formTitle.trim()) {
+        alert("Please enter a form title before publishing.");
+        return;
       }
-
-      navigate("/myforms");
-    } catch (error) {
-      console.error("Error publishing form:", error.response?.data || error);
-    }
-  };
-  const handleTitleChange = (index, value) => {
-    setQuestions((prevQuestions) => {
-      const updatedQuestions = [...prevQuestions];
-      updatedQuestions[index].title = value;
-      return updatedQuestions;
-    });
-  };
-  const addOption = (questionIndex) => {
-    setQuestions((prevQuestions) => {
-      const updatedQuestions = [...prevQuestions];
-      
-      // Ensure the question has an 'options' array
-      if (!updatedQuestions[questionIndex].options) {
-        updatedQuestions[questionIndex].options = [];
-      }
-  
-      // Add a new option
-      updatedQuestions[questionIndex].options.push(`Option ${updatedQuestions[questionIndex].options.length + 1}`);
-      
-      return updatedQuestions;
-    });
-  };
     
-
-  // Add Question
-  const addQuestion = () => {
-    setQuestions([...questions, { id: `${questions.length + 1}`, title: "New Question", type: "short", options: [] }]);
-  };
+      try {
+        const formResponse = await axios.post("http://localhost:8000/api/forms", {
+          name: formTitle,
+          description: formDescription,
+          is_active: status === "Activated",
+        });
+    
+        const formId = formResponse.data.id;
+        const formData = new FormData();
+    
+        questions.forEach((q, index) => {
+          formData.append(`questions[${index}][form_id]`, formId);
+          formData.append(`questions[${index}][question_text]`, q.title);
+          formData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short"); // ✅ Ensure correct type
+          formData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
+    
+          if (q.blob_data instanceof File) {
+            formData.append(`questions[${index}][blob_data]`, q.blob_data);
+          }
+        });
+    
+        await axios.post("http://localhost:8000/api/questions", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+    
+        navigate("/myforms");
+      } catch (error) {
+        console.error("Error publishing form:", error.response?.data || error);
+        alert("Error: " + JSON.stringify(error.response?.data));
+      }
+    };
   
 
-  const handleOptionChange = (questionIndex, optionIndex, value) => {
-    setQuestions((prevQuestions) => {
-      const updatedQuestions = [...prevQuestions];
-      updatedQuestions[questionIndex].options[optionIndex] = value;
-      return updatedQuestions;
-    });
-  };
+  const handleFileUpload = (index, event) => {
+    const file = event.target.files[0];
+    if (!file) return; // Prevent updating state if no file is selected
   
-  // Drag and Drop Handling
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    const reorderedQuestions = [...questions];
-    const [movedItem] = reorderedQuestions.splice(result.source.index, 1);
-    reorderedQuestions.splice(result.destination.index, 0, movedItem);
-    setQuestions(reorderedQuestions);
-  };
-  const deleteQuestion = (questionId) => {
     setQuestions((prevQuestions) =>
-      prevQuestions.filter((question) => question.id !== questionId)
+      prevQuestions.map((question, i) =>
+        i === index ? { ...question, blob_data: file } : question
+      )
     );
   };
   
-  
 
-  const handleTypeChange = (index, newType) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[index].type = newType;
-  
-    // Ensure multiple-choice and checkbox types have options
-    if (newType === "multiple" || newType === "checkbox") {
-      if (!updatedQuestions[index].options || updatedQuestions[index].options.length === 0) {
-        updatedQuestions[index].options = ["Option 1"]; // Default option
-      }
-    } else {
-      updatedQuestions[index].options = []; // Clear options for non-multiple choice types
-    }
-  
-    setQuestions(updatedQuestions);
+  const handleTitleChange = (index, value) => {
+    setQuestions((prevQuestions) => {
+      const updated = [...prevQuestions];
+      updated[index].title = value;
+      return updated;
+    });
   };
-  
+
+  const handleTypeChange = (index, value) => {
+    setQuestions((prevQuestions) => {
+      const updated = [...prevQuestions];
+      updated[index].type = value;
+      if (["short", "paragraph", "number"].includes(value)) {
+        updated[index].options = [];
+      }
+      return updated;
+    });
+  };
+
+  const addOption = (questionIndex) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[questionIndex].options = [...(updated[questionIndex].options || []), `Option ${updated[questionIndex].options.length + 1}`];
+      return updated;
+    });
+  };
+
+  const addQuestion = () => {
+    setQuestions([...questions, { id: `${questions.length + 1}`, title: "New Question", type: "short", options: [] }]);
+  };
+
+  const duplicateQuestion = (index) => {
+    setQuestions((prev) => {
+      const question = { ...prev[index], id: `${prev.length + 1}` };
+      return [...prev, question];
+    });
+  };
+
+  const deleteQuestion = (id) => {
+    setQuestions((prev) => prev.filter((q) => q.id !== id));
+  };
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const reordered = [...questions];
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    setQuestions(reordered);
+  };
+
+  const handleOptionChange = (questionIndex, optionIndex, value) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[questionIndex].options[optionIndex] = value;
+      return updated;
+    });
+  };
 
   return (
     <div className="create-form-container">
@@ -168,12 +163,24 @@ const CreateForm = () => {
             <span className="create-user-email">itintern@smartgforms.com</span>
           </div>
         </div>
-        <button className="create-create-btn">
+        <button
+          className="create-create-btn"
+          onClick={() => {
+            localStorage.removeItem("formTitle");
+            localStorage.removeItem("formDescription");
+            localStorage.removeItem("questions");
+
+            setFormTitle(initialTitle);
+            setFormDescription(initialDescription);
+            setQuestions([{ id: "1", title: "Question Title", type: "short", options: [] }]);
+          }}
+        >
           <FaPlusSquare className="plus-icon" /> Create new form
         </button>
+
         <nav className="create-sidebar-nav">
-          <p>Dashboard</p>
-          <p>My Forms</p>
+          <p onClick={() => navigate("/dashboard")}>Dashboard</p>
+          <p onClick={() => navigate("/myforms")}>My Forms </p>
           <p>Responses</p>
           <p>Notifications</p>
           <p>Settings</p>
@@ -182,8 +189,7 @@ const CreateForm = () => {
       </aside>
 
       <div className="create-form-content">
-      <FormHeader onPreview={handlePreview} onPublish={handlePublish} />
-
+        <FormHeader onPreview={handlePreview} onPublish={handlePublish} />
 
         <div className="create-form-settings">
           <div className="create-form-left">
@@ -204,23 +210,18 @@ const CreateForm = () => {
             />
           </div>
           <div className="create-form-actions">
-  
- 
-  <select 
-    value={status} 
-    onChange={(e) => setStatus(e.target.value)}
-    className="create-form-dropdown"
-  >
-    <option value="Activated">Activated</option>
-    <option value="Deactivated">Deactivated</option>
-  </select>
+            <select 
+              value={status} 
+              onChange={(e) => setStatus(e.target.value)}
+              className="create-form-dropdown">
+              <option value="Activated">Activated</option>
+              <option value="Deactivated">Deactivated</option>
+            </select>
 
-  <button className="create-user-icon-btn">
-    <FaUserPlus className="create-icon" />
-  </button>
-</div>
-
-
+            <button className="create-user-icon-btn">
+              <FaUserPlus className="create-icon" />
+            </button>
+          </div>
         </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -255,6 +256,8 @@ const CreateForm = () => {
                             <option value="paragraph">Paragraph</option>
                             <option value="multiple">Multiple Choice</option>
                             <option value="checkbox">Checkboxes</option>
+                            <option value="dropdown">Dropdown</option>
+                            <option value="number">Number</option>
                           </select>
                         </div>
 
@@ -265,26 +268,55 @@ const CreateForm = () => {
                           {question.type === "paragraph" && (
                             <textarea className="create-answer-textarea" placeholder="Type your answer here"></textarea>
                           )}
-                          {(question.type === "multiple" || question.type === "checkbox") && (
+                          {question.type === "number" && (
+                            <input type="number" className="create-answer-input" placeholder="Enter a number" step="1" />
+                          )}
+                          {(question.type === "multiple" || question.type === "checkbox" || question.type === "dropdown") && (
                             <div>
                               {question.options.map((option, oIndex) => (
                                 <div key={oIndex} className="option-group">
-                                  <input type={question.type === "multiple" ? "radio" : "checkbox"} name={`question-${question.id}`} />
-                                  <input type="text" className="create-answer-input" value={option} onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)} />
-                                  <IoRemoveCircleSharp className="create-icon-trash create-delete" onClick={() => {
-                                    const updatedQuestions = [...questions];
-                                    updatedQuestions[qIndex].options.splice(oIndex, 1);
-                                    setQuestions(updatedQuestions);
-                                  }} />
+                                  {question.type !== "dropdown" ? (
+                                    <input type={question.type === "multiple" ? "radio" : "checkbox"} name={`question-${question.id}`} />
+                                  ) : null}
+                                  <input
+                                    type="text"
+                                    className="create-answer-input"
+                                    value={option}
+                                    onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                                  />
+                                  <IoRemoveCircleSharp
+                                    className="create-icon-trash create-delete"
+                                    onClick={() => {
+                                      const updatedQuestions = [...questions];
+                                      updatedQuestions[qIndex].options.splice(oIndex, 1);
+                                      setQuestions(updatedQuestions);
+                                    }}
+                                  />
                                 </div>
                               ))}
                               <div className="option-group add-option" onClick={() => addOption(qIndex)}>
-  <input type={question.type === "multiple" ? "radio" : "checkbox"} disabled />
-  <span>Add option</span>
-</div>
+                                {question.type !== "dropdown" ? (
+                                  <input type={question.type === "multiple" ? "radio" : "checkbox"} disabled />
+                                ) : null}
+                                <span>Add option</span>
+                              </div>
                             </div>
                           )}
-                        </div>
+                          
+                          <div className="create-file-upload">
+                            <label htmlFor={`file-upload-${qIndex}`} className="file-upload-label">
+                              <FaUpload className="file-upload-icon" />
+                            </label>
+                            <input 
+                              id={`file-upload-${qIndex}`}
+                              type="file" 
+                              accept="image/*,audio/*,video/*,.pdf" 
+                              onChange={(e) => handleFileUpload(qIndex, e)}
+                            />
+                            {question.blob_data && <span className="file-name">{question.blob_data.name}</span>}
+                          </div>
+
+                          </div>
 
                         <div className="create-question-actions">
                           <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />

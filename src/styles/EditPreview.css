@@ -1,0 +1,173 @@
+/* Wrapper: Fullscreen layout */
+.edit-preview-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #5fff79;
+    min-height: 100vh;
+    overflow: hidden;
+    max-height: calc(100vh - 80px); /* Adjusted for header */
+    overflow-y: auto;
+    margin-top: 60px;
+}
+
+/* Header (Sticky Purple Bar) */
+.edit-preview-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Back button & title */
+.edit-preview-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.edit-preview-back-icon {
+    font-size: 22px;
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+/* Right Section: Status & User Info */
+.edit-preview-header-right {
+    display: flex;
+    align-items: center; /* Ensures vertical alignment */
+    gap: 24px; /* Adjust space between elements */
+    justify-content: flex-end; /* Align to the right */
+}
+
+/* Status (Eye Icon + Text) */
+.edit-preview-status {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    gap: 8px; /* Space between icon and text */
+    color: red; /* Default color for deactivated status */
+    margin-right: 150px;
+}
+
+.edit-preview-status.active {
+    color: green; /* Color for activated status */
+}
+
+/* User Info (Role + Avatar) */
+.edit-preview-user-info {
+    display: flex;
+    align-items: center; /* Align text and icon */
+    gap: 8px;
+    margin-right: 50px;
+
+}
+
+.edit-preview-user-role {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap; /* Prevents text from breaking */
+}
+
+.edit-preview-avatar {
+    font-size: 24px;
+}
+
+/* Form Container */
+.edit-preview-content {
+    width: 100%;
+    max-width: 800px; /* Same as Google Forms */
+    margin: 100px auto 40px; /* Center with spacing */
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-bottom: 80px;
+}
+
+/* Title */
+.edit-preview-title {
+    font-size: 28px;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 10px;
+}
+
+/* Description */
+.edit-preview-description {
+    font-size: 16px;
+    text-align: left;
+    color: #000000;
+    margin-bottom: 20px;
+    margin-left: 10px;
+}
+
+/* Individual Question */
+.edit-preview-question {
+    width: 92%;
+    padding: 20px;
+    padding-left: 35px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Input Fields */
+.edit-preview-input,
+.edit-preview-textarea,
+.edit-preview-dropdown {
+    width: fit-content;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fafafa;
+    outline: none;
+    transition: border 0.2s ease-in-out;
+    
+}
+
+/* Input Focus Effect (Google Forms Style) */
+.edit-preview-input:focus,
+.edit-preview-textarea:focus,
+.edit-preview-dropdown:focus {
+    border: 2px solid #673AB7;
+    background: white;
+}
+
+/* Textarea */
+.edit-preview-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Multiple Choice & Checkbox Styling */
+.edit-preview-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+}
+
+/* Radio & Checkbox */
+.edit-preview-radio,
+.edit-preview-checkbox {
+    transform: scale(1.2); /* Make them slightly larger */
+}
+
+/* Label */
+.edit-preview-label {
+    font-size: 16px;
+}

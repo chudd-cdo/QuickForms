@@ -12,6 +12,8 @@ import HomeHeader from "./components/HomeHeader";
 import DashboardHeader from "./components/DashboardHeader";
 import EditHeader from "./components/EditHeader";
 import { FormProvider } from "./components/FormContext";
+import EditPreview from "./pages/EditPreview"; // Import the new component
+
 
 
 function App() {
@@ -39,6 +41,9 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/create-form" element={<CreateForm onPublish={handlePublishForm} />} />
         <Route path="/preview-form" element={<PreviewForm forms={forms} />} />
+        <Route path="//edit-preview/:formId" element={<EditPreview />} />
+
+        
 
       </Routes>
     </div>

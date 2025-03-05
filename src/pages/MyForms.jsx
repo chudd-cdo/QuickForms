@@ -24,6 +24,9 @@ const MyForms = ({ forms, setForms }) => {
   const [formDescription, setFormDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [archivedView, setArchivedView] = useState(false);
+  const [formId, setFormId] = useState(null);
+  const [status, setStatus] = useState("Deactivated");
+  const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
     fetchForms();
@@ -48,19 +51,44 @@ const MyForms = ({ forms, setForms }) => {
     }
   };
 
-  const handleEdit = (id) => navigate(`/edit-form/${id}`, { state: { formId: id } });
+  useEffect(() => {
+    const id = location.state?.formId; // Get formId from location state
+
+    if (!formId) return;
+
+    const fetchFormData = async () => {
+      try {
+        const response = await axios.get(`/forms/${formId}`);
+        if (!response.data) {
+          console.error("No data received from API");
+          return;
+        }
+
+        const { name, description, is_active, questions } = response.data;
+
+        setFormTitle(name || "Untitled Form");
+        setFormDescription(description || "");
+        setStatus(is_active ? "Activated" : "Deactivated");
+        setQuestions(Array.isArray(questions) ? questions : []);
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setFormTitle("Error Loading Form");
+      }
+    };
+
+    fetchFormData();
+  }, [formId, location.key]);
+
+  const handleEdit = (id) => {
+    navigate(`/edit-form/${id}`, { state: { formId: id } });
+  };
+  
 
   const handleCreateForm = () => {
-    if (!formTitle.trim()) {
-      alert("Please enter a form title.");
-      return;
-    }
-
-    navigate("/create-form", { state: { formTitle, formDescription } });
-
-    setShowModal(false);
-    setFormTitle("");
-    setFormDescription("");
+    localStorage.removeItem("formTitle");
+    localStorage.removeItem("formDescription");
+    localStorage.removeItem("questions");
+    navigate("/create-form");
   };
 
   const handleDeleteForm = async (id) => {
@@ -69,6 +97,28 @@ const MyForms = ({ forms, setForms }) => {
       setForms((prevForms) => prevForms.filter((form) => form.id !== id));
     } catch (error) {
       console.error("Error deleting form", error);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!formTitle.trim()) {
+      alert("Please enter a form title before updating.");
+      return;
+    }
+
+    const updatedForm = {
+      id: formId,
+      name: formTitle,
+      description: formDescription,
+      is_active: status === "Activated",
+      questions,
+    };
+
+    try {
+      await axios.put(`/forms/${formId}`, updatedForm);
+      navigate("/myforms", { state: { updatedForm } });
+    } catch (error) {
+      console.error("Error saving form:", error);
     }
   };
 
@@ -126,7 +176,6 @@ const MyForms = ({ forms, setForms }) => {
     ],
     [archivedView]
   );
-  
 
   const table = useReactTable({
     data: filteredForms,
@@ -182,7 +231,7 @@ const MyForms = ({ forms, setForms }) => {
           </div>
           <div className="chudd-actions">
             <FaArchive className="chudd-archive-icon" onClick={() => setArchivedView(!archivedView)} />
-            <button className="chudd-create-form" onClick={() =>  navigate("/create-form")}>
+            <button className="chudd-create-form" onClick={handleCreateForm}>
               + Create new form
             </button>
           </div>

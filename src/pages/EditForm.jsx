@@ -1,52 +1,96 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import "../styles/EditForm.css";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa";
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
-import FormHeader from "../components/EditHeader";
-import { useLocation, useNavigate } from "react-router-dom";
+import EditHeader from "../components/EditHeader";
 import axios from "axios";
 
 const EditForm = () => {
+  const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const formId = location.state?.formId || null;
-  
-  const [formTitle, setFormTitle] = useState("Loading...");
-  const [formDescription, setFormDescription] = useState("");
-  const [status, setStatus] = useState("Activated");    
+  const formId = id || location.state?.formId || null;
 
-  const [questions, setQuestions] = useState([
-      { id: "1", title: "Question Title", type: "short", options: ["Option 1"] },
-    ]);
-    useEffect(() => {
-        if (!formId) return;
-      
-        const fetchFormData = async () => {
-          try {
-            const response = await axios.get(`/forms/${formId}`);
-            if (!response.data) {
-              console.error("No data received from API");
-              return;
-            }
-      
-            const { name, description, is_active, questions } = response.data;
-      
-            setFormTitle(name || "Untitled Form");
-            setFormDescription(description || "");
-            setStatus(is_active ? "Activated" : "Deactivated");
-            setQuestions(Array.isArray(questions) ? questions : []);
-          } catch (error) {
-            console.error("Error fetching form data:", error);
-            setFormTitle("Error Loading Form");
-          }
-        };
-      
-        fetchFormData();
-      }, [formId, location.key]);
-      
-  
+  const [formTitle, setFormTitle] = useState("");
+  const [formDescription, setFormDescription] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [status, setStatus] = useState("Deactivated");
+
+  useEffect(() => {
+    if (!formId) return;
+
+    // 1️⃣ Load from localStorage first
+    const savedPreview = localStorage.getItem(`previewForm-${formId}`);
+    if (savedPreview) {
+      const parsedForm = JSON.parse(savedPreview);
+      setFormTitle(parsedForm.title || "Untitled Form");
+      setFormDescription(parsedForm.description || "");
+      setQuestions(parsedForm.questions || []);
+      setStatus(parsedForm.status || "Deactivated"); // ✅ Ensure status persists correctly
+      return;
+    }
+
+    // 2️⃣ If no local preview, fetch from backend
+    const fetchFormData = async () => {
+      try {
+        const response = await axios.get(`/forms/${formId}`);
+        if (!response.data) {
+          console.error("No data received from API");
+          return;
+        }
+
+        const { name, description, is_active, questions } = response.data;
+
+        setFormTitle(name || "Untitled Form");
+        setFormDescription(description || "");
+        setStatus(is_active ? "Activated" : "Deactivated"); // ✅ Ensure backend status is used only if no preview exists
+
+        setQuestions(
+          Array.isArray(questions)
+            ? questions.map((q) => ({
+                id: q.id,
+                question_text: q.question_text || "Untitled Question",
+                question_type: q.question_type ?? "short",
+                options:
+                  ["multiple_choice", "dropdown", "checkbox"].includes(q.question_type) && q.options
+                    ? (typeof q.options === "string" ? JSON.parse(q.options) : q.options).map((option) =>
+                        typeof option === "object" && option.text ? option.text : option
+                      )
+                    : [],
+              }))
+            : []
+        );
+      } catch (error) {
+        console.error("Error fetching form data:", error);
+        setFormTitle("Error Loading Form");
+      }
+    };
+
+    fetchFormData();
+  }, [formId]); // ✅ Removed `location.key` to prevent unnecessary re-renders
+
+  const handlePreview = () => {
+    if (!formId) return;
+
+    const formData = {
+      title: formTitle,
+      description: formDescription,
+      status: status, // ✅ Save status directly
+      questions: questions.map((q) => ({
+        id: q.id,
+        question_text: q.question_text,
+        question_type: q.question_type || " ",
+        options: q.options ? [...q.options] : [],
+      })),
+    };
+
+    localStorage.setItem(`previewForm-${formId}`, JSON.stringify(formData));
+    navigate(`/edit-preview/${formId}`);
+  };
+
   const handleUpdate = async () => {
     if (!formTitle.trim()) {
       alert("Please enter a form title before updating.");
@@ -54,27 +98,72 @@ const EditForm = () => {
     }
 
     const updatedForm = {
-      id: formId, // Ensure ID remains the same
+      id: formId,
       name: formTitle,
       description: formDescription,
-      questions
+      is_active: status === "Activated", // ✅ Convert to boolean for backend
+      questions: questions.map((q) => ({
+        id: q.id,
+        question_text: q.question_text || "Untitled Question",
+        question_type: q.question_type || "short",
+        options: Array.isArray(q.options) ? q.options.filter((opt) => opt.trim()) : [],
+      })),
     };
-
 
     try {
-        await axios.put(`/forms/${formId}`, updatedForm);
-  
-        navigate("/myforms", { state: { updatedForm } }); // Pass updated form back
-      } catch (error) {
-        console.error("Error saving form:", error);
-      }
-    };
+      const response = await axios.put(
+        `http://localhost:8000/api/forms/${formId}`,
+        updatedForm,
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("Form updated:", response.data);
+
+      // ✅ Save updated form in localStorage to keep status persistent
+      localStorage.setItem(`previewForm-${formId}`, JSON.stringify({
+        title: updatedForm.name,
+        description: updatedForm.description,
+        status: status, // ✅ Keep latest status
+        questions: updatedForm.questions,
+      }));
+
+      navigate("/myforms", {
+        state: {
+          updatedForm: {
+            ...updatedForm,
+            updated_at: response.data.updated_at,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Error saving form:", error.response ? error.response.data : error.message);
+    }
+  };
 
   const addQuestion = () => {
     setQuestions([
       ...questions,
-      { id: `${questions.length + 1}`, title: "New Question", type: "short", options: ["Option 1"] },
+      {
+        id: `${questions.length + 1}`,
+        question_text: "New Question",
+        question_type: "short",
+        options: [],
+      },
     ]);
+  };
+
+  const handleQuestionChange = (index, field, value) => {
+    setQuestions((prevQuestions) => {
+      return prevQuestions.map((q, i) =>
+        i === index ? { ...q, [field]: value, options: Array.isArray(q.options) ? q.options : [] } : q
+      );
+    });
+  };
+
+  const handleInputChange = (questionId, value) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q) => (q.id === questionId ? { ...q, answer: value } : q))
+    );
   };
 
   const deleteQuestion = (id) => {
@@ -86,31 +175,28 @@ const EditForm = () => {
     setQuestions([...questions, questionToDuplicate]);
   };
 
-  const handleTitleChange = (index, value) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[index].title = value;
-    setQuestions(updatedQuestions);
-  };
-
-  const handleTypeChange = (index, newType) => {
-    const updatedQuestions = [...questions];
-    if (newType === "multiple" || newType === "checkbox") {
-      updatedQuestions[index].options = ["Option 1"];
-    }
-    updatedQuestions[index].type = newType;
-    setQuestions(updatedQuestions);
-  };
-
   const handleOptionChange = (qIndex, oIndex, value) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[qIndex].options[oIndex] = value;
-    setQuestions(updatedQuestions);
+    setQuestions((prevQuestions) => {
+      return prevQuestions.map((q, i) =>
+        i === qIndex ? { ...q, options: q.options.map((opt, oi) => (oi === oIndex ? value : opt)) } : q
+      );
+    });
+  };
+
+  const handleQuestionTypeChange = (index, value) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q, i) =>
+        i === index ? { ...q, question_type: value, options: value === "multiple_choice" || value === "checkbox" ? ["Option 1"] : [] } : q
+      )
+    );
   };
 
   const addOption = (qIndex) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[qIndex].options.push(`Option ${updatedQuestions[qIndex].options.length + 1}`);
-    setQuestions(updatedQuestions);
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q, i) =>
+        i === qIndex ? { ...q, options: [...(q.options || []), `Option ${q.options.length + 1}`] } : q
+      )
+    );
   };
 
   const handleDragEnd = (result) => {
@@ -139,8 +225,8 @@ const EditForm = () => {
           <FaPlusSquare className="plus-icon" /> Create new form
         </button>
         <nav className="create-sidebar-nav">
-          <p>Dashboard</p>
-          <p>My Forms</p>
+          <p onClick={() => navigate("/dashboard")}>Dashboard</p>
+          <p onClick={() => navigate("/myforms")}>My Forms </p>
           <p>Responses</p>
           <p>Notifications</p>
           <p>Settings</p>
@@ -149,7 +235,7 @@ const EditForm = () => {
       </aside>
 
       <div className="create-form-content">
-        <FormHeader formTitle={formTitle} setFormTitle={setFormTitle} onPublish={handleUpdate} />
+        <EditHeader onPreview={handlePreview} onUpdate={handleUpdate} />
 
         <div className="create-form-settings">
           <div className="create-form-left">
@@ -170,8 +256,8 @@ const EditForm = () => {
             />
           </div>
           <div className="create-form-actions">
-            <select 
-              value={status} 
+            <select
+              value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="create-form-dropdown"
             >
@@ -185,86 +271,157 @@ const EditForm = () => {
         </div>
 
         <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="questions-list">
+          <Droppable droppableId="questions-list">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {questions.map((question, qIndex) => (
+                  <Draggable key={question.id} draggableId={`draggable-${question.id}`} index={qIndex}>
                     {(provided) => (
-                      <div {...provided.droppableProps} ref={provided.innerRef}>
-                        {questions.map((question, qIndex) => (
-                          <Draggable key={question.id} draggableId={`draggable-${question.id}`} index={qIndex}>
-                            {(provided) => (
-                              <div
-                                className="create-question-card"
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <div className="create-question-row">
-                                  <div className="create-question-group">
-                                    <label className="create-question-label">Question:</label>
+                      <div
+                        className="create-question-card"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <div className="create-question-row">
+                          <div className="create-question-group">
+                            <label className="create-question-label">Question:</label>
+                            <input
+                              type="text"
+                              className="create-question-input"
+                              value={question.question_text}
+                              onChange={(e) => handleQuestionChange(qIndex, "question_text", e.target.value)}
+                            />
+                          </div>
+                          <select
+                            value={question.question_type}
+                            onChange={(e) => handleQuestionTypeChange(qIndex, e.target.value)}
+                          >
+                            <option value="short">Short Answer</option>
+                            <option value="paragraph">Paragraph</option>
+                            <option value="multiple_choice">Multiple Choice</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="dropdown">Dropdown</option>
+                            <option value="number">Number</option>
+                          </select>
+                        </div>
+
+                        <div className="edit-answer-container">
+                          {question.question_type?.trim() === "text" ||
+                          question.question_type?.trim() === "short" ? (
+                            <input
+                              type="text"
+                              placeholder="Enter your answer"
+                              className="input-field"
+                              value={question.answer || ""}
+                              onChange={(e) => handleInputChange(question.id, e.target.value)}
+                            />
+                          ) : question.question_type?.trim() === "paragraph" ? (
+                            <textarea
+                              placeholder="Enter your answer"
+                              className="edit-answer-textarea"
+                              value={question.answer || ""}
+                              onChange={(e) => handleInputChange(question.id, e.target.value)}
+                            ></textarea>
+                          ) : null}
+
+                          {(question.question_type === "multiple_choice" || question.question_type === "checkbox") && (
+                            <div>
+                              {question.options.length > 0 ? (
+                                question.options.map((option, oIndex) => (
+                                  <div key={oIndex} className="option-group">
+                                    <input type={question.question_type === "multiple_choice" ? "radio" : "checkbox"} name={`question-${question.id}`} />
                                     <input
                                       type="text"
-                                      className="create-question-input"
-                                      value={question.title}
-                                      onChange={(e) => handleTitleChange(qIndex, e.target.value)}
+                                      className="create-answer-input"
+                                      value={option}
+                                      onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                                    />
+                                    <IoRemoveCircleSharp
+                                      className="create-icon-trash create-delete"
+                                      onClick={() => {
+                                        const updatedQuestions = [...questions];
+                                        updatedQuestions[qIndex].options.splice(oIndex, 1);
+                                        setQuestions(updatedQuestions);
+                                      }}
                                     />
                                   </div>
-                                  <select
-                                    className="create-question-type"
-                                    value={question.type}
-                                    onChange={(e) => handleTypeChange(qIndex, e.target.value)}
-                                  >
-                                    <option value="short">Short Answer</option>
-                                    <option value="paragraph">Paragraph</option>
-                                    <option value="multiple">Multiple Choice</option>
-                                    <option value="checkbox">Checkboxes</option>
-                                  </select>
-                                </div>
-        
-                                <div className="edit-answer-container">
-                                  {question.type === "short" && (
-                                    <input type="text" className="edit-answer-input" placeholder="Type your answer here" />
-                                  )}
-                                  {question.type === "paragraph" && (
-                                    <textarea className="edit-answer-textarea" placeholder="Type your answer here"></textarea>
-                                  )}
-                                  {(question.type === "multiple" || question.type === "checkbox") && (
-                                    <div>
-                                      {question.options.map((option, oIndex) => (
-                                        <div key={oIndex} className="option-group">
-                                          <input type={question.type === "multiple" ? "radio" : "checkbox"} name={`question-${question.id}`} />
-                                          <input type="text" className="create-answer-input" value={option} onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)} />
-                                          <IoRemoveCircleSharp className="create-icon-trash create-delete" onClick={() => {
-                                            const updatedQuestions = [...questions];
-                                            updatedQuestions[qIndex].options.splice(oIndex, 1);
-                                            setQuestions(updatedQuestions);
-                                          }} />
-                                        </div>
-                                      ))}
-                                      <div className="option-group add-option" onClick={() => addOption(qIndex)}>
-          <input type={question.type === "multiple" ? "radio" : "checkbox"} disabled />
-          <span>Add option</span>
-        </div>
-                                    </div>
-                                  )}
-                                </div>
-        
-                                <div className="create-question-actions">
-                                  <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />
-                                  <FaTrash className="create-icon create-delete" onClick={() => deleteQuestion(question.id)} />
-                                  <label className="create-required-toggle">
-                                    Required
-                                    <input type="checkbox" className="toggle-input" />
-                                    <span className="toggle-slider"></span>
-                                  </label>
-                                </div>
+                                ))
+                              ) : (
+                                <p>No options available.</p>
+                              )}
+                              <div className="option-group add-option" onClick={() => addOption(qIndex)}>
+                                <input type={question.question_type === "multiple_choice" ? "radio" : "checkbox"} disabled />
+                                <span>Add option</span>
                               </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
+                            </div>
+                          )}
+                          {question.question_type === "dropdown" && (
+                            <div>
+                              {question.options.length > 0 ? (
+                                question.options.map((option, oIndex) => (
+                                  <div key={oIndex} className="option-group">
+                                    <input
+                                      type="text"
+                                      className="create-answer-input"
+                                      value={option}
+                                      onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                                    />
+                                    <IoRemoveCircleSharp
+                                      className="create-icon-trash create-delete"
+                                      onClick={() => {
+                                        const updatedQuestions = [...questions];
+                                        updatedQuestions[qIndex].options.splice(oIndex, 1);
+                                        setQuestions(updatedQuestions);
+                                      }}
+                                    />
+                                  </div>
+                                ))
+                              ) : (
+                                <p>No options available.</p>
+                              )}
+                              <div className="option-group add-option" onClick={() => addOption(qIndex)}>
+                                <span>Add option</span>
+                              </div>
+                              <select className="dropdown-select">
+                                {question.options.map((option, index) => (
+                                  <option key={index} value={option}>
+                                    {option}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+
+                          {question.question_type === "number" && (
+                            <input type="number" className="input-field" />
+                          )}
+                        </div>
+
+                        <div className="create-question-actions">
+                          <IoDuplicateOutline
+                            className="create-icon duplicate-icon"
+                            onClick={() => duplicateQuestion(qIndex)}
+                          />
+                          <FaTrash
+                            className="create-icon create-delete"
+                            onClick={() => deleteQuestion(question.id)}
+                          />
+                          <label className="create-required-toggle">
+                            Required
+                            <input type="checkbox" className="toggle-input" />
+                            <span className="toggle-slider"></span>
+                          </label>
+                        </div>
                       </div>
                     )}
-                  </Droppable>
-                </DragDropContext>
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
 
         <button className="create-add-question-btn" onClick={addQuestion}>
           <FiPlusCircle className="create-icon" /> Add Question
