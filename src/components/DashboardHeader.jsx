@@ -10,16 +10,6 @@ function DashboardHeader() {
         <img src={logo} alt="SmartGForm Logo" className="dashboard-logo" />
         <span className="dashboard-title">SmartGForm</span>
       </div>
-
-      <div className="dashboard-user-profile">
-        <div className="dashboard-user-info">
-          <p className="dashboard-user-role">IT Intern</p>
-          <span className="dashboard-user-email">itintern@smartgforms.com</span>
-        </div>
-        <div className="dashboard-user-avatar">
-          <FaUserCircle />
-        </div>
-      </div>
     </header>
   );
 }

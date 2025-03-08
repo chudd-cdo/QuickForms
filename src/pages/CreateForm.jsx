@@ -17,10 +17,9 @@ const CreateForm = () => {
   const [formDescription, setFormDescription] = useState(() => localStorage.getItem("formDescription") || initialDescription);
   const [questions, setQuestions] = useState(() => {
     const savedQuestions = localStorage.getItem("questions");
-    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [], blob_data: null }];
+    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [] }];
   });
   const [status, setStatus] = useState("Activated");
-
 
   useEffect(() => {
     localStorage.setItem("formTitle", formTitle);
@@ -32,66 +31,48 @@ const CreateForm = () => {
     navigate("/preview-form", { state: { form: { title: formTitle, description: formDescription, questions } } });
   };
 
- 
-    const typeMapping = {
-      short: "short",
-      paragraph: "paragraph",
-      multiple: "multiple_choice",
-      checkbox: "checkbox",
-      dropdown: "dropdown",
-      number: "number",
-    };
-    
-    const handlePublish = async () => {
-      if (!formTitle.trim()) {
-        alert("Please enter a form title before publishing.");
-        return;
-      }
-    
-      try {
-        const formResponse = await axios.post("http://localhost:8000/api/forms", {
-          name: formTitle,
-          description: formDescription,
-          is_active: status === "Activated",
-        });
-    
-        const formId = formResponse.data.id;
-        const formData = new FormData();
-    
-        questions.forEach((q, index) => {
-          formData.append(`questions[${index}][form_id]`, formId);
-          formData.append(`questions[${index}][question_text]`, q.title);
-          formData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short"); // ✅ Ensure correct type
-          formData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
-    
-          if (q.blob_data instanceof File) {
-            formData.append(`questions[${index}][blob_data]`, q.blob_data);
-          }
-        });
-    
-        await axios.post("http://localhost:8000/api/questions", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-    
-        navigate("/myforms");
-      } catch (error) {
-        console.error("Error publishing form:", error.response?.data || error);
-        alert("Error: " + JSON.stringify(error.response?.data));
-      }
-    };
-  
-
-  const handleFileUpload = (index, event) => {
-    const file = event.target.files[0];
-    if (!file) return; // Prevent updating state if no file is selected
-  
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((question, i) =>
-        i === index ? { ...question, blob_data: file } : question
-      )
-    );
+  const typeMapping = {
+    short: "short",
+    paragraph: "paragraph",
+    multiple: "multiple_choice",
+    checkbox: "checkbox",
+    dropdown: "dropdown",
+    number: "number",
   };
-  
+
+  const handlePublish = async () => {
+    if (!formTitle.trim()) {
+      alert("Please enter a form title before publishing.");
+      return;
+    }
+
+    try {
+      const formResponse = await axios.post("http://localhost:8000/api/forms", {
+        name: formTitle,
+        description: formDescription,
+        is_active: status === "Activated",
+      });
+
+      const formId = formResponse.data.id;
+      const formData = new FormData();
+
+      questions.forEach((q, index) => {
+        formData.append(`questions[${index}][form_id]`, formId);
+        formData.append(`questions[${index}][question_text]`, q.title);
+        formData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
+        formData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
+      });
+
+      await axios.post("http://localhost:8000/api/questions", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      navigate("/myforms");
+    } catch (error) {
+      console.error("Error publishing form:", error.response?.data || error);
+      alert("Error: " + JSON.stringify(error.response?.data));
+    }
+  };
 
   const handleTitleChange = (index, value) => {
     setQuestions((prevQuestions) => {
@@ -263,7 +244,7 @@ const CreateForm = () => {
 
                         <div className="create-answer-container">
                           {question.type === "short" && (
-                            <input type="text" className="create-answer-input" placeholder="Type your answer here" />
+                            <input type="text" className="create-answer-input" placeholder="Short answer text" disabled />
                           )}
                           {question.type === "paragraph" && (
                             <textarea className="create-answer-textarea" placeholder="Type your answer here"></textarea>
@@ -302,21 +283,7 @@ const CreateForm = () => {
                               </div>
                             </div>
                           )}
-                          
-                          <div className="create-file-upload">
-                            <label htmlFor={`file-upload-${qIndex}`} className="file-upload-label">
-                              <FaUpload className="file-upload-icon" />
-                            </label>
-                            <input 
-                              id={`file-upload-${qIndex}`}
-                              type="file" 
-                              accept="image/*,audio/*,video/*,.pdf" 
-                              onChange={(e) => handleFileUpload(qIndex, e)}
-                            />
-                            {question.blob_data && <span className="file-name">{question.blob_data.name}</span>}
-                          </div>
-
-                          </div>
+                        </div>
 
                         <div className="create-question-actions">
                           <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />

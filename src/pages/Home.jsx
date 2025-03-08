@@ -37,7 +37,7 @@ function Home() {
             Create your <br /> Forms now <br /> with <span className="highlight">SmartGForms!</span>
           </h1>
           <p className="hero-subtitle">THE SMARTER WAY TO CREATE FORMS.</p>
-          <button className="cta-button" onClick={handleGetStarted}>
+          <button className="cta-button"  onClick={() => openModal(true)}>
             <span className="cta-text">Get started now</span> <FaArrowRight className="cta-icon" />
           </button>
         </div>

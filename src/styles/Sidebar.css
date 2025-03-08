@@ -1,0 +1,48 @@
+.sb-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #e6f4e6; /* Light green background */
+    width: 100px; /* Adjust width to make content visible */
+    height: 100vh; /* Ensure it takes full height */
+    margin-top: 90px;
+    padding: 15px 0;
+    border-right: 2px solid #c0e0c0; /* Light green border */
+    position: fixed;
+    top: 0;
+    left: -5px;
+    overflow-y: auto; /* Add scroll if content overflows */
+    gap: 0px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+
+.sb-menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 15px 0;
+    width: 100%;
+    gap: 10px;
+    color: #333;
+    transition: background 0.3s ease;
+}
+
+.sb-menu-item .sb-icon {
+    font-size: 24px;
+    height: auto;
+}
+
+.sb-menu-item span {
+    font-size: 12px;
+    margin-top: 5px;
+    color: green;
+}
+
+.sb-menu-item.active,
+.sb-menu-item:hover {
+    background: #b5e0b5; /* Highlight color */
+    border-radius: 8px;
+}

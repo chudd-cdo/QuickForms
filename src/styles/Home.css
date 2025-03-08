@@ -82,13 +82,13 @@
     font-size: 40px;
     font-weight: bold;
     margin-top: 0;
-    color: #008507;
+    color: #008106;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
   
   .cta-button {
     background: white;
-    border: 2px solid #4CAF50;
+    border: 2px solid #17bd1d;
     padding: 12px 24px;
     font-size: 18px;
     display: flex;
@@ -99,12 +99,23 @@
     margin-top: 20px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     width: 55%;
-
   }
-  
+
+  .cta-button:hover {
+    color: rgb(255, 246, 246);
+    border: 2px solid white;
+  }
   .cta-text {
-    color: #4CAF50;
+    color: #3bd640;
     margin-right: 8px;
+  }
+
+  .cta-text:hover {
+    color: #f1f1f1;
+  }
+
+  .cta-icon{
+    color: white;
   }
   
   /* Modal */

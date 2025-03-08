@@ -32,7 +32,7 @@ html {
 
 /* Sidebar */
 .create-sidebar {
-    margin-top: 20px;
+    
     width: 250px;
     background-color: #fdfdfd;
     padding: 15px;
@@ -129,6 +129,7 @@ button {
 .create-form-label {
     font-size: 26px;
     font-weight: bold;
+    margin-left: 20px;
 }
 
 .create-form-title-input{
@@ -149,6 +150,7 @@ button {
     font-size: 16px;
     cursor: pointer;
     background-color: transparent;
+    margin-left: 20px;
 }
 
 .create-form-actions {
@@ -210,6 +212,7 @@ button {
 .create-question-label {
     font-size: 18px;
     font-weight: bold;
+    margin-left: 20px;
 }
 
 .create-question-input {
@@ -246,6 +249,7 @@ input{
     border: 1px solid #ccc;
     font-size: 14px;
     cursor: pointer;
+    margin-left: 20px;
 }
 
 /* Question Actions */

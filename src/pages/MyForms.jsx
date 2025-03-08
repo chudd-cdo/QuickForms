@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import api from "../api";
 import axios from "axios";
 import {
   useReactTable,
@@ -9,28 +8,30 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import "../styles/MyForms.css";
-import {
-  FaRegFileAlt, FaTrash, FaSearch, FaHome, FaWpforms, 
-  FaSignOutAlt, FaArchive, FaEdit, FaBell, FaCogs
-} from "react-icons/fa";
+import { FaTrash, FaSearch, FaArchive, FaEdit } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
 
 axios.defaults.baseURL = "http://localhost:8000/api";
 
 const MyForms = ({ forms, setForms }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showModal, setShowModal] = useState(false);
-  const [formTitle, setFormTitle] = useState("");
-  const [formDescription, setFormDescription] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [archivedView, setArchivedView] = useState(false);
   const [formId, setFormId] = useState(null);
-  const [status, setStatus] = useState("Deactivated");
-  const [questions, setQuestions] = useState([]);
 
-  useEffect(() => {
+  const token = localStorage.getItem("authToken");
+
+useEffect(() => {
+  if (!token) {
+    console.error("No authentication token found");
+    navigate("/");
+  } else {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     fetchForms();
-  }, []);
+  }
+}, [token]);
+
 
   useEffect(() => {
     if (location.state?.updatedForm) {
@@ -44,52 +45,74 @@ const MyForms = ({ forms, setForms }) => {
 
   const fetchForms = async () => {
     try {
-      const response = await api.get("/forms"); // No need to repeat baseURL
+      const response = await axios.get("/forms");
       setForms(response.data);
     } catch (error) {
-      console.error("Error fetching forms", error);
+      handleApiError(error);
+    }
+  };
+
+  const fetchFormData = async () => {
+    if (!formId) return;
+
+    try {
+      const response = await axios.get(`/forms/${formId}`);
+      if (response.data) {
+        const { name, description, is_active, questions } = response.data;
+        setFormTitle(name || "Untitled Form");
+        setFormDescription(description || "");
+        setStatus(is_active ? "Activated" : "Deactivated");
+        setQuestions(
+          Array.isArray(questions)
+            ? questions.map((q) => ({
+                id: q.id,
+                question_text: q.question_text || "Untitled Question",
+                question_type: q.question_type ?? "short",
+                options: parseOptions(q),
+              }))
+            : []
+        );
+      }
+    } catch (error) {
+      handleApiError(error);
     }
   };
 
   useEffect(() => {
-    const id = location.state?.formId; // Get formId from location state
-
-    if (!formId) return;
-
-    const fetchFormData = async () => {
-      try {
-        const response = await axios.get(`/forms/${formId}`);
-        if (!response.data) {
-          console.error("No data received from API");
-          return;
-        }
-
-        const { name, description, is_active, questions } = response.data;
-
-        setFormTitle(name || "Untitled Form");
-        setFormDescription(description || "");
-        setStatus(is_active ? "Activated" : "Deactivated");
-        setQuestions(Array.isArray(questions) ? questions : []);
-      } catch (error) {
-        console.error("Error fetching form data:", error);
-        setFormTitle("Error Loading Form");
-      }
-    };
-
     fetchFormData();
-  }, [formId, location.key]);
+  }, [formId]);
+
+  const handleApiError = (error) => {
+    if (error.response?.status === 401) {
+      console.error("Unauthorized access. Redirecting to login...");
+      navigate("/");
+    } else {
+      console.error("API error:", error);
+    }
+  };
+
+  const parseOptions = (q) => {
+    return ["multiple_choice", "dropdown", "checkbox"].includes(q.question_type)
+      ? typeof q.options === "string"
+        ? JSON.parse(q.options)
+        : q.options || []
+      : [];
+  };
 
   const handleEdit = (id) => {
     navigate(`/edit-form/${id}`, { state: { formId: id } });
   };
   
-
   const handleCreateForm = () => {
+    // Clear any stored form data
     localStorage.removeItem("formTitle");
     localStorage.removeItem("formDescription");
     localStorage.removeItem("questions");
+  
+    // Navigate to CreateForm page
     navigate("/create-form");
   };
+  
 
   const handleDeleteForm = async (id) => {
     try {
@@ -97,28 +120,6 @@ const MyForms = ({ forms, setForms }) => {
       setForms((prevForms) => prevForms.filter((form) => form.id !== id));
     } catch (error) {
       console.error("Error deleting form", error);
-    }
-  };
-
-  const handleUpdate = async () => {
-    if (!formTitle.trim()) {
-      alert("Please enter a form title before updating.");
-      return;
-    }
-
-    const updatedForm = {
-      id: formId,
-      name: formTitle,
-      description: formDescription,
-      is_active: status === "Activated",
-      questions,
-    };
-
-    try {
-      await axios.put(`/forms/${formId}`, updatedForm);
-      navigate("/myforms", { state: { updatedForm } });
-    } catch (error) {
-      console.error("Error saving form:", error);
     }
   };
 
@@ -145,33 +146,10 @@ const MyForms = ({ forms, setForms }) => {
           </div>
         ),
       },
-      { 
-        header: "Name", 
-        accessorKey: "name",
-        cell: ({ getValue }) => {
-          const name = getValue();
-          return name.length > 10 ? name.substring(0, 10) + "..." : name;
-        }
-      },
-      { 
-        header: "Date Created",
-        accessorKey: "created_at",
-        cell: ({ getValue }) => new Date(getValue()).toLocaleDateString(),
-      },
-      { 
-        header: "Date Modified",
-        accessorKey: "updated_at",
-        cell: ({ getValue }) => new Date(getValue()).toLocaleString(),
-      },
-      { 
-        header: "Status",
-        accessorKey: "is_active",
-        cell: ({ getValue }) => (
-          <span className={getValue() ? "chudd-status-active" : "chudd-status-deactivated"}>
-            {getValue() ? "Activated" : "Deactivated"}
-          </span>
-        ),
-      },
+      { header: "Name", accessorKey: "name" },
+      { header: "Date Created", accessorKey: "created_at", cell: ({ getValue }) => new Date(getValue()).toLocaleDateString() },
+      { header: "Date Modified", accessorKey: "updated_at", cell: ({ getValue }) => new Date(getValue()).toLocaleString() },
+      { header: "Status", accessorKey: "is_active", cell: ({ getValue }) => <span className={getValue() ? "chudd-status-active" : "chudd-status-deactivated"}>{getValue() ? "Activated" : "Deactivated"}</span> },
       { header: "Responses", accessorKey: "user_id", cell: ({ getValue }) => getValue() || "0" },
     ],
     [archivedView]
@@ -187,33 +165,7 @@ const MyForms = ({ forms, setForms }) => {
 
   return (
     <div className="chudd-myforms-container">
-      <div className="chudd-sidebar">
-        <div className="chudd-menu-item" onClick={() => navigate("/dashboard")}>
-          <FaHome className="icon" />
-          <span>Dashboard</span>
-        </div>
-        <div className="chudd-menu-item" onClick={() => navigate("/myforms")}>
-          <FaWpforms className="icon" />
-          <span>My Forms</span>
-        </div>
-        <div className="chudd-menu-item" onClick={() => navigate("/responses")}>
-          <FaRegFileAlt className="icon" />
-          <span>Responses</span>
-        </div>
-        <div className="chudd-menu-item" onClick={() => navigate("/notifications")}>
-          <FaBell className="icon" />
-          <span>Notifications</span>
-        </div>
-        <div className="chudd-menu-item">
-          <FaCogs className="icon" />
-          <span>Settings</span>
-        </div>
-        <div className="chudd-menu-item">
-          <FaSignOutAlt className="icon" />
-          <span>Logout</span>
-        </div>
-      </div>
-
+      <Sidebar />
       <div className="chudd-main-content">
         <div className="chudd-top-bar">
           <h1>My Forms</h1>
@@ -229,12 +181,7 @@ const MyForms = ({ forms, setForms }) => {
             />
             <FaSearch className="chudd-search-icon" />
           </div>
-          <div className="chudd-actions">
-            <FaArchive className="chudd-archive-icon" onClick={() => setArchivedView(!archivedView)} />
-            <button className="chudd-create-form" onClick={handleCreateForm}>
-              + Create new form
-            </button>
-          </div>
+          <button className="chudd-create-form" onClick={handleCreateForm}>+ Create new form</button>
         </div>
 
         <table className="chudd-myforms-table">
@@ -257,23 +204,7 @@ const MyForms = ({ forms, setForms }) => {
             ))}
           </tbody>
         </table>
-
-        <div className="chudd-pagination">
-          <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>{"<"}</button>
-          {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, i) => i + 1).map((pageNumber) => (
-            <button
-              key={pageNumber}
-              className={`chudd-page-number ${table.getState().pagination.pageIndex + 1 === pageNumber ? "active" : ""}`}
-              onClick={() => table.setPageIndex(pageNumber - 1)}
-            >
-              {pageNumber}
-            </button>
-          ))}
-          <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>{">"}</button>
-        </div>
       </div>
-
-     
     </div>
   );
 };

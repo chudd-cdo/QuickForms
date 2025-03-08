@@ -7,6 +7,8 @@ import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import EditHeader from "../components/EditHeader";
 import axios from "axios";
+import AssignUserModal from "../components/AssignUserModal";
+import LocalStorage from "../components/localStorage";
 
 const EditForm = () => {
   const { id } = useParams();
@@ -18,22 +20,11 @@ const EditForm = () => {
   const [formDescription, setFormDescription] = useState("");
   const [questions, setQuestions] = useState([]);
   const [status, setStatus] = useState("Deactivated");
+  const [isUserModalOpen, setUserModalOpen] = useState(false);
 
   useEffect(() => {
     if (!formId) return;
-
-    // 1️⃣ Load from localStorage first
-    const savedPreview = localStorage.getItem(`previewForm-${formId}`);
-    if (savedPreview) {
-      const parsedForm = JSON.parse(savedPreview);
-      setFormTitle(parsedForm.title || "Untitled Form");
-      setFormDescription(parsedForm.description || "");
-      setQuestions(parsedForm.questions || []);
-      setStatus(parsedForm.status || "Deactivated"); // ✅ Ensure status persists correctly
-      return;
-    }
-
-    // 2️⃣ If no local preview, fetch from backend
+  
     const fetchFormData = async () => {
       try {
         const response = await axios.get(`/forms/${formId}`);
@@ -41,53 +32,67 @@ const EditForm = () => {
           console.error("No data received from API");
           return;
         }
-
+  
         const { name, description, is_active, questions } = response.data;
-
+  
+        // ✅ Get preview data first
+        const savedPreview = LocalStorage.getFormPreview(formId);
+        if (savedPreview) {
+          console.log("✅ Using saved preview data");
+          setFormTitle(savedPreview.title || "Untitled Form");
+          setFormDescription(savedPreview.description || "");
+          setQuestions(savedPreview.questions || []);
+          setStatus(savedPreview.status || "Deactivated");
+          return;
+        }
+  
+        // ✅ No preview? Use backend data
         setFormTitle(name || "Untitled Form");
         setFormDescription(description || "");
-        setStatus(is_active ? "Activated" : "Deactivated"); // ✅ Ensure backend status is used only if no preview exists
-
-        setQuestions(
-          Array.isArray(questions)
-            ? questions.map((q) => ({
-                id: q.id,
-                question_text: q.question_text || "Untitled Question",
-                question_type: q.question_type ?? "short",
-                options:
-                  ["multiple_choice", "dropdown", "checkbox"].includes(q.question_type) && q.options
-                    ? (typeof q.options === "string" ? JSON.parse(q.options) : q.options).map((option) =>
-                        typeof option === "object" && option.text ? option.text : option
-                      )
-                    : [],
-              }))
-            : []
-        );
+        setStatus(is_active ? "Activated" : "Deactivated");
+        setQuestions(questions.map((q) => ({
+          id: q.id,
+          question_text: q.question_text || "Untitled Question",
+          question_type: q.question_type ?? "short",
+          options: ["multiple_choice", "dropdown", "checkbox"].includes(q.question_type) && q.options
+            ? JSON.parse(q.options).map((option) => (typeof option === "object" ? option.text : option))
+            : [],
+        })));
+  
+        // ✅ Save latest form data for preview
+        LocalStorage.saveFormPreview(formId, {
+          title: name,
+          description,
+          status: is_active ? "Activated" : "Deactivated",
+          questions,
+        });
+  
       } catch (error) {
         console.error("Error fetching form data:", error);
-        setFormTitle("Error Loading Form");
       }
     };
-
+  
     fetchFormData();
-  }, [formId]); // ✅ Removed `location.key` to prevent unnecessary re-renders
+  }, [formId]);
 
+  // 🔹 3️⃣ Save to localStorage before previewing
   const handlePreview = () => {
     if (!formId) return;
 
     const formData = {
       title: formTitle,
       description: formDescription,
-      status: status, // ✅ Save status directly
+      status: status,
       questions: questions.map((q) => ({
         id: q.id,
         question_text: q.question_text,
-        question_type: q.question_type || " ",
+        question_type: q.question_type || "short",
         options: q.options ? [...q.options] : [],
       })),
     };
 
     localStorage.setItem(`previewForm-${formId}`, JSON.stringify(formData));
+
     navigate(`/edit-preview/${formId}`);
   };
 
@@ -101,7 +106,7 @@ const EditForm = () => {
       id: formId,
       name: formTitle,
       description: formDescription,
-      is_active: status === "Activated", // ✅ Convert to boolean for backend
+      is_active: status === "Activated",
       questions: questions.map((q) => ({
         id: q.id,
         question_text: q.question_text || "Untitled Question",
@@ -119,11 +124,10 @@ const EditForm = () => {
 
       console.log("Form updated:", response.data);
 
-      // ✅ Save updated form in localStorage to keep status persistent
       localStorage.setItem(`previewForm-${formId}`, JSON.stringify({
         title: updatedForm.name,
         description: updatedForm.description,
-        status: status, // ✅ Keep latest status
+        status: status,
         questions: updatedForm.questions,
       }));
 
@@ -264,7 +268,8 @@ const EditForm = () => {
               <option value="Activated">Activated</option>
               <option value="Deactivated">Deactivated</option>
             </select>
-            <button className="create-user-icon-btn">
+
+            <button className="create-user-icon-btn" onClick={() => setUserModalOpen(true)}>
               <FaUserPlus className="create-icon" />
             </button>
           </div>
@@ -426,6 +431,14 @@ const EditForm = () => {
         <button className="create-add-question-btn" onClick={addQuestion}>
           <FiPlusCircle className="create-icon" /> Add Question
         </button>
+        {isUserModalOpen && (
+            <AssignUserModal 
+              isOpen={isUserModalOpen} 
+              onClose={() => setUserModalOpen(false)} 
+              formId={formId} 
+            />
+        )}
+
       </div>
     </div>
   );

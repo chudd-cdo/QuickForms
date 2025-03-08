@@ -1,15 +1,9 @@
-import React, { useState, useRef } from "react";
+/*import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Dashboard.css";
 import {
-  FaRegFileAlt,
   FaTrash,
   FaSearch,
-  FaHome,
-  FaWpforms,
-  FaBell,
-  FaCogs,
-  FaSignOutAlt,
   FaChevronLeft,
   FaChevronRight,
   FaEllipsisV,
@@ -17,6 +11,7 @@ import {
   FaEye,
   FaTimes,
 } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
 
 const Dashboard = () => {
   const [recentForms, setRecentForms] = useState([
@@ -26,8 +21,23 @@ const Dashboard = () => {
   const [showRecentForms, setShowRecentForms] = useState(false);
   const [showFullScroll, setShowFullScroll] = useState(false);
   const [menuOpen, setMenuOpen] = useState(null);
+  const [user, setUser] = useState({ name: "", email: "" });
+
   const scrollRef = useRef(null);
   const navigate = useNavigate();
+
+  // Check for token and user info
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    const storedUser = localStorage.getItem("user");
+
+    if (!token) {
+      navigate("/");
+    } else if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser({ name: parsedUser.name, email: parsedUser.email });
+    }
+  }, [navigate]);
 
   const scrollRight = () => {
     if (scrollRef.current) {
@@ -42,11 +52,13 @@ const Dashboard = () => {
   };
 
   const handleCreateNewForm = () => {
-    const newForm = {
-      id: Date.now(),
-      name: `Untitled Form ${recentForms.length + 1}`,
-    };
-    setRecentForms([...recentForms, newForm]);
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("Please log in to create a form.");
+      navigate("/");
+      return;
+    }
+    navigate("/create-form");
   };
 
   const handleRenameForm = (id) => {
@@ -65,7 +77,13 @@ const Dashboard = () => {
   };
 
   const handleOpenForm = (id) => {
-    alert(`Opening form ID: ${id}`);
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      alert("You are not authorized. Please log in again.");
+      navigate("/");
+      return;
+    }
+    navigate(`/myform/${id}`);
   };
 
   const handleTrash = () => {
@@ -74,79 +92,50 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="menu-item" onClick={() => navigate("/dashboard")}>
-          <FaHome className="icon" />
-          <span>Dashboard</span>
-        </div>
-        <div className="menu-item" onClick={() => navigate("/myforms")}>
-          <FaWpforms className="icon" />
-          <span>My Forms</span>
-        </div>
-        <div className="menu-item" onClick={() => navigate("/responses")}>
-          <FaRegFileAlt className="icon" />
-          <span>Responses</span>
-        </div>
-        <div className="menu-item" onClick={() => navigate("/notifications")}>
-          <FaBell className="icon" />
-          <span>Notifications</span>
-        </div>
-        <div className="menu-item">
-          <FaCogs className="icon" />
-          <span>Settings</span>
-        </div>
-        <div className="menu-item">
-          <FaSignOutAlt className="icon" />
-          <span>Logout</span>
-        </div>
-      </div>
+      {/* Sidebar Component *//*}
+      <Sidebar />
 
-    
-        <div className="dashboard-sidebar">
-          <h2>Dashboard</h2>
-          <button
-            className="create-form"
-            onClick={() => navigate("/create-form")}
-          >
-            + Create new form
-          </button>
-          <div className="recent-forms">
-            <h3>Recent Forms</h3>
-            <div className={`forms-list ${showRecentForms ? "scrollable" : ""}`}>
-          {recentForms.length > 0 ? (
-            recentForms.map((form) => (
-              <div key={form.id} className="form-item">
-            📄 {form.name}
-            <FaEllipsisV
-              className="options-icon"
-              onClick={() =>
-                setMenuOpen(menuOpen === form.id ? null : form.id)
-              }
-            />
-            {menuOpen === form.id && (
-              <div className="dropdown-menu">
-                <div onClick={() => handleRenameForm(form.id)}>
-              <FaPencilAlt /> Rename
+      <div className="dashboard-sidebar">
+        <h2 className="dashboard-h2">Home</h2>
+        <button className="create-form" onClick={handleCreateNewForm}>
+          + Create new form
+        </button>
+        <div className="recent-forms">
+          <h3>Recent Forms</h3>
+          <div className={`forms-list ${showRecentForms ? "scrollable" : ""}`}>
+            {recentForms.length > 0 ? (
+              recentForms.map((form) => (
+                <div key={form.id} className="form-item">
+                  📄 {form.name}
+                  <FaEllipsisV
+                    className="options-icon"
+                    onClick={() =>
+                      setMenuOpen(menuOpen === form.id ? null : form.id)
+                    }
+                  />
+                  {menuOpen === form.id && (
+                    <div className="dropdown-menu">
+                      <div onClick={() => handleRenameForm(form.id)}>
+                        <FaPencilAlt /> Rename
+                      </div>
+                      <div onClick={() => handleOpenForm(form.id)}>
+                        <FaEye /> Open/Edit
+                      </div>
+                      <div onClick={() => handleDeleteForm(form.id)}>
+                        <FaTimes /> Delete
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div onClick={() => handleOpenForm(form.id)}>
-              <FaEye /> Open/Edit
-                </div>
-                <div onClick={() => handleDeleteForm(form.id)}>
-              <FaTimes /> Delete
-                </div>
-              </div>
+              ))
+            ) : (
+              <p>No forms available</p>
             )}
-              </div>
-            ))
-          ) : (
-            <p>No forms available</p>
-          )}
-            </div>
-            <a
-          href="#"
-          className="see-all"
-          onClick={(event) => {
+          </div>
+          <a
+            href="#"
+            className="see-all"
+            onClick={(event) => {
               event.preventDefault();
               setShowRecentForms(!showRecentForms);
             }}
@@ -160,28 +149,27 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="main-content">
+      {/* Main Content *//*}
+      <div className="dashboard-main-content">
         <div className="top-bar">
           <div className="search-bar">
             <input type="text" placeholder="Search..." />
             <FaSearch className="search-icon" />
           </div>
-         <div class="user-profile">
-    <div class="user-profile-info">
-        <p>IT Intern</p>
-        <span>itintern@smartgforms.com</span>
-    </div>
-    <div class="user-avatar">👤</div>
-</div>
-
+          <div className="user-profile">
+            <div className="user-profile-info">
+              <p>{user.name || "User"}</p>
+              <span>{user.email || "user@smartgforms.com"}</span>
+            </div>
+            <div className="user-avatar">👤</div>
+          </div>
         </div>
         <div className="banner">
           <h2>SMARTER WAY TO CREATE FORMS</h2>
           <h3>SMARTGFORMS</h3>
         </div>
 
-        {/* Recent Forms Scrollable Section */}
+        {/* Recent Forms Scrollable Section *//*}
         <div className="recent-forms-section">
           <h3>Available Form</h3>
           <div className="carousel-container">
@@ -218,7 +206,10 @@ const Dashboard = () => {
               ))}
             </div>
             {showFullScroll && (
-              <FaChevronRight className="scroll-btn right" onClick={scrollRight} />
+              <FaChevronRight
+                className="scroll-btn right"
+                onClick={scrollRight}
+              />
             )}
           </div>
           <a
@@ -238,3 +229,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+*/
