@@ -24,29 +24,37 @@ const EditForm = () => {
 
   useEffect(() => {
     if (!formId) return;
-  
+
     const fetchFormData = async () => {
       try {
-        const response = await axios.get(`/forms/${formId}`);
+        const authToken = LocalStorage.getToken();
+        if (!authToken) {
+          console.error("No authentication token found. Redirecting to login...");
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get(`http://192.168.5.41:8000/api/forms/${formId}`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+
         if (!response.data) {
           console.error("No data received from API");
           return;
         }
-  
+
         const { name, description, is_active, questions } = response.data;
-  
-        // ✅ Get preview data first
+
         const savedPreview = LocalStorage.getFormPreview(formId);
         if (savedPreview) {
-          console.log("✅ Using saved preview data");
+          console.log("Using saved preview data");
           setFormTitle(savedPreview.title || "Untitled Form");
           setFormDescription(savedPreview.description || "");
           setQuestions(savedPreview.questions || []);
           setStatus(savedPreview.status || "Deactivated");
           return;
         }
-  
-        // ✅ No preview? Use backend data
+
         setFormTitle(name || "Untitled Form");
         setFormDescription(description || "");
         setStatus(is_active ? "Activated" : "Deactivated");
@@ -55,27 +63,35 @@ const EditForm = () => {
           question_text: q.question_text || "Untitled Question",
           question_type: q.question_type ?? "short",
           options: ["multiple_choice", "dropdown", "checkbox"].includes(q.question_type) && q.options
-            ? JSON.parse(q.options).map((option) => (typeof option === "object" ? option.text : option))
+            ? (() => {
+                try {
+                  return Array.isArray(q.options) ? q.options.map((option) => (typeof option === "object" ? option.text : option)) : q.options.split(',').map(opt => opt.trim());
+                } catch (e) {
+                  return q.options.split(',').map(opt => opt.trim());
+                }
+              })()
             : [],
         })));
-  
-        // ✅ Save latest form data for preview
+
         LocalStorage.saveFormPreview(formId, {
           title: name,
           description,
           status: is_active ? "Activated" : "Deactivated",
           questions,
         });
-  
+
       } catch (error) {
-        console.error("Error fetching form data:", error);
+        console.error("Error fetching form data:", error.response?.data || error.message);
+        if (error.response?.status === 401) {
+          alert("Session expired. Please log in again.");
+          navigate("/");
+        }
       }
     };
-  
-    fetchFormData();
-  }, [formId]);
 
-  // 🔹 3️⃣ Save to localStorage before previewing
+    fetchFormData();
+  }, [formId, navigate]);
+
   const handlePreview = () => {
     if (!formId) return;
 
@@ -102,6 +118,13 @@ const EditForm = () => {
       return;
     }
 
+    const token = LocalStorage.getToken();
+    if (!token) {
+      console.error("No authentication token found. Redirecting to login...");
+      navigate("/login");
+      return;
+    }
+
     const updatedForm = {
       id: formId,
       name: formTitle,
@@ -117,9 +140,14 @@ const EditForm = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/forms/${formId}`,
+        `http://192.168.5.41:8000/api/forms/${formId}`,
         updatedForm,
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          }
+        }
       );
 
       console.log("Form updated:", response.data);
@@ -141,6 +169,11 @@ const EditForm = () => {
       });
     } catch (error) {
       console.error("Error saving form:", error.response ? error.response.data : error.message);
+      if (error.response?.status === 401) {
+        alert("Session expired. Please log in again.");
+        LocalStorage.clearAuthData();
+        navigate("/");
+      }
     }
   };
 
@@ -148,7 +181,7 @@ const EditForm = () => {
     setQuestions([
       ...questions,
       {
-        id: `${questions.length + 1}`,
+        id: Date.now().toString(),
         question_text: "New Question",
         question_type: "short",
         options: [],
@@ -175,7 +208,10 @@ const EditForm = () => {
   };
 
   const duplicateQuestion = (index) => {
-    const questionToDuplicate = { ...questions[index], id: `${questions.length + 1}` };
+    const questionToDuplicate = {
+      ...questions[index],
+      id: Date.now().toString()
+    };
     setQuestions([...questions, questionToDuplicate]);
   };
 
@@ -432,13 +468,12 @@ const EditForm = () => {
           <FiPlusCircle className="create-icon" /> Add Question
         </button>
         {isUserModalOpen && (
-            <AssignUserModal 
-              isOpen={isUserModalOpen} 
-              onClose={() => setUserModalOpen(false)} 
-              formId={formId} 
-            />
+          <AssignUserModal
+            isOpen={isUserModalOpen}
+            onClose={() => setUserModalOpen(false)}
+            formId={formId}
+          />
         )}
-
       </div>
     </div>
   );

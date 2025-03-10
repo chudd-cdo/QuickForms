@@ -1,12 +1,14 @@
 import axios from "axios";
+import LocalStorage from "./components/localStorage"; 
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: "http://192.168.5.41:8000/api",
+  withCredentials: true, // ✅ Required for Sanctum auth
 });
 
-// Automatically attach token to every request
+// ✅ Attach token automatically to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("authToken");
+  const token = LocalStorage.getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

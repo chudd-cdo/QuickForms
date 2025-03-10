@@ -7,6 +7,7 @@ import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
 import "../styles/CreateForm.css";
+import LocalStorage from "../components/localStorage";
 
 const CreateForm = () => {
   const navigate = useNavigate();
@@ -47,11 +48,31 @@ const CreateForm = () => {
     }
 
     try {
-      const formResponse = await axios.post("http://localhost:8000/api/forms", {
-        name: formTitle,
-        description: formDescription,
-        is_active: status === "Activated",
-      });
+      const authToken = LocalStorage.getToken();
+      const userId = LocalStorage.getUserId();
+
+      if (!userId) {
+        alert("User not authenticated. Please log in again.");
+        return;
+      }
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      };
+
+      const formResponse = await axios.post(
+        "http://localhost:8000/api/forms",
+        {
+          user_id: userId,
+          name: formTitle,
+          description: formDescription,
+          is_active: status === "Activated",
+        },
+        config
+      );
 
       const formId = formResponse.data.id;
       const formData = new FormData();
@@ -64,7 +85,10 @@ const CreateForm = () => {
       });
 
       await axios.post("http://localhost:8000/api/questions", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       navigate("/myforms");

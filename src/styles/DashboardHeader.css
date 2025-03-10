@@ -1,5 +1,5 @@
 /* Dashboard Header */
-.dashboard-header {
+.chudd-dashboard-header {
   position: fixed;
   top: 0;
   left: 0;
@@ -15,17 +15,17 @@
 }
 
 /* Logo Section */
-.dashboard-logo-container {
+.chudd-dashboard-logo-container {
   display: flex;
   align-items: center;
 }
 
-.dashboard-logo {
+.chudd-dashboard-logo {
   height: 50px;
   margin-right: 10px;
 }
 
-.dashboard-title {
+.chudd-dashboard-title {
   font-size: 24px;
   font-weight: bold;
   color: #08d10f;
@@ -33,35 +33,31 @@
 }
 
 /* User Profile Section */
-.dashboard-user-profile {
+/* User Profile Section */
+.chudd-user-profile {
   display: flex;
   align-items: center;
   margin-right: 80px;
 }
 
-.dashboard-user-info {
+/* User Profile Info */
+.chudd-user-profile-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  
-}
-
-.dashboard-user-role {
-  margin: 0;
-  font-size: 14px;
-  color: #333;
-}
-
-.dashboard-user-email {
-  font-size: 12px;
-  color: #777;
+  margin-right: 10px; /* Add margin to separate info from avatar */
 }
 
 /* User Avatar */
-.dashboard-user-avatar {
-  font-size: 35px;
-  margin-left: 10px;
+.chudd-user-avatar {
+  font-size: 60px; /* Increased font size for larger avatar */
   color: black;
   cursor: pointer;
   transition: color 0.3s ease;
+  margin-top: 10px;
+}
+
+.chudd-dashboard-email{
+  left: auto;
+  margin-top: -15px;
 }

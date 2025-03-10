@@ -2,8 +2,9 @@ import React from "react";
 import { FaHome, FaWpforms, FaRegFileAlt, FaBell, FaCogs, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css"; 
-import axios from "axios";
+
 import LocalStorage from "../components/localStorage";
+import api from "../api";
 
 
 
@@ -12,22 +13,13 @@ const Sidebar = () => {
   
     const handleLogout = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:8000/api/logout",
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${LocalStorage.getToken()}`,
-            },
-          }
-        );
+        await api.post("/logout");
     
-        LocalStorage.clearAuthData(); // ✅ Clear local storage
+        LocalStorage.clearAuthData();
+        delete api.defaults.headers.common["Authorization"]; // ✅ Remove token
     
-        console.log("✅ Logout successful:", response.data); // 🔥 Log success message in console
-        console.log("✅ Local storage after logout:", localStorage); // 🔍 Check if storage is empty
-    
-        navigate("/"); // Redirect to login page
+        console.log("✅ Logout successful");
+        navigate("/");
       } catch (error) {
         console.error("❌ Logout failed:", error.response?.data || error.message);
       }

@@ -5,9 +5,6 @@ import { FaArrowRight } from "react-icons/fa";
 import AuthModal from "./AuthModal"; // Import the modal component
 import Header from "../components/HomeHeader";
 
-
-
-
 function Home() {
   const [showModal, setShowModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
@@ -37,7 +34,7 @@ function Home() {
             Create your <br /> Forms now <br /> with <span className="highlight">SmartGForms!</span>
           </h1>
           <p className="hero-subtitle">THE SMARTER WAY TO CREATE FORMS.</p>
-          <button className="cta-button"  onClick={() => openModal(true)}>
+          <button className="cta-button" onClick={() => openModal(true)}>
             <span className="cta-text">Get started now</span> <FaArrowRight className="cta-icon" />
           </button>
         </div>

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 import Home from "./pages/Home";
 import MyForms from "./pages/MyForms";
 import Responses from "./pages/Responses";
@@ -12,14 +13,38 @@ import HomeHeader from "./components/HomeHeader";
 import EditHeader from "./components/EditHeader";
 import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
-import ProtectedRoute from "./components/ProtectedRoute"; // Import the ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
+import LocalStorage from "./components/localStorage";// Utility to manage local storage
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [forms, setForms] = useState([]); // Store created forms
+  const [authToken, setAuthToken] = useState(LocalStorage.getToken());
+
+  useEffect(() => {
+    // Auto-login if token exists in local storage
+    if (authToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
+    }
+  }, [authToken]);
 
   const handlePublishForm = (newForm) => {
     setForms((prevForms) => [...prevForms, newForm]);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:8000/api/logout", {}, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      LocalStorage.clearAuthData(); // Clear stored token
+      setAuthToken(null);
+      navigate("/"); // Redirect to login page
+    } catch (error) {
+      console.error("❌ Logout failed:", error.response?.data || error.message);
+    }
   };
 
   return (
@@ -40,7 +65,7 @@ function App() {
             <Route
               path="/myforms"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <MyForms forms={forms} setForms={setForms} />
                 </ProtectedRoute>
               }
@@ -48,7 +73,7 @@ function App() {
             <Route
               path="/responses"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <Responses />
                 </ProtectedRoute>
               }
@@ -56,7 +81,7 @@ function App() {
             <Route
               path="/notifications"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <Notifications />
                 </ProtectedRoute>
               }
@@ -64,7 +89,7 @@ function App() {
             <Route
               path="/create-form"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <CreateForm onPublish={handlePublishForm} />
                 </ProtectedRoute>
               }
@@ -72,7 +97,7 @@ function App() {
             <Route
               path="/edit-form/:id"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <EditForm forms={forms} setForms={setForms} />
                 </ProtectedRoute>
               }
@@ -80,7 +105,7 @@ function App() {
             <Route
               path="/preview-form"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <PreviewForm forms={forms} />
                 </ProtectedRoute>
               }
@@ -88,7 +113,7 @@ function App() {
             <Route
               path="/edit-preview/:formId"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute authToken={authToken}>
                   <EditPreview />
                 </ProtectedRoute>
               }

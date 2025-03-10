@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import api from "../api"; // ✅ Use the axios instance with auth
 import "../styles/AssignUserModal.css";
+import axios from "axios";
 
 const AssignUserModal = ({ isOpen, onClose, formId }) => {
     if (!isOpen) return null; // Prevents rendering when modal is closed
@@ -18,8 +19,8 @@ const AssignUserModal = ({ isOpen, onClose, formId }) => {
         const fetchData = async () => {
             try {
                 const [usersResponse, assignedResponse] = await Promise.all([
-                    axios.get("http://localhost:8000/api/users", { signal }),
-                    axios.get(`http://localhost:8000/api/assigned-users/${formId}`, { signal })
+                    api.get("/users", { signal }), // ✅ Use api instance
+                    api.get(`/assigned-users/${formId}`, { signal }) // ✅ Use api instance
                 ]);
 
                 setUsers(usersResponse.data);
@@ -30,7 +31,7 @@ const AssignUserModal = ({ isOpen, onClose, formId }) => {
                 })));
             } catch (error) {
                 if (!axios.isCancel(error)) {
-                    console.error("Error fetching users:", error);
+                    console.error("❌ Error fetching users:", error.response?.data || error.message);
                 }
             }
         };
@@ -58,7 +59,7 @@ const AssignUserModal = ({ isOpen, onClose, formId }) => {
 
     // Assign user
     const assignUser = (user) => {
-        axios.post("http://localhost:8000/api/assigned-users", { user_id: user.id, form_id: formId })
+        api.post("/assigned-users", { user_id: user.id, form_id: formId })
             .then(() => {
                 setAssignedUsers(prev => [...prev, { user_id: user.id, name: user.name, email: user.email }]);
             })
@@ -67,7 +68,7 @@ const AssignUserModal = ({ isOpen, onClose, formId }) => {
 
     // Unassign user
     const unassignUser = (userId) => {
-        axios.delete("http://localhost:8000/api/assigned-users", {
+        api.delete("/assigned-users", {
             data: { user_id: userId, form_id: formId }
         })
         .then(() => {

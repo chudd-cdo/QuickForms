@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api";
 import { FaUser, FaLock, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../styles/AuthModal.css";
@@ -14,38 +14,35 @@ function AuthModal({ isLogin, closeModal, setIsLogin }) {
   const [dob, setDob] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    axios.get("http://localhost:8000/sanctum/csrf-cookie", { withCredentials: true });
-  }, []);
 
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+    e.preventDefault();
+    setError("");
 
-  const apiUrl = `http://localhost:8000/api/${isLogin ? "login" : "register"}`;
-  const payload = { email, password };
+    const apiUrl = isLogin ? "/login" : "/register";
+    const payload = { email, password };
 
-  if (!isLogin) {
-    payload.name = name;
-    payload.dob = dob;
-  }
-
-  try {
-    await axios.get("http://localhost:8000/sanctum/csrf-cookie", { withCredentials: true });
-
-    const response = await axios.post(apiUrl, payload, { withCredentials: true });
-
-    const { token, user } = response.data;
-    if (token) {
-      localStorage.setItem("authToken", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/myforms");
+    if (!isLogin) {
+      payload.name = name;
+      payload.dob = dob;
     }
-  } catch (error) {
-    setError(error.response?.data?.message || "An error occurred");
-  }
+
+    try {
+      await api.get("/sanctum/csrf-cookie"); // ✅ CSRF Token Protection
+      const response = await api.post(apiUrl, payload);
+
+      const { token, user } = response.data;
+      if (token) {
+        console.log("User Data:", user); // Debugging
+        LocalStorage.setAuthData(token, user); // ✅ Ensure user_id is stored
+        navigate("/myforms");
+      }
+    } catch (error) {
+      setError(error.response?.data?.message || "An error occurred");
+    }
 };
+
 
 
   return (
