@@ -34,7 +34,7 @@ const EditForm = () => {
           return;
         }
 
-        const response = await axios.get(`http://192.168.5.41:8000/api/forms/${formId}`, {
+        const response = await axios.get(`http://192.168.5.72:8000/api/forms/${formId}`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
 
@@ -140,7 +140,7 @@ const EditForm = () => {
 
     try {
       const response = await axios.put(
-        `http://192.168.5.41:8000/api/forms/${formId}`,
+        `http://192.168.5.72:8000/api/forms/${formId}`,
         updatedForm,
         {
           headers: {

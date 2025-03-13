@@ -1,199 +1,228 @@
-import React, { useState, useRef } from "react";
-import { useNavigate, BrowserRouter as Router } from "react-router-dom";
-import "../styles/Responses.css";
-import Header from "../components/DashboardHeader"; // Import the Header
-
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 import {
-  FaRegFileAlt,
-  FaTrash,
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  flexRender,
+} from "@tanstack/react-table";
+import {
   FaSearch,
-  FaHome,
-  FaWpforms,
-  FaBell,
-  FaCogs,
-  FaSignOutAlt,
+  FaUserCircle,
   FaChevronLeft,
   FaChevronRight,
-  FaEllipsisV,
-  FaPencilAlt,
-  FaEye,
-  FaTimes,
 } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
+import "../styles/Responses.css";
 
 const Responses = () => {
-  const [recentForms, setRecentForms] = useState([
-    { id: 1, name: "CHUDD Survey" },
-    { id: 2, name: "CHUDD Survey 1" },
-  ]);
-  const [showRecentForms, setShowRecentForms] = useState(false);
-  const [showFullScroll, setShowFullScroll] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(null);
-  const scrollRef = useRef(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const responsesPerPage = 5;
+  const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
-  };
+  // Fetch responses from API
+  useEffect(() => {
+    const fetchResponses = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get("http://192.168.5.93:8000/api/responses", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
+        console.log("API Response Data:", response.data);
 
-  const handleCreateNewForm = () => {
-    const newForm = {
-      id: Date.now(),
-      name: `Untitled Form ${recentForms.length + 1}`,
+        const formattedResponses = response.data.map((res) => ({
+          userName: res.userName || "Unknown",
+          formName: res.formName || "Untitled Form",
+          status: res.status === "Active" ? "Active" : "Deactive", // Reflect the latest status
+          time: new Date(res.submission_time).toLocaleString(), // Format the timestamp
+        }));
+
+        setResponses(formattedResponses);
+      } catch (error) {
+        console.error("Error fetching responses:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    setRecentForms([...recentForms, newForm]);
-  };
 
-  const handleRenameForm = (id) => {
-    const newName = prompt("Enter new form name:");
-    if (newName) {
-      setRecentForms(
-        recentForms.map((form) =>
-          form.id === id ? { ...form, name: newName } : form
-        )
-      );
-    }
-  };
+    // Initial fetch
+    fetchResponses();
 
-  const handleDeleteForm = (id) => {
-    setRecentForms(recentForms.filter((form) => form.id !== id));
-  };
+    // Set interval for real-time updates
+    const intervalId = setInterval(fetchResponses, 5000); // Fetch data every 5 seconds
 
-  const handleOpenForm = (id) => {
-    alert(`Opening form ID: ${id}`);
-  };
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
 
-  const handleTrash = () => {
-    setRecentForms([]);
+  // Filter responses based on search query
+  const filteredResponses = responses.filter(
+    (response) =>
+      (response.userName && response.userName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (response.formName && response.formName.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const columns = useMemo(
+    () => [
+      {
+        header: "User Name",
+        accessorKey: "userName",
+        cell: ({ row }) => (
+          <div>
+            <FaUserCircle className="responses-user-icon" /> {row.original.userName}
+          </div>
+        ),
+      },
+      { header: "Form Name", accessorKey: "formName" },
+      {
+        header: "Status",
+        accessorKey: "status",
+        cell: ({ row }) => (
+          <span className={row.original.status === "Active" ? "active-status" : "inactive-status"}>
+            {row.original.status}
+          </span>
+        ),
+      },
+      { header: "Submission Time", accessorKey: "time" },
+    ],
+    []
+  );
+
+  const table = useReactTable({
+    data: filteredResponses,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const handleCreateForm = () => {
+    alert("Create new form clicked");
   };
 
   return (
     <div className="responses-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="menu-item" onClick={() => navigate("/dashboard")}>
-          <FaHome className="icon" />
-          <span>Dashboard</span>
-        </div>
-        <div className="menu-item">
-          <FaWpforms className="icon" />
-          <span>My Forms</span>
-        </div>
-        <div className="menu-item" onClick={() => navigate("/responses")}>
-          <FaRegFileAlt className="icon" />
-          <span>Responses</span>
-        </div>
-        <div className="menu-item" onClick={() => navigate("/notifications")}>
-          <FaBell className="icon" />
-          <span>Notifications</span>
-        </div>
-        <div className="menu-item">
-          <FaCogs className="icon" />
-          <span>Settings</span>
-        </div>
-        <div className="menu-item">
-          <FaSignOutAlt className="icon" />
-          <span>Logout</span>
-        </div>
-      </div>
+      <Sidebar />
+      <div className="responses-main-content">
+        <DashboardHeader />
 
-      {/* Responses Sidebar */}
-      <div className="responses-sidebar">
-        <h2>Responses</h2>
-        <button className="create-form" onClick={handleCreateNewForm}>
-          + Create new form
-        </button>
-        <div className="recent-forms">
-          <h3>Recent Forms</h3>
-          <div className={`forms-list ${showRecentForms ? "scrollable" : ""}`}>
-            {recentForms.length > 0 ? (
-              recentForms.map((form) => (
-                <div key={form.id} className="form-item">
-                  📄 {form.name}
-                  <FaEllipsisV
-                    className="options-icon"
-                    onClick={() =>
-                      setMenuOpen(menuOpen === form.id ? null : form.id)
-                    }
-                  />
-                  {menuOpen === form.id && (
-                    <div className="dropdown-menu">
-                      <div onClick={() => handleRenameForm(form.id)}>
-                        <FaPencilAlt /> Rename
-                      </div>
-                      <div onClick={() => handleOpenForm(form.id)}>
-                        <FaEye /> Open/Edit
-                      </div>
-                      <div onClick={() => handleDeleteForm(form.id)}>
-                        <FaTimes /> Delete
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>No forms available</p>
-            )}
+        <div className="chudd-top-bar">
+          <h1>User Responses</h1>
+        </div>
+
+        <div className="chudd-search-actions-container">
+          <div className="chudd-search-bar">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <FaSearch className="chudd-search-icon" />
           </div>
-          <a
-            href="#"
-            className="see-all"
-            onClick={(event) => {
-              event.preventDefault();
-              setShowRecentForms(!showRecentForms);
-            }}
+          <button className="chudd-create-form" onClick={handleCreateForm}>
+            + Create new form
+          </button>
+        </div>
+
+        <div className="responses-table-container">
+          {loading ? (
+            <p>Loading responses...</p>
+          ) : (
+            <table className="responses-table">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id}>
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(
+                    currentPage * responsesPerPage,
+                    (currentPage + 1) * responsesPerPage
+                  )
+                  .map((row) => (
+                    <tr key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Pagination */}
+        <div className="responses-pagination">
+          <button
+            onClick={() => setCurrentPage(0)}
+            disabled={currentPage === 0}
           >
-            {showRecentForms ? "Show Less" : "See All"}
-          </a>
-        </div>
-        <div className="trash-section" onClick={handleTrash}>
-          <FaTrash className="trash-icon" />
-          <span>Trash</span>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="main-content">
-        <div className="top-bar">
-          <div className="search-bar">
-            <input type="text" placeholder="Search..." />
-            <FaSearch className="search-icon" />
-          </div>
-          <div className="user-profile">
-            <div className="user-profile-info">
-              <p>IT Intern</p>
-              <span>itintern@smartgforms.com</span>
-            </div>
-            <div className="user-avatar">👤</div>
-          </div>
-        </div>
-        <div className="banner">
-          <h2>SMARTER WAY TO CREATE FORMS</h2>
-          <h3>SMARTGFORMS</h3>
-        </div>
-
-        {/* Recent Forms Scrollable Section */}
-        <div className="recent-forms-section">
-          <h3>Users Forms Responses</h3>
-          
-          
-          <a
-            href="#"
-            className="see-all"
-            onClick={(event) => {
-              event.preventDefault();
-              setShowFullScroll(!showFullScroll);
-            }}
+            {"<<"}
+          </button>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+            disabled={currentPage === 0}
           >
-            {showFullScroll ? "Show Less" : "See All"}
-          </a>
+            <FaChevronLeft />
+          </button>
+
+          {Array.from(
+            { length: Math.ceil(filteredResponses.length / responsesPerPage) },
+            (_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index)}
+                className={currentPage === index ? "active-page" : ""}
+              >
+                {index + 1}
+              </button>
+            )
+          )}
+
+          <button
+            onClick={() =>
+              setCurrentPage((prev) =>
+                Math.min(
+                  prev + 1,
+                  Math.ceil(filteredResponses.length / responsesPerPage) - 1
+                )
+              )
+            }
+            disabled={
+              currentPage >=
+              Math.ceil(filteredResponses.length / responsesPerPage) - 1
+            }
+          >
+            <FaChevronRight />
+          </button>
+          <button
+            onClick={() =>
+              setCurrentPage(
+                Math.ceil(filteredResponses.length / responsesPerPage) - 1
+              )
+            }
+            disabled={
+              currentPage >=
+              Math.ceil(filteredResponses.length / responsesPerPage) - 1
+            }
+          >
+            {">>"}
+          </button>
         </div>
       </div>
     </div>
@@ -201,4 +230,3 @@ const Responses = () => {
 };
 
 export default Responses;
-

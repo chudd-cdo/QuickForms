@@ -74,33 +74,7 @@ const Notifications = () => {
 
   return (
       <div className="notifications-container">
-        {/* Sidebar */}
-        <div className="sidebar">
-          <div className="menu-item" onClick={() => navigate("/dashboard")}>
-            <FaHome className="icon" />
-            <span>Dashboard</span>
-          </div>
-          <div className="menu-item">
-            <FaWpforms className="icon" />
-            <span>My Forms</span>
-          </div>
-          <div className="menu-item" onClick={() => navigate("/responses")}>
-            <FaRegFileAlt className="icon" />
-            <span>Responses</span>
-          </div>
-          <div className="menu-item" onClick={() => navigate("/notifications")}>
-            <FaBell className="icon" />
-            <span>Notifications</span>
-          </div>
-          <div className="menu-item">
-            <FaCogs className="icon" />
-            <span>Settings</span>
-          </div>
-          <div className="menu-item">
-            <FaSignOutAlt className="icon" />
-            <span>Logout</span>
-          </div>
-        </div>
+       
 
       {/* Notifications Sidebar */}
       <div className="notifications-sidebar">

@@ -64,7 +64,7 @@ const CreateForm = () => {
       };
 
       const formResponse = await axios.post(
-        "http://localhost:8000/api/forms",
+        "http://192.168.5.72:8000/api/forms",
         {
           user_id: userId,
           name: formTitle,
@@ -84,7 +84,7 @@ const CreateForm = () => {
         formData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
       });
 
-      await axios.post("http://localhost:8000/api/questions", formData, {
+      await axios.post("http://192.168.5.72:8000/api/questions", formData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "multipart/form-data",

@@ -33,19 +33,6 @@ function App() {
     setForms((prevForms) => [...prevForms, newForm]);
   };
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("http://localhost:8000/api/logout", {}, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
-
-      LocalStorage.clearAuthData(); // Clear stored token
-      setAuthToken(null);
-      navigate("/"); // Redirect to login page
-    } catch (error) {
-      console.error("❌ Logout failed:", error.response?.data || error.message);
-    }
-  };
 
   return (
     <FormProvider>
