@@ -9,6 +9,7 @@ import EditHeader from "../components/EditHeader";
 import axios from "axios";
 import AssignUserModal from "../components/AssignUserModal";
 import LocalStorage from "../components/localStorage";
+import api from "../api";
 
 const EditForm = () => {
   const { id } = useParams();
@@ -34,7 +35,7 @@ const EditForm = () => {
           return;
         }
 
-        const response = await axios.get(`http://192.168.5.72:8000/api/forms/${formId}`, {
+        const response = await api.get(`/forms/${formId}`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
 
@@ -139,8 +140,8 @@ const EditForm = () => {
     };
 
     try {
-      const response = await axios.put(
-        `http://192.168.5.72:8000/api/forms/${formId}`,
+      const response = await api.put(
+        `/forms/${formId}`,
         updatedForm,
         {
           headers: {

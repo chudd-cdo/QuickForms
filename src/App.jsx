@@ -9,12 +9,13 @@ import CreateForm from "./pages/CreateForm";
 import PreviewForm from "./pages/PreviewForm";
 import EditForm from "./pages/EditForm";
 import EditPreview from "./pages/EditPreview";
+import ProfilePage from "./pages/ProfilePage"; // ✅ Import ProfilePage
 import HomeHeader from "./components/HomeHeader";
 import EditHeader from "./components/EditHeader";
 import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LocalStorage from "./components/localStorage";// Utility to manage local storage
+import LocalStorage from "./components/localStorage"; // Utility to manage local storage
 
 function App() {
   const location = useLocation();
@@ -33,7 +34,6 @@ function App() {
     setForms((prevForms) => [...prevForms, newForm]);
   };
 
-
   return (
     <FormProvider>
       <div>
@@ -43,7 +43,7 @@ function App() {
 
         <div className="main-layout">
           {/* Show Sidebar only for relevant pages */}
-          {["/myforms", "/responses", "/notifications"].includes(location.pathname) && <Sidebar />}
+          {["/myforms", "/responses", "/notifications", "/profile"].includes(location.pathname) && <Sidebar />}
 
           <Routes>
             <Route path="/" element={<Home />} />
@@ -102,6 +102,14 @@ function App() {
               element={
                 <ProtectedRoute authToken={authToken}>
                   <EditPreview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute authToken={authToken}>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />

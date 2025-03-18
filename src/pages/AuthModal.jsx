@@ -24,26 +24,31 @@ function AuthModal({ isLogin, closeModal, setIsLogin }) {
     const payload = { email, password };
 
     if (!isLogin) {
-      payload.name = name;
-      payload.dob = dob;
+        payload.name = name;
+        payload.dob = dob;
     }
 
     try {
-      await api.get("/sanctum/csrf-cookie"); // ✅ CSRF Token Protection
-      const response = await api.post(apiUrl, payload);
+        await api.get("/sanctum/csrf-cookie"); // ✅ CSRF Token Protection
+        const response = await api.post(apiUrl, payload);
 
-      const { token, user } = response.data;
-      if (token) {
-        console.log("User Data:", user); // Debugging
-        LocalStorage.setAuthData(token, user); // ✅ Ensure user_id is stored
-        navigate("/myforms");
-      }
+        const { token, user, profile_photo_url } = response.data;
+
+        if (token) {
+            console.log("User Data:", user); // Debugging
+            LocalStorage.setAuthData(token, user); // ✅ Ensure user_id is stored
+            
+            if (profile_photo_url) {
+                LocalStorage.saveProfilePhoto(profile_photo_url); // ✅ Save profile photo
+            }
+
+            navigate("/myforms");
+        }
     } catch (error) {
-      setError(error.response?.data?.message || "An error occurred");
+        setError(error.response?.data?.message || "An error occurred");
+        console.error("Auth failed:", error);
     }
 };
-
-
 
   return (
     <div className="auth-container">

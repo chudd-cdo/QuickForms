@@ -1,171 +1,125 @@
-import React, { useState, useRef } from "react";
-import { useNavigate, BrowserRouter as Router } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from "react";
+import api from "../api";
+import { FaSearch } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
 import "../styles/Notifications.css";
-import {
-  FaRegFileAlt,
-  FaTrash,
-  FaSearch,
-  FaHome,
-  FaWpforms,
-  FaBell,
-  FaCogs,
-  FaSignOutAlt,
-  FaChevronLeft,
-  FaChevronRight,
-  FaEllipsisV,
-  FaPencilAlt,
-  FaEye,
-  FaTimes,
-} from "react-icons/fa";
 
 const Notifications = () => {
-  const [recentForms, setRecentForms] = useState([
-    { id: 1, name: "CHUDD Survey" },
-    { id: 2, name: "CHUDD Survey 1" },
-  ]);
-  const [showRecentForms, setShowRecentForms] = useState(false);
-  const [showFullScroll, setShowFullScroll] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(null);
-  const scrollRef = useRef(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [searchQuery, setSearchQuery] = useState("");
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("all"); // "all" or "unread"
 
-  const scrollRight = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
-  };
+  // Fetch notifications from API
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await api.get("/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-  const scrollLeft = () => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
+        console.log("API Response Data:", response.data);
 
-  const handleCreateNewForm = () => {
-    const newForm = {
-      id: Date.now(),
-      name: `Untitled Form ${recentForms.length + 1}`,
+        const formattedNotifications = response.data.map((notif) => ({
+          id: notif.id,
+          avatar: notif.avatar || "/default-avatar.png",
+          userName: notif.userName || "Unknown",
+          message: notif.message || "New notification",
+          time: notif.time ? new Date(notif.time).toLocaleString() : "N/A",
+          isRead: notif.isRead || false, // Assuming API returns isRead status
+        }));
+
+        setNotifications(formattedNotifications);
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    setRecentForms([...recentForms, newForm]);
-  };
 
-  const handleRenameForm = (id) => {
-    const newName = prompt("Enter new form name:");
-    if (newName) {
-      setRecentForms(
-        recentForms.map((form) =>
-          form.id === id ? { ...form, name: newName } : form
-        )
-      );
-    }
-  };
+    fetchNotifications();
+    const intervalId = setInterval(fetchNotifications, 5000);
+    return () => clearInterval(intervalId);
+  }, []);
 
-  const handleDeleteForm = (id) => {
-    setRecentForms(recentForms.filter((form) => form.id !== id));
-  };
-
-  const handleOpenForm = (id) => {
-    alert(`Opening form ID: ${id}`);
-  };
-
-  const handleTrash = () => {
-    setRecentForms([]);
-  };
+  // Filter notifications based on active tab
+  const filteredNotifications = useMemo(() => {
+    return notifications
+      .filter((notif) =>
+        notif.userName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .filter((notif) => (activeTab === "unread" ? !notif.isRead : true));
+  }, [notifications, searchQuery, activeTab]);
 
   return (
-      <div className="notifications-container">
-       
+    <div className="notifications-container">
+      <Sidebar />
+      <div className="notifications-main-content">
+        <DashboardHeader />
+        <div className="notifications-content-wrapper">
+          <div className="notifications-header">
+            <h1>Notifications</h1>
+          </div>
 
-      {/* Notifications Sidebar */}
-      <div className="notifications-sidebar">
-        <h2>Notifications</h2>
-        <button className="create-form" onClick={handleCreateNewForm}>
-          + Create new form
-        </button>
-        <div className="recent-forms">
-          <h3>Recent Forms</h3>
-          <div className={`forms-list ${showRecentForms ? "scrollable" : ""}`}>
-            {recentForms.length > 0 ? (
-              recentForms.map((form) => (
-                <div key={form.id} className="form-item">
-                  📄 {form.name}
-                  <FaEllipsisV
-                    className="options-icon"
-                    onClick={() =>
-                      setMenuOpen(menuOpen === form.id ? null : form.id)
-                    }
+          {/* Search Bar - Placed ABOVE Tabs */}
+          <div className="notifications-search-bar-container">
+            <div className="notifications-search-bar">
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <FaSearch className="notifications-search-icon" />
+            </div>
+          </div>
+
+          {/* Tabs for All and Unread Notifications */}
+          <div className="notifications-tabs">
+            <button
+              className={`notifications-tab ${activeTab === "all" ? "active" : ""}`}
+              onClick={() => setActiveTab("all")}
+            >
+              All
+            </button>
+            <button
+              className={`notifications-tab ${activeTab === "unread" ? "active" : ""}`}
+              onClick={() => setActiveTab("unread")}
+            >
+              Unread
+            </button>
+          </div>
+
+          {/* Notifications List */}
+          <div className="notifications-list">
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notif) => (
+                <div
+                  key={notif.id}
+                  className={`notification-item ${notif.isRead ? "read" : "unread"}`}
+                >
+                  <img
+                    src={notif.avatar}
+                    alt="User Avatar"
+                    className="notification-avatar"
                   />
-                  {menuOpen === form.id && (
-                    <div className="dropdown-menu">
-                      <div onClick={() => handleRenameForm(form.id)}>
-                        <FaPencilAlt /> Rename
-                      </div>
-                      <div onClick={() => handleOpenForm(form.id)}>
-                        <FaEye /> Open/Edit
-                      </div>
-                      <div onClick={() => handleDeleteForm(form.id)}>
-                        <FaTimes /> Delete
-                      </div>
-                    </div>
-                  )}
+                  <div className="notification-details">
+                    <span className="notification-user">{notif.userName}</span>
+                    <span className="notification-message">{notif.message}</span>
+                  </div>
+                  <span className="notification-time">{notif.time}</span>
                 </div>
               ))
             ) : (
-              <p>No forms available</p>
+              <p className="no-notifications">No notifications found</p>
             )}
           </div>
-          <a
-            href="#"
-            className="see-all"
-            onClick={(event) => {
-              event.preventDefault();
-              setShowRecentForms(!showRecentForms);
-            }}
-          >
-            {showRecentForms ? "Show Less" : "See All"}
-          </a>
-        </div>
-        <div className="trash-section" onClick={handleTrash}>
-          <FaTrash className="trash-icon" />
-          <span>Trash</span>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="main-content">
-        <div className="top-bar">
-          <div className="search-bar">
-            <input type="text" placeholder="Search..." />
-            <FaSearch className="search-icon" />
+          <div className="see-previous-notifications">
+            <a href="/previous-notifications">See Previous Notifications</a>
           </div>
-          <div className="user-profile">
-            <div className="user-profile-info">
-              <p>IT Intern</p>
-              <span>itintern@smartgforms.com</span>
-            </div>
-            <div className="user-avatar">👤</div>
-          </div>
-        </div>
-        <div className="banner">
-          <h2>SMARTER WAY TO CREATE FORMS</h2>
-          <h3>SMARTGFORMS</h3>
-        </div>
-
-        {/* Recent Forms Scrollable Section */}
-        <div className="recent-forms-section">
-          <h3>All Notifications</h3>
-          
-          
-          <a
-            href="#"
-            className="see-all"
-            onClick={(event) => {
-              event.preventDefault();
-              setShowFullScroll(!showFullScroll);
-            }}
-          >
-            {showFullScroll ? "Show Less" : "See All"}
-          </a>
         </div>
       </div>
     </div>

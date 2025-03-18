@@ -3,33 +3,33 @@
   display: flex;
   height: 100vh;
   background-color: #e6f7d4;
-  margin-top: -15px;
-  width: 93%;
-  margin-left: 95px;
-  margin-top: 100px;
-  height: 100vh;
-  max-height: 550px;
+  overflow: hidden;
+  margin-top: 10px;
 }
 
 /* Main Content */
 .chudd-main-content {
   flex-grow: 1;
-  padding: 20px;
+  max-width: 1180px;
   background-color: white;
-  border: 1px solid black;
+  border: 2px solid #000;
   border-radius: 10px;
-  margin: 20px;
-  overflow-y: auto;
+  padding: 20px;
+  margin-left: 120px;
+  margin-top: 100px;
   position: relative;
-  height: 100vh;
-  max-height: 470px;
+  height: calc(100vh - 170px);
+  overflow-y: auto;
 }
 
 /* Top Bar */
 .chudd-top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  padding-bottom: 5px;
+  color: black;
+  text-align: left;
+  margin-top: -10px;
 }
 
 /* Search & Actions Container */
@@ -37,8 +37,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  gap: 20px;
 }
 
 /* Search Bar */
@@ -46,43 +44,60 @@
   display: flex;
   align-items: center;
   border: 1px solid #ccc;
-  border-radius: 15px;
-  padding: 5px 10px;
+  border-radius: 10px;
+  padding: 5px 12px;
   max-width: 300px;
   background-color: white;
   flex-grow: 1;
+  height: 35px;
 }
 
+/* Search Input */
 .chudd-search-bar input {
   border: none;
   outline: none;
   flex-grow: 1;
   padding: 5px;
   background: transparent;
+  font-size: 14px;
 }
 
+/* Search Icon */
 .chudd-search-icon {
-  font-size: 14px;
+  font-size: 16px;
   color: #666;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
 }
 
 /* Actions */
 .chudd-actions {
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 10px; /* Reduced gap for closer alignment */
 }
 
-/* Archive Icon */
-.chudd-archive-icon {
-  font-size: 20px;
-  cursor: pointer;
-  color: #333;
-  transition: color 0.3s;
-}
+/* Archive Button */
 
-.chudd-archive-icon:hover {
-  color: #007bff;
+  .chudd-archive-button {
+    background-color:white; /* Green background */
+    border: none;
+    cursor: pointer;
+    width: 50px;
+    height: 50px; /* Ensures it's a perfect square */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the icon */
+  }
+  .chudd-archive-button i {
+    font-size: 34px; /* Adjust the icon size */
+    color: black; /* Ensure good contrast */
+  }
+
+.chudd-archive-button:hover {
+  background-color: #41df46;
 }
 
 /* Create New Form Button */
@@ -102,28 +117,48 @@
 }
 
 .chudd-create-form:hover {
-  background-color: #a5d899;
+  background-color: #41df46;
 }
 
 /* Table Styles */
 .chudd-myforms-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 6px;
   margin-top: 20px;
 }
 
-.chudd-myforms-table th, .chudd-myforms-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
+.chudd-myforms-table th,
+.chudd-myforms-table td {
+  padding: 12px;
+  text-align: left;
+}
+
+.chudd-myforms-table th:nth-child(6),
+.chudd-myforms-table td:nth-child(6) {
   text-align: center;
+  vertical-align: middle;
 }
 
 .chudd-myforms-table th {
-  background-color: #f4f4f4;
+  font-weight: bold;
+  border-bottom: 2px solid #4CAF50;
+  background-color: white;
 }
 
-.chudd-myforms-table tr:nth-child(even) {
-  background-color: #e6f7d4;
+.chudd-myforms-table tbody tr {
+  background-color: #d1f8c9;
+  border-radius: 8px;
+}
+
+.chudd-myforms-table tbody tr td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.chudd-myforms-table tbody tr td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 
 /* Status Styles */
@@ -138,12 +173,16 @@
 }
 
 /* Edit & Delete Icons */
-.chudd-edit-icon, .chudd-delete-icon {
+.chudd-edit-icon,
+.chudd-delete-icon {
   cursor: pointer;
-  margin-right: 10px;
   font-size: 14px;
   color: #666;
   transition: color 0.3s;
+}
+
+.chudd-edit-icon {
+  margin-right: 8px;
 }
 
 .chudd-edit-icon:hover {
@@ -154,129 +193,35 @@
   color: red;
 }
 
-/* Highlighted Row */
-.chudd-highlight {
-  background-color: #dfffd6 !important;
-}
-
-/* Responsive Table */
-@media (max-width: 768px) {
-  .chudd-myforms-table th, .chudd-myforms-table td {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .chudd-icon {
-    font-size: 16px;
-  }
-}
-
-/* Modal Overlay */
-.chudd-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Modal */
-.chudd-modal {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-  max-width: 90%;
-}
-
-.chudd-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.chudd-close {
-  cursor: pointer;
-  font-size: 24px;
-}
-
-.chudd-modal-body {
-  margin: 20px 0;
-}
-
-.chudd-modal-body label {
-  display: block;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-.chudd-modal-body input,
-.chudd-modal-body textarea {
-  width: 95%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.chudd-modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.chudd-cancel {
-  background: #ccc;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.chudd-create {
-  background: #4caf50;
-  color: white;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.chudd-form-name {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Adjust spacing */
-}
-
-.chudd-edit-icon,
-.chudd-delete-icon,
-.chudd-archive-icon {
-  cursor: pointer;
-  font-size: 18px;
-}
-
+/* Pagination */
 .chudd-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 20px;
   gap: 8px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
 }
 
 .chudd-pagination button {
   background: none;
   border: none;
-  font-size: 18px;
-  color: #000;
+  font-size: 16px;
+  color: #070806;
   cursor: pointer;
   padding: 5px 10px;
   width: 40px;
+  border-radius: 5px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.chudd-pagination button:hover {
+  background-color: #4fb838;
+  color: white;
 }
 
 .chudd-pagination button:disabled {
@@ -284,19 +229,22 @@
   cursor: default;
 }
 
-.chudd-page-number {
-  font-size: 16px;
-  color: #666;
-}
-
+/* Active Page Number */
 .chudd-page-number.active {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: bold;
   color: #000;
 }
 
-.chudd-pagination button:hover {
-  background-color: #4fb838;
-  border-radius: 5px;
-  color: white;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chudd-myforms-table th,
+  .chudd-myforms-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .chudd-actions {
+    gap: 5px; /* Further reduces spacing on smaller screens */
+  }
 }

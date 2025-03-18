@@ -1,0 +1,236 @@
+/* Profile Container */
+.sgf-profile-container {
+    display: flex;
+    height: 100vh;
+    background-color: #e6f7d4;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+/* Main Profile Section */
+.sgf-profile-main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    margin: 70px 0 0 90px;
+    height: 100vh;
+}
+
+/* Profile Content */
+.sgf-profile-content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Profile Card */
+.sgf-profile-card {
+    background: white;
+    padding: 20px;
+    width: 100%;
+    max-width: 1500px;
+    height: 70vh;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    border: 2px solid #9b59b6;
+}
+
+/* Title */
+.sgf-profile-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Profile Photo Section */
+.sgf-profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+}
+
+/* Profile Photo and Label */
+.sgf-photo-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.sgf-photo-label {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+}
+
+.sgf-profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 2px solid #4CAF50;
+    object-fit: cover;
+}
+
+/* Photo Actions */
+.sgf-photo-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    align-items: center;
+}
+
+.sgf-remove-btn {
+    background-color: transparent;
+    color: #d9534f;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.sgf-change-btn {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Info Section */
+.sgf-info-section {
+    margin-top: 20px;
+}
+
+/* Info Rows */
+.sgf-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: white;
+    position: relative;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Labels and Text */
+.sgf-info-text {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 14px;
+}
+
+/* Button Group */
+.sgf-button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Edit and Disconnect Buttons */
+.sgf-edit-btn,
+.sgf-disconnect-btn {
+    padding: 5px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.sgf-edit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.sgf-disconnect-btn {
+    background-color: #FF9800;
+    color: white;
+}
+
+.sgf-edit-btn:hover,
+.sgf-disconnect-btn:hover {
+    filter: brightness(0.9);
+}
+
+.sgf-edit-btn:hover,
+.sgf-disconnect-btn:hover,
+.sgf-save-btn:hover,
+.sgf-cancel-btn:hover {
+    filter: brightness(0.9);
+}
+
+/* ✅ Crop Modal */
+.sgf-crop-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+}
+
+.crop-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #f0f0f0;
+}
+
+/* ✅ Crop Buttons */
+.sgf-crop-buttons {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.sgf-crop-buttons button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.sgf-crop-buttons button:first-child {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.sgf-crop-buttons button:last-child {
+    background-color: #28a745;
+    color: white;
+}
+
+/* ✅ Success Modal */
+.sgf-success-modal {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}

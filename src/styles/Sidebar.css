@@ -23,9 +23,9 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 15px 0;
+    padding: 30px 0;
     width: 100%;
-    gap: 10px;
+    gap: 0px;
     color: #333;
     transition: background 0.3s ease;
 }
@@ -38,11 +38,13 @@
 .sb-menu-item span {
     font-size: 12px;
     margin-top: 5px;
-    color: green;
+    color: rgb(0, 0, 0);
 }
 
 .sb-menu-item.active,
 .sb-menu-item:hover {
-    background: #b5e0b5; /* Highlight color */
-    border-radius: 8px;
+    background: linear-gradient(180deg, #b8e3aa, #89da83);
+    font-weight: bolder;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
 }

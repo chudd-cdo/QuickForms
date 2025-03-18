@@ -59,22 +59,22 @@ const AssignUserModal = ({ isOpen, onClose, formId }) => {
 
     // Assign user
     const assignUser = (user) => {
-        api.post("/assigned-users", { user_id: user.id, form_id: formId })
+        api.post("/assign-user", { user_id: user.id, form_id: formId }) // ✅ Correct API endpoint
             .then(() => {
                 setAssignedUsers(prev => [...prev, { user_id: user.id, name: user.name, email: user.email }]);
             })
-            .catch(error => console.error("Error assigning user:", error));
+            .catch(error => console.error("Error assigning user:", error.response?.data || error.message));
     };
 
     // Unassign user
     const unassignUser = (userId) => {
-        api.delete("/assigned-users", {
+        api.delete("/unassign-user", { // ✅ Correct API endpoint
             data: { user_id: userId, form_id: formId }
         })
         .then(() => {
             setAssignedUsers(prev => prev.filter(user => user.user_id !== userId));
         })
-        .catch(error => console.error("Error unassigning user:", error));
+        .catch(error => console.error("Error unassigning user:", error.response?.data || error.message));
     };
 
     // Close modal when clicking outside

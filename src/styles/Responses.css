@@ -1,26 +1,34 @@
-/* Responses Container */
+/* Main Container */
 .responses-container {
   display: flex;
-  flex-direction: column;
   height: 100vh;
-  background-color: #f5fff5;
+  background-color: #e6f7d4;
+  overflow: hidden;
+  margin-top: 10px;
 }
 
 /* Main Content */
 .responses-main-content {
-  flex: 1;
-  padding: 20px;
-  background: #ffffff;
+  flex-grow: 1;
+  max-width: 1180px;
+  background-color: white;
+  border: 2px solid #000000;
   border-radius: 10px;
-  margin: 120px 20px 10px 115px;
-  border: 1px solid black;
+  padding: 20px;
+  margin-left: 120px;
+  margin-top: 100px;
+  position: relative;
+  height: calc(100vh - 170px);
 }
 
 /* Header */
-.responses-header {
-  font-size: 24px;
+.response-top-bar {
+  font-size: 16px;
   font-weight: bold;
-  margin-bottom: 20px;
+  padding-bottom: 5px;
+  color: black;
+  text-align: left;
+  margin-top: -10px;
 }
 
 /* Search Bar Container */
@@ -28,91 +36,166 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  justify-content: flex-end;
 }
 
+/* Search Bar */
 .responses-search-bar {
   display: flex;
   align-items: center;
   border: 1px solid #ccc;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background: white;
+  border-radius: 10px;
+  padding: 5px 12px;
+  max-width: 300px;
+  background-color: white;
+  flex-grow: 1;
+  height: 35px; /* Consistent height */
+  line-height: 35px; /* Ensures vertical centering */
 }
 
+/* Search Input */
 .responses-search-bar input {
   border: none;
-  outline: none;
-  padding: 5px;
-  font-size: 16px;
+    outline: none;
+    flex-grow: 1;
+    padding: 5px;
+    background: transparent;
+    font-size: 14px;
+    height: 100%;
+    vertical-align: middle; /* Ensures proper vertical alignment */
+    margin-top: -2px;
 }
 
+/* Search Icon */
 .responses-search-icon {
-  color: #777;
-  margin-left: 5px;
-}
-
-.responses-create-form-button {
-  background: #ffffff;
-  border: 1px solid black;
-  color: black;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 16px;
+  color: #666;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  height: 100%; /* Makes sure it fills the parent height */
 }
 
-.responses-create-form-button:hover {
-  background: #f0f0f0;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .responses-search-bar-container {
+    justify-content: center; /* Center the search bar on smaller screens */
+  }
+
+  .responses-search-bar {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+
+
+/* Table Container */
+.responses-table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
 /* Table */
-.responses-table-container {
-  background: #eaf8e4;
-
-  border-radius: 10px;
-}
-
 .responses-table {
   width: 100%;
-  border-collapse: collapse;
-  text-align: left;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  text-align: center;
+  
 }
 
-.responses-table th,
-.responses-table td {
-  padding: 12px;
-  border-bottom: 1px solid #d4edda;
-  border: 1px solid rgb(0, 0, 0);
-}
-
+/* Table Headers */
 .responses-table th {
-  background: #edf7f0;
-  color: rgb(0, 0, 0);
-  font-weight: bold;
-}
-
-.responses-table tbody tr:nth-child(odd) {
   background: white;
+  color: black;
+  font-weight: bold;
+  border-bottom: 2px solid #4CAF50;
+  padding: 10px;
+  font-size: 14px;
+  text-align: center;
+
 }
 
-.responses-table tbody tr.highlight-row {
-  background: #d4edda;
+/* Table Rows */
+.responses-table tbody tr {
+  background: #e6f7d4;
+  border-radius: 8px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
-.status-active {
+
+
+/* Rounded Corners for First and Last Cells */
+.responses-table tbody tr td:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.responses-table tbody tr td:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Ensures consistent left alignment for the User Name column */
+.responses-table td:nth-child(2) {
+  text-align: left !important;
+  padding-left: 20px; /* Adjust this as needed */
+  display: flex;
+  align-items: center;
+  min-width: 150px; /* Ensures uniform width */
+}
+
+
+
+/* Use a fixed width for the user name column to maintain alignment */
+.responses-table th:nth-child(2),
+.responses-table td:nth-child(2) {
+  width: 40px; /* Adjust width as necessary */
+}
+
+
+/* Table Cells */
+.responses-table td {
+  border: none;
+  font-size: 14px;
+  vertical-align: middle;
+  padding: 10px;
+  text-align: center;
+  
+}
+
+/* User Column */
+.responses-avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Avatar Icon */
+.responses-avatar {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: block;
+  margin: auto;
+  border: 1px solid black;
+}
+
+.responses-user {
+  text-align: left;
+  padding-left: 10px;
+}
+
+/* Status Styles */
+.responses-status-active{
   color: green;
   font-weight: bold;
 }
 
-/* Icons */
-.responses-user-icon {
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-.responses-user-icon:hover {
+.responses-status-deactivated {
   color: red;
+  font-weight: bold;
 }
 
 /* Pagination */
@@ -120,18 +203,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 30px;
+  margin-top: 20px;
   gap: 8px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
 }
 
 .responses-pagination button {
   background: none;
   border: none;
-  font-size: 18px;
-  color: #000;
+  font-size: 16px;
+  color: #070806;
   cursor: pointer;
   padding: 5px 10px;
   width: 40px;
+  border-radius: 5px;
+  transition: background 0.3s, color 0.3s;
 }
 
 .responses-pagination button:disabled {
@@ -139,13 +229,51 @@
   cursor: default;
 }
 
-.responses-pagination span {
-  font-size: 16px;
-  color: #666;
-}
-
 .responses-pagination button:hover {
   background-color: #4fb838;
-  border-radius: 5px;
   color: white;
+}
+
+.responses-page-number.active {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chudd-myforms-table th,
+  .chudd-myforms-table td {
+      padding: 8px;
+      font-size: 14px;
+  }
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .responses-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .responses-main-content {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 20px;
+    padding: 15px;
+  }
+
+
+  .responses-search-bar {
+    width: 100%;
+  }
+
+  
+  .responses-table-container {
+    overflow-x: auto;
+  }
+
+  .responses-pagination {
+    width: 100%;
+    justify-content: center;
+  }
 }

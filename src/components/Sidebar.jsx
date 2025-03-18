@@ -40,7 +40,7 @@ const Sidebar = () => {
         <FaBell className="sb-icon" />
         <span>Notifications</span>
       </div>
-      <div className="sb-menu-item">
+      <div className="sb-menu-item" onClick={() => navigate("/profile")}>
         <FaCogs className="sb-icon" />
         <span>Settings</span>
       </div>

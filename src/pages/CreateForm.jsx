@@ -8,6 +8,7 @@ import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
 import "../styles/CreateForm.css";
 import LocalStorage from "../components/localStorage";
+import api from "../api";
 
 const CreateForm = () => {
   const navigate = useNavigate();
@@ -46,58 +47,47 @@ const CreateForm = () => {
       alert("Please enter a form title before publishing.");
       return;
     }
-
+  
     try {
-      const authToken = LocalStorage.getToken();
       const userId = LocalStorage.getUserId();
-
       if (!userId) {
         alert("User not authenticated. Please log in again.");
         return;
       }
-
-      const config = {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "application/json",
-        },
+  
+      // ✅ Prepare form data correctly
+      const formData = {
+        user_id: userId,
+        name: formTitle,
+        description: formDescription,
+        is_active: status === "Activated",
       };
-
-      const formResponse = await axios.post(
-        "http://192.168.5.72:8000/api/forms",
-        {
-          user_id: userId,
-          name: formTitle,
-          description: formDescription,
-          is_active: status === "Activated",
-        },
-        config
-      );
-
+  
+      // ✅ Use `api.post` to send the form
+      const formResponse = await api.post("/forms", formData);
       const formId = formResponse.data.id;
-      const formData = new FormData();
-
+  
+      // ✅ Prepare questions data
+      const questionData = new FormData();
       questions.forEach((q, index) => {
-        formData.append(`questions[${index}][form_id]`, formId);
-        formData.append(`questions[${index}][question_text]`, q.title);
-        formData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
-        formData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
+        questionData.append(`questions[${index}][form_id]`, formId);
+        questionData.append(`questions[${index}][question_text]`, q.title);
+        questionData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
+        questionData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
       });
-
-      await axios.post("http://192.168.5.72:8000/api/questions", formData, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          "Content-Type": "multipart/form-data",
-        },
+  
+      // ✅ Use `api.post` to send questions
+      await api.post("/questions", questionData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
-      navigate("/myforms");
+  
+      navigate("/myforms"); // ✅ Redirect to MyForms after successful publish
     } catch (error) {
       console.error("Error publishing form:", error.response?.data || error);
       alert("Error: " + JSON.stringify(error.response?.data));
     }
   };
-
+  
   const handleTitleChange = (index, value) => {
     setQuestions((prevQuestions) => {
       const updated = [...prevQuestions];

@@ -14,7 +14,7 @@
   import LocalStorage from "../components/localStorage"; // ✅ Token handling utility
   import api from "../api";
 
-  axios.defaults.baseURL = "http://192.168.5.72:8000/api"; // ✅ Ensure correct API base URL
+
 
   const MyForms = ({ forms, setForms }) => {
     const navigate = useNavigate();
@@ -131,7 +131,7 @@
         { header: "Date Created", accessorKey: "created_at", cell: ({ getValue }) => new Date(getValue()).toLocaleDateString() },
         { header: "Date Modified", accessorKey: "updated_at", cell: ({ getValue }) => new Date(getValue()).toLocaleString() },
         { header: "Status", accessorKey: "is_active", cell: ({ getValue }) => <span className={getValue() ? "chudd-status-active" : "chudd-status-deactivated"}>{getValue() ? "Activated" : "Deactivated"}</span> },
-        { header: "Responses", accessorKey: "responses_count", cell: ({ getValue }) => getValue() || "0" },
+        { header: "Responses", accessorKey: "responses_count", cell: ({ getValue }) => getValue() || "0" }
 
       ],
       [archivedView]
@@ -152,6 +152,8 @@
   // Calculate start and end of the visible page group
   const startPage = Math.floor(currentPage / pageGroupSize) * pageGroupSize;
   const endPage = Math.min(startPage + pageGroupSize, pageCount);
+
+  
     return (
       <div className="chudd-header">
         <DashboardHeader />
@@ -171,8 +173,18 @@
                 />
                 <FaSearch className="chudd-search-icon" />
               </div>
-              <button className="chudd-create-form" onClick={handleCreateForm}>+ Create new form</button>
+              
+              {/* Archive Button + Create Form Button */}
+              <div className="chudd-actions">
+                <button className="chudd-archive-button">
+                  <FaArchive />
+                </button>
+                <button className="chudd-create-form" onClick={handleCreateForm}>
+                  + Create new form
+                </button>
+              </div>
             </div>
+
             <table className="chudd-myforms-table">
               <thead>
                 {table.getHeaderGroups().map((headerGroup) => (
