@@ -16,6 +16,8 @@ import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LocalStorage from "./components/localStorage"; // Utility to manage local storage
+import './styles/responsive.css';
+
 
 function App() {
   const location = useLocation();
