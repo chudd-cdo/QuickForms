@@ -154,30 +154,33 @@ const ProfilePage = () => {
                         <h1 className="sgf-profile-title">Your Account</h1>
 
                         <div className="sgf-profile-photo-section">
-                            <span className="sgf-photo-label">Profile Photo</span>
-                            <img
-                                src={photoPreview || user.profile_photo_url || "default-photo-url"}
-                                alt="Profile"
-                                className="sgf-profile-image"
-                                onError={(e) => (e.target.src = "default-photo-url")} // Fallback if image fails
-                            />
+    <div className="sgf-photo-info">
+        <span className="sgf-photo-label">Profile Photo</span>
+        <img
+            src={photoPreview || user.profile_photo_url || "default-photo-url"}
+            alt="Profile"
+            className="sgf-profile-image"
+            onError={(e) => (e.target.src = "default-photo-url")}
+        />
+    </div>
 
-                            <div className="sgf-photo-actions">
-                                <button className="sgf-remove-btn" onClick={handleRemovePhoto} disabled={!photoPreview}>
-                                    <strong>Remove</strong>
-                                </button>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    id="fileInput"
-                                    style={{ display: "none" }}
-                                    onChange={handlePhotoChange}
-                                />
-                                <button className="sgf-change-btn" onClick={() => document.getElementById("fileInput").click()}>
-                                    Change
-                                </button>
-                            </div>
-                        </div>
+    <div className="sgf-photo-actions">
+        <button className="sgf-remove-btn" onClick={handleRemovePhoto} disabled={!photoPreview}>
+            <strong>Remove</strong>
+        </button>
+        <input
+            type="file"
+            accept="image/*"
+            id="fileInput"
+            style={{ display: "none" }}
+            onChange={handlePhotoChange}
+        />
+        <button className="sgf-change-btn" onClick={() => document.getElementById("fileInput").click()}>
+            Change
+        </button>
+    </div>
+</div>
+
 
                         {/* Cropper Modal */}
                         {isCropping && (

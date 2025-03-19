@@ -1,48 +1,146 @@
-/* Normalize CSS for consistent rendering across browsers */
+/* ✅ Normalize CSS for consistent rendering across browsers */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
-  
-  /* Mobile First Approach */
-  body {
+}
+
+/* ✅ Ensure consistent zoom rendering and smooth scrolling */
+html {
+    font-size: 100%;                  /* Base size for scaling */
+    scroll-behavior: smooth;          /* Smooth scrolling experience */
+    -webkit-text-size-adjust: 100%;   /* Prevent font scaling in landscape on iOS */
+    -ms-text-size-adjust: 100%;       /* Prevent font scaling in IE */
+}
+
+body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     color: #333;
-  }
-  
-  /* Mobile screens */
-  @media (max-width: 600px) {
+    min-width: 320px;                /* Prevent content from shrinking on small screens */
+    max-width: 1920px;               /* Prevent content from stretching too wide */
+    margin: 0 auto;                  /* Center content */
+    overflow-x: hidden;              /* Prevent horizontal scroll on zoom */
+    background-color: #f5f5f5;       /* Light background for readability */
+}
+
+/* ✅ Main container for content */
+.container {
+    width: 100%;
+    max-width: 1200px;               /* Keep content from being too wide */
+    margin: 0 auto;                   /* Center the content */
+    padding: 20px;                    /* Default padding */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Add subtle shadow */
+    background: white;                /* White content background */
+    border-radius: 10px;              /* Slightly rounded corners */
+}
+
+/* ✅ Mobile screens (Small devices) */
+@media (max-width: 600px) {
     .container {
-      padding: 10px;
-      font-size: 14px;
+        padding: 15px;
+        font-size: 14px;
     }
-  }
-  
-  /* Tablet screens */
-  @media (min-width: 601px) and (max-width: 1024px) {
+
+    button, input, textarea {
+        font-size: 14px;             /* Smaller font size for mobile */
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* ✅ Tablet screens (Medium devices) */
+@media (min-width: 601px) and (max-width: 1024px) {
     .container {
-      padding: 20px;
-      font-size: 16px;
+        padding: 30px;
+        font-size: 16px;
     }
-  }
-  
-  /* Desktop screens */
-  @media (min-width: 1025px) {
+
+    button, input, textarea {
+        font-size: 16px;
+    }
+}
+
+/* ✅ Desktop screens (Large devices) */
+@media (min-width: 1025px) {
     .container {
-      padding: 40px;
-      font-size: 18px;
+        padding: 50px;
+        font-size: 18px;
     }
-  }
-  
-  /* Browser compatibility fixes */
-  button {
-    cursor: pointer;       /* Ensures consistent pointer on all browsers */
-  }
-  
-  img {
+
+    button, input, textarea {
+        font-size: 18px;
+    }
+}
+
+/* ✅ Ultra-wide screens */
+@media (min-width: 1440px) {
+    html {
+        font-size: 110%;           /* Slight increase for large screens */
+    }
+}
+
+@media (min-width: 1920px) {
+    html {
+        font-size: 120%;           /* Larger scaling for ultra-wide screens */
+    }
+}
+
+/* ✅ Responsive images */
+img {
     max-width: 100%;
-    height: auto;          /* Makes images responsive */
-  }
-  
+    height: auto;
+    display: block;                 /* Prevents spacing issues below images */
+    object-fit: cover;              /* Ensure images retain aspect ratio */
+}
+
+/* ✅ Button styling */
+button {
+    cursor: pointer;                 /* Consistent pointer across browsers */
+    border: none;
+    outline: none;
+    transition: all 0.3s ease;      /* Smooth transitions */
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #4CAF50;       /* Green button */
+    color: white;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: scale(1.05);         /* Slight scale effect on hover */
+}
+
+/* ✅ Consistent form styling */
+input, textarea, select {
+    font-family: inherit;
+    font-size: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #4CAF50;          /* Highlight focus */
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+/* ✅ Browser compatibility fixes */
+button, input, textarea {
+    -webkit-appearance: none;       /* Remove native styling on iOS */
+    -moz-appearance: none;          /* Remove native styling on Firefox */
+    appearance: none;               /* Ensure consistent styling */
+}
+
+/* ✅ Improve touch responsiveness */
+@media (pointer: coarse) {
+    button, input, textarea {
+        touch-action: manipulation;  /* Improves touch experience */
+    }
+}

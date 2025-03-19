@@ -5,7 +5,7 @@
     background: #e6f4e6; /* Light green background */
     width: 100px; /* Adjust width to make content visible */
     height: 100vh; /* Ensure it takes full height */
-    margin-top: 90px;
+    margin-top: 68px;
     padding: 15px 0;
     border-right: 2px solid #c0e0c0; /* Light green border */
     position: fixed;
@@ -14,7 +14,7 @@
     overflow-y: auto; /* Add scroll if content overflows */
     gap: 0px;
     border: 1px solid black;
-    border-radius: 10px;
+   
 }
 
 .sb-menu-item {
@@ -23,11 +23,12 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 30px 0;
+    padding: 25px 0;
     width: 100%;
     gap: 0px;
     color: #333;
     transition: background 0.3s ease;
+    margin-top: 10px;
 }
 
 .sb-menu-item .sb-icon {

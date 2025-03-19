@@ -13,6 +13,7 @@
   import DashboardHeader from "../components/DashboardHeader";
   import LocalStorage from "../components/localStorage"; // ✅ Token handling utility
   import api from "../api";
+  
 
 
 
@@ -207,43 +208,48 @@
             </table>
             
             <div className="chudd-pagination">
-                    <button 
-              onClick={() => table.firstPage()} 
-              disabled={!table.getCanPreviousPage()}
-            >
-              {"<<"}
-            </button>
-            <button 
-              onClick={() => table.previousPage()} 
-              disabled={!table.getCanPreviousPage()}
-            >
-              {"<"}
-            </button>
+  <button 
+    onClick={() => table.firstPage()} 
+    disabled={!table.getCanPreviousPage()}
+  >
+    {"<<"}
+  </button>
+  
+  <button 
+    onClick={() => table.previousPage()} 
+    disabled={!table.getCanPreviousPage()}
+  >
+    {"<"}
+  </button>
 
-            {/* Page Number Buttons */}
-            {Array.from({ length: table.getPageCount() }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => table.setPageIndex(index)}
-                className={table.getState().pagination.pageIndex === index ? "active-page" : ""}
-              >
-                {index + 1}
-              </button>
-            ))}
+  {/* Page Number Buttons */}
+  {Array.from({ length: table.getPageCount() }, (_, index) => (
+    <button
+      key={index}
+      onClick={() => table.setPageIndex(index)}
+      className={`chudd-page-number ${
+        table.getState().pagination.pageIndex === index ? "active" : "" 
+      } ${!table.getCanNextPage() && !table.getCanPreviousPage() ? "disabled" : ""}`}
+    >
+      {index + 1}
+    </button>
+  ))}
 
-            <button 
-              onClick={() => table.nextPage()} 
-              disabled={!table.getCanNextPage()}
-            >
-              {">"}
-            </button>
-            <button 
-              onClick={() => table.lastPage()} 
-              disabled={!table.getCanNextPage()}
-            >
-              {">>"}
-            </button>
-            </div>
+  <button 
+    onClick={() => table.nextPage()} 
+    disabled={!table.getCanNextPage()}
+  >
+    {">"}
+  </button>
+
+  <button 
+    onClick={() => table.lastPage()} 
+    disabled={!table.getCanNextPage()}
+  >
+    {">>"}
+  </button>
+</div>
+
           </div>
         </div>
       </div>

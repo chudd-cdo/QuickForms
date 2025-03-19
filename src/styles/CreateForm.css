@@ -42,34 +42,60 @@ html {
     align-items: center;
     border: 1px solid black;
     height: 100%;
+    overflow: hidden;                /* ✅ Ensures no content spills out */
+
 }
 
 /* User Profile */
 .create-user-profile {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;                     /* ✅ Reduced gap between avatar and text */
     margin-bottom: 20px;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    margin-left: 85px;
 }
 
+/* User Avatar */
+.create-user-avatar {
+    width: 40px;                   /* ✅ Slightly smaller avatar */
+    height: 40px;                  
+    flex-shrink: 0;                 /* ✅ Prevent shrinking */
+    display: flex;                  
+    justify-content: center;        
+    align-items: center;
+    border-radius: 50%;             /* ✅ Circular avatar */
+    background-color: #f3f3f3;      
+    box-shadow: 0 0 5px rgba(0,0,0,0.1); 
+    overflow: hidden;               
+}
+
+/* User Info */
+.create-user-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;            /* ✅ Prevents wrapping */
+    text-overflow: ellipsis;        /* ✅ Adds "..." if text overflows */
+    min-width: 0;                   /* ✅ Prevent shrinking issues */
+}
+
+/* User Role */
 .create-user-role {
     font-size: 16px;
     font-weight: bold;
     margin: 0;
 }
 
+/* User Email */
 .create-user-email {
     font-size: 14px;
     color: #555;
     margin: 0;
 }
 
-.create-user-avatar {
-    font-size: 40px;
-    cursor: pointer;
-    margin-left: -50px;
-}
 
 /* Buttons */
 button {

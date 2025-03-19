@@ -26,7 +26,7 @@ const EditHeader = ({ onPreview, onUpdate }) => {
           Save
         </button>
 
-        <FaEllipsisV className="edit-icon form-more-options" />
+        
       </div>
     </header>
   );

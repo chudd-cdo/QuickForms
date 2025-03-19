@@ -18,15 +18,14 @@ const FormHeader = ({ onPreview, onPublish }) => {
 
       {/* Actions: Preview, Publish */}
       <div className="form-header-right">
-        <button className="form-previewform-btn" onClick={onPreview}>
-          <FaEye className="form-icon" /> Preview
+        <button className="form-preview-btn" onClick={onPreview}>
+          <FaEye className="form-icon" /> 
+          <span>Preview</span> 
         </button>
 
         <button className="form-publish-btn" onClick={onPublish}>
-          Publish
+          <span>Publish</span>
         </button>
-
-        <FaEllipsisV className="form-icon form-more-options" />
       </div>
     </header>
   );

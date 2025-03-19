@@ -1,36 +1,46 @@
-import React, { useState, useEffect, useMemo } from "react";
-import api from "../api";
-import { FaSearch } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import api from "../api"; // Ensure this is configured for API requests
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import "../styles/Notifications.css";
 
 const Notifications = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all"); // "all" or "unread"
+  const [activeTab, setActiveTab] = useState("all");
 
-  // Fetch notifications from API
+  // Fetch notifications from the backend
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.error("No auth token found.");
+          return;
+        }
+    
         const response = await api.get("/notifications", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("API Response Data:", response.data);
-
-        const formattedNotifications = response.data.map((notif) => ({
+    
+        console.log("Fetched Notifications:", response.data);
+    
+        if (!response.data.notifications || !Array.isArray(response.data.notifications)) {
+          throw new Error("Invalid response format");
+        }
+    
+        // Check for missing values
+        const formattedNotifications = response.data.notifications.map((notif) => ({
           id: notif.id,
           avatar: notif.avatar || "/default-avatar.png",
           userName: notif.userName || "Unknown",
-          message: notif.message || "New notification",
-          time: notif.time ? new Date(notif.time).toLocaleString() : "N/A",
-          isRead: notif.isRead || false, // Assuming API returns isRead status
+          message: notif.message || "No message provided",
+          time: notif.time ? new Date(notif.time).toLocaleString() : "Unknown time",
+          isRead: Boolean(notif.isRead),
         }));
-
+    
+        console.log("Formatted Notifications:", formattedNotifications);
+    
         setNotifications(formattedNotifications);
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -38,20 +48,42 @@ const Notifications = () => {
         setLoading(false);
       }
     };
+    
 
     fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 5000);
+    const intervalId = setInterval(fetchNotifications, 5000); // Auto-refresh every 5 seconds
     return () => clearInterval(intervalId);
   }, []);
 
-  // Filter notifications based on active tab
-  const filteredNotifications = useMemo(() => {
-    return notifications
-      .filter((notif) =>
-        notif.userName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      .filter((notif) => (activeTab === "unread" ? !notif.isRead : true));
-  }, [notifications, searchQuery, activeTab]);
+  // Mark a notification as read
+  const markAsRead = async (id) => {
+    try {
+      await api.patch(`/notifications/${id}/read`);
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) =>
+          notif.id === id ? { ...notif, isRead: true } : notif
+        )
+      );
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  // Mark all notifications as read
+  const markAllAsRead = async () => {
+    try {
+      await api.patch("/notifications/read-all");
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) => ({ ...notif, isRead: true }))
+      );
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
+  };
+
+  const filteredNotifications = notifications.filter((notif) =>
+    activeTab === "unread" ? !notif.isRead : true
+  );
 
   return (
     <div className="notifications-container">
@@ -61,19 +93,9 @@ const Notifications = () => {
         <div className="notifications-content-wrapper">
           <div className="notifications-header">
             <h1>Notifications</h1>
-          </div>
-
-          {/* Search Bar - Placed ABOVE Tabs */}
-          <div className="notifications-search-bar-container">
-            <div className="notifications-search-bar">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <FaSearch className="notifications-search-icon" />
-            </div>
+            <button onClick={markAllAsRead} className="mark-all-read">
+              Mark All as Read
+            </button>
           </div>
 
           {/* Tabs for All and Unread Notifications */}
@@ -94,14 +116,17 @@ const Notifications = () => {
 
           {/* Notifications List */}
           <div className="notifications-list">
-            {filteredNotifications.length > 0 ? (
+            {loading ? (
+              <p>Loading notifications...</p>
+            ) : filteredNotifications.length > 0 ? (
               filteredNotifications.map((notif) => (
                 <div
                   key={notif.id}
                   className={`notification-item ${notif.isRead ? "read" : "unread"}`}
+                  onClick={() => markAsRead(notif.id)}
                 >
                   <img
-                    src={notif.avatar}
+                    src={notif.avatar || "/default-avatar.png"}
                     alt="User Avatar"
                     className="notification-avatar"
                   />
@@ -115,10 +140,6 @@ const Notifications = () => {
             ) : (
               <p className="no-notifications">No notifications found</p>
             )}
-          </div>
-
-          <div className="see-previous-notifications">
-            <a href="/previous-notifications">See Previous Notifications</a>
           </div>
         </div>
       </div>

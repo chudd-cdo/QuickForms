@@ -16,9 +16,9 @@
   border-radius: 10px;
   padding: 20px;
   margin-left: 120px;
-  margin-top: 100px;
+  margin-top: 80px;
   position: relative;
-  height: calc(100vh - 170px);
+  height: calc(100vh - 100px);
   overflow-y: auto;
 }
 
@@ -90,10 +90,8 @@
     display: flex;
     align-items: center;
     justify-content: center; /* Centers the icon */
-  }
-  .chudd-archive-button i {
-    font-size: 34px; /* Adjust the icon size */
-    color: black; /* Ensure good contrast */
+    color: black;
+
   }
 
 .chudd-archive-button:hover {
@@ -193,7 +191,7 @@
   color: red;
 }
 
-/* Pagination */
+/* ✅ Pagination Container */
 .chudd-pagination {
   display: flex;
   justify-content: center;
@@ -206,7 +204,7 @@
   transform: translateX(-50%);
   width: 100%;
 }
-
+/* ✅ Pagination Buttons */
 .chudd-pagination button {
   background: none;
   border: none;
@@ -219,32 +217,37 @@
   transition: background 0.3s, color 0.3s;
 }
 
+/* ✅ Button Hover Effect */
 .chudd-pagination button:hover {
   background-color: #4fb838;
   color: white;
 }
 
+/* ✅ Disabled Buttons */
 .chudd-pagination button:disabled {
-  color: #ccc;
-  cursor: default;
+  color: #ccc;                   /* Gray out the button */
+  background-color: #f0f0f0;     /* Light gray background */
+  cursor: not-allowed;           /* Indicate it's not clickable */
+  pointer-events: none;          /* Prevent interaction */
+  box-shadow: none;              /* Remove any shadow effect */
+  opacity: 0.6;                   /* Slight transparency */
 }
 
-/* Active Page Number */
+/* ✅ Active Page Number */
 .chudd-page-number.active {
   font-size: 18px;
   font-weight: bold;
-  color: #000;
+  color: #fff;
+  background-color: #4fb838;  /* Highlight active page */
+  border-radius: 5px;
+  transition: 0.3s;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .chudd-myforms-table th,
-  .chudd-myforms-table td {
-    padding: 8px;
-    font-size: 14px;
-  }
-
-  .chudd-actions {
-    gap: 5px; /* Further reduces spacing on smaller screens */
-  }
+/* ✅ Disabled Page Number */
+.chudd-page-number.disabled {
+  color: #ccc;                   /* Gray out the page number */
+  font-weight: normal;           /* Remove boldness */
+  pointer-events: none;          /* Disable interaction */
+  opacity: 0.6;                   /* Slight transparency */
+  background-color: #f0f0f0;
 }
