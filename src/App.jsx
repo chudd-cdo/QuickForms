@@ -4,6 +4,7 @@ import axios from "axios";
 import Home from "./pages/Home";
 import MyForms from "./pages/MyForms";
 import Responses from "./pages/Responses";
+import ResponseDetails from "./pages/ResponseDetails"; // ✅ Imported ResponseDetails page
 import Notifications from "./pages/Notifications";
 import CreateForm from "./pages/CreateForm";
 import PreviewForm from "./pages/PreviewForm";
@@ -16,8 +17,6 @@ import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LocalStorage from "./components/localStorage"; // Utility to manage local storage
-import './styles/responsive.css';
-
 
 function App() {
   const location = useLocation();
@@ -68,6 +67,14 @@ function App() {
               }
             />
             <Route
+              path="/responses/:responseId"
+              element={
+                <ProtectedRoute authToken={authToken}>
+                  <ResponseDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/notifications"
               element={
                 <ProtectedRoute authToken={authToken}>
@@ -107,6 +114,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+                         <Route
+  path="/response-details/:id"
+  element={
+    <ProtectedRoute authToken={authToken}>
+      <ResponseDetails />
+    </ProtectedRoute>
+  }
+/>
+
+
             <Route
               path="/profile"
               element={

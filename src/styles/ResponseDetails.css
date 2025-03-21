@@ -1,0 +1,225 @@
+/* Wrapper */
+.response-details-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #5fff79;
+  min-height: 100vh;
+  overflow: hidden;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  margin-top: 60px;
+}
+
+/* Header */
+.response-details-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: #ffffff;
+  color: #000000;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Back button & title */
+.response-details-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.response-details-back-icon {
+  font-size: 22px;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+/* User Info */
+.response-details-header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: flex-end;
+}
+
+.response-details-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 50px;
+}
+
+.response-details-user-name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.response-details-avatar {
+  font-size: 24px;
+}
+
+/* Content */
+.response-details-content {
+  width: 100%;
+  max-width: 800px;
+  margin: 50px auto 80px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Title */
+.response-details-form-title {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: left;
+  margin-left: 10px;
+}
+
+/* Description */
+.response-details-form-description {
+  font-size: 16px;
+  text-align: left;
+  color: #000000;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+/* Submission Time */
+.response-details-submission-time {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* Question */
+.response-details-question {
+  width: 92%;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Answer */
+.response-details-question-text {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.response-details-answer {
+  font-size: 16px;
+}
+
+.response-details-answer-text {
+  color: #333;
+}
+
+.response-details-no-answer {
+  color: #999;
+  font-style: italic;
+}
+
+.response-details-no-data {
+  font-size: 16px;
+  color: #777;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Loading & Error */
+.loading-message,
+.error-message {
+  font-size: 16px;
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-icon {
+  font-size: 20px;
+  color: #555;
+}
+
+.file-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 16px;
+  font-weight: bold;
+  width: 100px;
+}
+
+.file-button:hover {
+  color: #0056b3;
+}
+
+/* Modal Background */
+.file-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.file-modal-content {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Close Button */
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 22px;
+  color: red;
+}
+
+/* Image Preview */
+.file-preview-image {
+  max-width: 100%;
+  max-height: 80vh; /* Ensures full visibility on any screen */
+  object-fit: contain; /* Keeps the whole image visible */
+}
+
+/* PDF & Other Files */
+.file-preview-frame {
+  width: 100%;
+  height: 80vh; /* Makes sure it fits within the screen */
+  border: none;
+}

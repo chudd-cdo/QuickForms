@@ -6,7 +6,6 @@ import { FaTrash, FaUserCircle, FaUserPlus, FaPlusSquare } from "react-icons/fa"
 import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import EditHeader from "../components/EditHeader";
-import axios from "axios";
 import AssignUserModal from "../components/AssignUserModal";
 import LocalStorage from "../components/localStorage";
 import api from "../api";

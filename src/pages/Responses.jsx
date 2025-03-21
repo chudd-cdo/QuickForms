@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 import {
   useReactTable,
@@ -15,23 +16,32 @@ const Responses = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pageIndex, setPageIndex] = useState(0);
   const responsesPerPage = 5;
+  const navigate = useNavigate();
+
+  const [pageIndex, setPageIndex] = useState(() => {
+    return Number(localStorage.getItem("responsesPageIndex")) || 0;
+  });
 
   // Fetch responses from API
   useEffect(() => {
+    // Retrieve stored page index if available
+    const storedPageIndex = localStorage.getItem("responsesPageIndex");
+    if (storedPageIndex) {
+      setPageIndex(Number(storedPageIndex));
+    }
+  
     const fetchResponses = async () => {
       try {
         const token = localStorage.getItem("authToken");
         const response = await api.get("/responses", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
+  
         console.log("API Response Data:", response.data);
-
+  
         const formattedResponses = response.data.map((res) => ({
+          id: res.id || null,
           avatar: res.avatar || "/default-avatar.png",
           userName: res.userName || "Unknown",
           formName: res.formName || "Untitled Form",
@@ -40,24 +50,26 @@ const Responses = () => {
             ? new Date(res.submission_time).toLocaleString()
             : "N/A",
         }));
-
-        // Preserve current page index if data length remains the same
-        setResponses((prev) => 
-          JSON.stringify(prev) === JSON.stringify(formattedResponses) ? prev : formattedResponses
-        );
+  
+        setResponses((prevResponses) => {
+          if (JSON.stringify(prevResponses) !== JSON.stringify(formattedResponses)) {
+            return formattedResponses;
+          }
+          return prevResponses;
+        });
       } catch (error) {
         console.error("Error fetching responses:", error);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchResponses();
-    
-    // Real-time updates every 5 seconds
+  
     const intervalId = setInterval(fetchResponses, 5000);
     return () => clearInterval(intervalId);
   }, []);
+  
 
   // Optimized filtering
   const filteredResponses = useMemo(() => {
@@ -68,17 +80,27 @@ const Responses = () => {
     );
   }, [responses, searchQuery]);
 
+  const handleRowClick = useCallback(
+    (row) => {
+      localStorage.setItem("responsesPageIndex", pageIndex); // ✅ Save current page
+      console.log("Navigating to:", row.original.id);
+      if (row.original.id) {
+        navigate(`/response-details/${row.original.id}`);
+      } else {
+        console.warn("Invalid ID for navigation:", row.original.id);
+      }
+    },
+    [navigate, pageIndex]
+  );
+  
+
   const columns = [
     {
       accessorKey: "avatar",
       header: " ",
       cell: ({ row }) => (
         <div className="responses-avatar-container">
-          <img
-            src={row.original.avatar}
-            alt="User Avatar"
-            className="responses-avatar"
-          />
+          <img src={row.original.avatar} alt="User Avatar" className="responses-avatar" />
         </div>
       ),
     },
@@ -97,9 +119,7 @@ const Responses = () => {
       cell: ({ row }) => (
         <span
           className={
-            row.original.status === "Active"
-              ? "responses-status-active"
-              : "responses-status-deactivated"
+            row.original.status === "Active" ? "responses-status-active" : "responses-status-deactivated"
           }
         >
           {row.original.status}
@@ -118,17 +138,21 @@ const Responses = () => {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     state: { pagination: { pageIndex, pageSize: responsesPerPage } },
+    manualPagination: false,
     onPaginationChange: (updater) => {
       setPageIndex((prev) => {
-        const newState = typeof updater === "function" ? updater(prev) : updater;
-        return newState.pageIndex !== undefined ? newState.pageIndex : prev;
+        const newPageIndex = typeof updater === "function" ? updater(prev).pageIndex : updater.pageIndex;
+        
+        if (newPageIndex !== undefined) {
+          localStorage.setItem("responsesPageIndex", newPageIndex); // ✅ Corrected
+          return newPageIndex;
+        }
+        
+        return prev;
       });
     },
   });
-
-  const handleCreateForm = () => {
-    alert("Create new form clicked");
-  };
+  
 
   return (
     <div className="responses-container">
@@ -140,18 +164,17 @@ const Responses = () => {
             <h1>User Responses</h1>
           </div>
 
-              <div className="responses-search-bar-container">
-                <div className="responses-search-bar">
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <FaSearch className="responses-search-icon" />
-                </div>
-              </div>
-
+          <div className="responses-search-bar-container">
+            <div className="responses-search-bar">
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <FaSearch className="responses-search-icon" />
+            </div>
+          </div>
 
           <div className="responses-table-wrapper">
             <div className="responses-table-container">
@@ -168,7 +191,11 @@ const Responses = () => {
                 <tbody>
                   {table.getRowModel().rows.length > 0 ? (
                     table.getRowModel().rows.map((row) => (
-                      <tr key={row.id}>
+                      <tr 
+                        key={row.id} 
+                        onClick={() => handleRowClick(row)}
+                        style={{ cursor: "pointer" }} 
+                      >
                         {row.getVisibleCells().map((cell) => (
                           <td key={cell.id}>
                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -188,43 +215,48 @@ const Responses = () => {
             </div>
           </div>
 
-          <div className="responses-pagination">
-            <button 
-              onClick={() => setPageIndex(0)} 
-              disabled={pageIndex === 0}
-            >
-              {"<<"}
-            </button>
-            <button 
-              onClick={() => setPageIndex((prev) => Math.max(prev - 1, 0))} 
-              disabled={pageIndex === 0}
-            >
-              {"<"}
-            </button>
+          <div className="chudd-pagination">
+  <button 
+    onClick={() => table.firstPage()} 
+    disabled={!table.getCanPreviousPage()}
+  >
+    {"<<"}
+  </button>
+  
+  <button 
+    onClick={() => table.previousPage()} 
+    disabled={!table.getCanPreviousPage()}
+  >
+    {"<"}
+  </button>
 
-            {Array.from({ length: table.getPageCount() }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => setPageIndex(index)}
-                className={pageIndex === index ? "active-page" : ""}
-              >
-                {index + 1}
-              </button>
-            ))}
+  {/* Page Number Buttons */}
+  {Array.from({ length: table.getPageCount() }, (_, index) => (
+    <button
+      key={index}
+      onClick={() => table.setPageIndex(index)}
+      className={`chudd-page-number ${
+        table.getState().pagination.pageIndex === index ? "active" : "" 
+      } ${!table.getCanNextPage() && !table.getCanPreviousPage() ? "disabled" : ""}`}
+    >
+      {index + 1}
+    </button>
+  ))}
 
-            <button 
-              onClick={() => setPageIndex((prev) => Math.min(prev + 1, table.getPageCount() - 1))} 
-              disabled={pageIndex >= table.getPageCount() - 1}
-            >
-              {">"}
-            </button>
-            <button 
-              onClick={() => setPageIndex(table.getPageCount() - 1)} 
-              disabled={pageIndex >= table.getPageCount() - 1}
-            >
-              {">>"}
-            </button>
-          </div>
+  <button 
+    onClick={() => table.nextPage()} 
+    disabled={!table.getCanNextPage()}
+  >
+    {">"}
+  </button>
+
+  <button 
+    onClick={() => table.lastPage()} 
+    disabled={!table.getCanNextPage()}
+  >
+    {">>"}
+  </button>
+</div>
         </div>
       </div>
     </div>

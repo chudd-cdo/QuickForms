@@ -40,6 +40,7 @@ const CreateForm = () => {
     checkbox: "checkbox",
     dropdown: "dropdown",
     number: "number",
+    file: "file",
   };
 
   const handlePublish = async () => {
@@ -73,8 +74,14 @@ const CreateForm = () => {
         questionData.append(`questions[${index}][form_id]`, formId);
         questionData.append(`questions[${index}][question_text]`, q.title);
         questionData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
-        questionData.append(`questions[${index}][options]`, q.options.length > 0 ? JSON.stringify(q.options) : "[]");
+      
+        if (q.options && q.options.length > 0) {
+          q.options.forEach((option, optIndex) => {
+            questionData.append(`questions[${index}][options][${optIndex}]`, option);
+          });
+        }
       });
+      
   
       // ✅ Use `api.post` to send questions
       await api.post("/questions", questionData, {
@@ -100,7 +107,7 @@ const CreateForm = () => {
     setQuestions((prevQuestions) => {
       const updated = [...prevQuestions];
       updated[index].type = value;
-      if (["short", "paragraph", "number"].includes(value)) {
+      if (["short", "paragraph", "number","file"].includes(value)) {
         updated[index].options = [];
       }
       return updated;
@@ -253,6 +260,7 @@ const CreateForm = () => {
                             <option value="checkbox">Checkboxes</option>
                             <option value="dropdown">Dropdown</option>
                             <option value="number">Number</option>
+                            <option value="file">Upload File</option> 
                           </select>
                         </div>
 
@@ -297,6 +305,28 @@ const CreateForm = () => {
                               </div>
                             </div>
                           )}
+
+                          {/* ✅ Ensure file input always appears when type is "file" */}
+                          {question.type === "file" && (
+  <div className="create-upload-container">
+    <input
+      type="file"
+      className="create-upload-input"
+      onChange={(e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setQuestions((prev) => {
+            const updated = [...prev];
+            updated[qIndex].file = file; // ✅ Store file
+            return updated;
+          });
+        }
+      }}
+    />
+    {question.file && <p className="upload-file-name">{question.file.name}</p>}
+  </div>
+)}
+
                         </div>
 
                         <div className="create-question-actions">

@@ -199,7 +199,7 @@
   font-weight: bold;
 }
 
-/* Pagination */
+/* ✅ Pagination Container */
 .responses-pagination {
   display: flex;
   justify-content: center;
@@ -212,7 +212,7 @@
   transform: translateX(-50%);
   width: 100%;
 }
-
+/* ✅ Pagination Buttons */
 .responses-pagination button {
   background: none;
   border: none;
@@ -225,56 +225,38 @@
   transition: background 0.3s, color 0.3s;
 }
 
-.responses-pagination button:disabled {
-  color: #ccc;
-  cursor: default;
-}
-
+/* ✅ Button Hover Effect */
 .responses-pagination button:hover {
   background-color: #4fb838;
   color: white;
 }
 
+/* ✅ Disabled Buttons */
+.responses-pagination button:disabled {
+  color: #ccc;                   /* Gray out the button */
+  background-color: #f0f0f0;     /* Light gray background */
+  cursor: not-allowed;           /* Indicate it's not clickable */
+  pointer-events: none;          /* Prevent interaction */
+  box-shadow: none;              /* Remove any shadow effect */
+  opacity: 0.6;                   /* Slight transparency */
+}
+
+/* ✅ Active Page Number */
 .responses-page-number.active {
   font-size: 18px;
   font-weight: bold;
-  color: #000;
+  color: #fff;
+  background-color: #4fb838;  /* Highlight active page */
+  border-radius: 5px;
+  transition: 0.3s;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .chudd-myforms-table th,
-  .chudd-myforms-table td {
-      padding: 8px;
-      font-size: 14px;
-  }
+/* ✅ Disabled Page Number */
+.responses-page-number.disabled {
+  color: #ccc;                   /* Gray out the page number */
+  font-weight: normal;           /* Remove boldness */
+  pointer-events: none;          /* Disable interaction */
+  opacity: 0.6;                   /* Slight transparency */
+  background-color: #f0f0f0;
 }
-/* Responsive Design */
-@media (max-width: 768px) {
-  .responses-container {
-    flex-direction: column;
-    align-items: center;
-  }
 
-  .responses-main-content {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 20px;
-    padding: 15px;
-  }
-
-
-  .responses-search-bar {
-    width: 100%;
-  }
-
-  
-  .responses-table-container {
-    overflow-x: auto;
-  }
-
-  .responses-pagination {
-    width: 100%;
-    justify-content: center;
-  }
-}
