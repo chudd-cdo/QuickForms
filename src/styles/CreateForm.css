@@ -167,6 +167,7 @@ button {
     font-weight: bold;
     cursor: pointer;
     background-color: transparent;
+    margin-left: 5px;
 }
 .create-form-description-input {
     width: 100%;
@@ -357,12 +358,12 @@ input{
     justify-content: center;
     cursor: pointer;
     margin-top: 10px;
-    width: 20%;
+    width: 100px;
     margin: 10px auto;
 }
 
 .create-add-question-btn:hover {
-    color: #f3f3f3;
+    background-color: #69e470;
 }
 
 /* Option Group */

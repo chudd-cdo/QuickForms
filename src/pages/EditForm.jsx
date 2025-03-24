@@ -265,7 +265,6 @@ const EditForm = () => {
           <FaPlusSquare className="plus-icon" /> Create new form
         </button>
         <nav className="create-sidebar-nav">
-          <p onClick={() => navigate("/dashboard")}>Dashboard</p>
           <p onClick={() => navigate("/myforms")}>My Forms </p>
           <p>Responses</p>
           <p>Notifications</p>
@@ -283,6 +282,7 @@ const EditForm = () => {
               <label className="create-form-label">Form Title:</label>
               <input
                 type="text"
+                placeholder="Enter form title"
                 className="create-form-title-input"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
@@ -290,6 +290,7 @@ const EditForm = () => {
             </div>
             <input
               type="text"
+              placeholder="Enter form description"
               className="create-form-description-input"
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}

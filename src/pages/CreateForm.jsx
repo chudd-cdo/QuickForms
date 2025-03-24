@@ -12,8 +12,9 @@ import api from "../api";
 
 const CreateForm = () => {
   const navigate = useNavigate();
-  const initialTitle = "Untitled Form";
+  const initialTitle = "";
   const initialDescription = "";
+
 
   const [formTitle, setFormTitle] = useState(() => localStorage.getItem("formTitle") || initialTitle);
   const [formDescription, setFormDescription] = useState(() => localStorage.getItem("formDescription") || initialDescription);
@@ -22,6 +23,10 @@ const CreateForm = () => {
     return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [] }];
   });
   const [status, setStatus] = useState("Activated");
+  const user = LocalStorage.getUserData() || {}; 
+
+
+
 
   useEffect(() => {
     localStorage.setItem("formTitle", formTitle);
@@ -43,57 +48,56 @@ const CreateForm = () => {
     file: "file",
   };
 
-  const handlePublish = async () => {
-    if (!formTitle.trim()) {
-      alert("Please enter a form title before publishing.");
+  const [formId, setFormId] = useState(null); // Add this state
+
+const handlePublish = async () => {
+  if (!formTitle.trim()) {
+    alert("Please enter a form title before publishing.");
+    return;
+  }
+
+  try {
+    const userId = LocalStorage.getUserId();
+    if (!userId) {
+      alert("User not authenticated. Please log in again.");
       return;
     }
-  
-    try {
-      const userId = LocalStorage.getUserId();
-      if (!userId) {
-        alert("User not authenticated. Please log in again.");
-        return;
+
+    const formData = {
+      user_id: userId,
+      name: formTitle,
+      description: formDescription,
+      is_active: status === "Activated",
+    };
+
+    const formResponse = await api.post("/forms", formData);
+    const newFormId = formResponse.data.id; // Get the form ID
+    setFormId(newFormId); // Store form ID in state
+
+    const questionData = new FormData();
+    questions.forEach((q, index) => {
+      questionData.append(`questions[${index}][form_id]`, newFormId);
+      questionData.append(`questions[${index}][question_text]`, q.title);
+      questionData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
+    
+      if (q.options && q.options.length > 0) {
+        q.options.forEach((option, optIndex) => {
+          questionData.append(`questions[${index}][options][${optIndex}]`, option);
+        });
       }
-  
-      // ✅ Prepare form data correctly
-      const formData = {
-        user_id: userId,
-        name: formTitle,
-        description: formDescription,
-        is_active: status === "Activated",
-      };
-  
-      // ✅ Use `api.post` to send the form
-      const formResponse = await api.post("/forms", formData);
-      const formId = formResponse.data.id;
-  
-      // ✅ Prepare questions data
-      const questionData = new FormData();
-      questions.forEach((q, index) => {
-        questionData.append(`questions[${index}][form_id]`, formId);
-        questionData.append(`questions[${index}][question_text]`, q.title);
-        questionData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
-      
-        if (q.options && q.options.length > 0) {
-          q.options.forEach((option, optIndex) => {
-            questionData.append(`questions[${index}][options][${optIndex}]`, option);
-          });
-        }
-      });
-      
-  
-      // ✅ Use `api.post` to send questions
-      await api.post("/questions", questionData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-  
-      navigate("/myforms"); // ✅ Redirect to MyForms after successful publish
-    } catch (error) {
-      console.error("Error publishing form:", error.response?.data || error);
-      alert("Error: " + JSON.stringify(error.response?.data));
-    }
-  };
+    });
+
+    await api.post("/questions", questionData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    navigate("/myforms");
+  } catch (error) {
+    console.error("Error publishing form:", error.response?.data || error);
+    alert("Error: " + JSON.stringify(error.response?.data));
+  }
+};
+
   
   const handleTitleChange = (index, value) => {
     setQuestions((prevQuestions) => {
@@ -161,9 +165,9 @@ const CreateForm = () => {
             <FaUserCircle />
           </div>
           <div className="create-user-profile-info">
-            <p className="create-user-role"><strong>IT Intern</strong></p>
-            <span className="create-user-email">itintern@smartgforms.com</span>
-          </div>
+          <p>{user.name || "User"}</p>
+          <span className="chudd-dashboard-email">{user.email || "user@smartgforms.com"}</span>
+        </div>
         </div>
         <button
           className="create-create-btn"
@@ -181,7 +185,6 @@ const CreateForm = () => {
         </button>
 
         <nav className="create-sidebar-nav">
-          <p onClick={() => navigate("/dashboard")}>Dashboard</p>
           <p onClick={() => navigate("/myforms")}>My Forms </p>
           <p>Responses</p>
           <p>Notifications</p>
@@ -199,6 +202,7 @@ const CreateForm = () => {
               <label className="create-form-label">Form Title:</label>
               <input
                 type="text"
+                placeholder="Enter form title"
                 className="create-form-title-input"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
@@ -206,6 +210,7 @@ const CreateForm = () => {
             </div>
             <input
               type="text"
+              placeholder="Enter form description"
               className="create-form-description-input"
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
@@ -220,9 +225,17 @@ const CreateForm = () => {
               <option value="Deactivated">Deactivated</option>
             </select>
 
-            <button className="create-user-icon-btn">
-              <FaUserPlus className="create-icon" />
-            </button>
+            <button className="create-user-icon-btn" onClick={() => {
+  if (!formId) {
+    alert("Publish the form before assigning users.");
+    return;
+  }
+  setUserModalOpen(true);
+}}>
+  <FaUserPlus className="create-icon" />
+</button>
+
+
           </div>
         </div>
 
@@ -308,24 +321,24 @@ const CreateForm = () => {
 
                           {/* ✅ Ensure file input always appears when type is "file" */}
                           {question.type === "file" && (
-  <div className="create-upload-container">
-    <input
-      type="file"
-      className="create-upload-input"
-      onChange={(e) => {
-        const file = e.target.files[0];
-        if (file) {
-          setQuestions((prev) => {
-            const updated = [...prev];
-            updated[qIndex].file = file; // ✅ Store file
-            return updated;
-          });
-        }
-      }}
-    />
-    {question.file && <p className="upload-file-name">{question.file.name}</p>}
-  </div>
-)}
+                              <div className="create-upload-container">
+                                <input
+                                  type="file"
+                                  className="create-upload-input"
+                                  onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                      setQuestions((prev) => {
+                                        const updated = [...prev];
+                                        updated[qIndex].file = file; // ✅ Store file
+                                        return updated;
+                                      });
+                                    }
+                                  }}
+                                />
+                                {question.file && <p className="upload-file-name">{question.file.name}</p>}
+                              </div>
+                            )}
 
                         </div>
 

@@ -260,3 +260,6 @@
   background-color: #f0f0f0;
 }
 
+.responses-table tbody tr:hover {
+  background-color: #72e25e;
+}
