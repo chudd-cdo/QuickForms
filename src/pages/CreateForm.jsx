@@ -20,7 +20,7 @@ const CreateForm = () => {
   const [formDescription, setFormDescription] = useState(() => localStorage.getItem("formDescription") || initialDescription);
   const [questions, setQuestions] = useState(() => {
     const savedQuestions = localStorage.getItem("questions");
-    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "Question Title", type: "short", options: [] }];
+    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "", type: "short", options: [] }];
   });
   const [status, setStatus] = useState("Activated");
   const user = LocalStorage.getUserData() || {}; 
@@ -127,7 +127,7 @@ const handlePublish = async () => {
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { id: `${questions.length + 1}`, title: "New Question", type: "short", options: [] }]);
+    setQuestions([...questions, { id: `${questions.length + 1}`, title: "", type: "short", options: [] }]);
   };
 
   const duplicateQuestion = (index) => {
@@ -178,7 +178,7 @@ const handlePublish = async () => {
 
             setFormTitle(initialTitle);
             setFormDescription(initialDescription);
-            setQuestions([{ id: "1", title: "Question Title", type: "short", options: [] }]);
+            setQuestions([{ id: "1", title: "", type: "short", options: [] }]);
           }}
         >
           <FaPlusSquare className="plus-icon" /> Create new form
@@ -257,6 +257,7 @@ const handlePublish = async () => {
                             <label className="create-question-label">Question:</label>
                             <input
                               type="text"
+                              placeholder="Enter question"
                               className="create-question-input"
                               value={question.title}
                               onChange={(e) => handleTitleChange(qIndex, e.target.value)}
