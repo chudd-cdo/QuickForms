@@ -70,7 +70,7 @@ const ProfilePage = () => {
         }
 
         try {
-            const response = await api.put("/user/update", { [field]: updatedUser[field] });
+            const response = await api.put("/profile/update", { [field]: updatedUser[field] });
             setUser(response.data.user);
             setEditingField(null);
 

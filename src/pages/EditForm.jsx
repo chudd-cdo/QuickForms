@@ -226,10 +226,18 @@ const EditForm = () => {
   const handleQuestionTypeChange = (index, value) => {
     setQuestions((prevQuestions) =>
       prevQuestions.map((q, i) =>
-        i === index ? { ...q, question_type: value, options: value === "multiple_choice" || value === "checkbox" ? ["Option 1"] : [] } : q
+        i === index
+          ? {
+              ...q,
+              question_type: value,
+              options: value === "multiple_choice" || value === "checkbox" ? ["Option 1"] : [],
+              file: value === "file" ? null : q.file, // Ensure file is reset for other types
+            }
+          : q
       )
     );
   };
+  
 
   const addOption = (qIndex) => {
     setQuestions((prevQuestions) =>
@@ -345,7 +353,8 @@ const EditForm = () => {
                             <option value="checkbox">Checkbox</option>
                             <option value="dropdown">Dropdown</option>
                             <option value="number">Number</option>
-                          </select>
+                            <option value="file">Upload File</option>
+                            </select>
                         </div>
 
                         <div className="edit-answer-container">
@@ -398,6 +407,28 @@ const EditForm = () => {
                               </div>
                             </div>
                           )}
+
+                           {/* ✅ Ensure file input always appears when type is "file" */}
+                           {question.question_type === "file" && (
+                              <div className="create-upload-container">
+                                <input
+                                  type="file"
+                                  className="create-upload-input"
+                                  onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                      setQuestions((prev) => {
+                                        const updated = [...prev];
+                                        updated[qIndex].file = file; // ✅ Store file
+                                        return updated;
+                                      });
+                                    }
+                                  }}
+                                />
+                                {question.file && <p className="upload-file-name">{question.file.name}</p>}
+                              </div>
+                            )}
+
                           {question.question_type === "dropdown" && (
                             <div>
                               {question.options.length > 0 ? (

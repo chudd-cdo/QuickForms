@@ -157,17 +157,20 @@
 .edit-preview-option {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin: 8px 0;
+    gap: 10px; /* Space between radio button and text */
+    margin: 20px 0; /* Increase vertical spacing */
+    margin-top: 10px;
 }
 
 /* Radio & Checkbox */
 .edit-preview-radio,
 .edit-preview-checkbox {
-    transform: scale(1.2); /* Make them slightly larger */
-}
+    transform: scale(1.2); /* Increase size */
+    margin-bottom: 8px; 
+margin-top: 10px;}
 
 /* Label */
 .edit-preview-label {
     font-size: 16px;
+    margin-left: 10px;
 }
