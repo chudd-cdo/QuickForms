@@ -24,6 +24,9 @@ const Responses = () => {
   });
 
   // Fetch responses from API
+
+  
+  
   useEffect(() => {
     // Retrieve stored page index if available
     const storedPageIndex = localStorage.getItem("responsesPageIndex");
@@ -34,12 +37,20 @@ const Responses = () => {
     const fetchResponses = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const response = await api.get("/responses", {
+        const formId = localStorage.getItem("selectedFormId"); // Get selected form ID
+        
+        if (!formId) {
+          console.warn("No form ID selected. Responses cannot be filtered.");
+          return;
+        }
+    
+        const response = await api.get(`/responses`, {
           headers: { Authorization: `Bearer ${token}` },
+          params: { form_id: formId }, // Send form_id as a query parameter
         });
-  
+    
         console.log("API Response Data:", response.data);
-  
+    
         const formattedResponses = response.data.map((res) => ({
           id: res.id || null,
           avatar: res.avatar || "/default-avatar.png",
@@ -50,19 +61,15 @@ const Responses = () => {
             ? new Date(res.submission_time).toLocaleString()
             : "N/A",
         }));
-  
-        setResponses((prevResponses) => {
-          if (JSON.stringify(prevResponses) !== JSON.stringify(formattedResponses)) {
-            return formattedResponses;
-          }
-          return prevResponses;
-        });
+    
+        setResponses(formattedResponses);
       } catch (error) {
         console.error("Error fetching responses:", error);
       } finally {
         setLoading(false);
       }
     };
+    
   
     fetchResponses();
   

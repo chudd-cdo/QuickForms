@@ -17,6 +17,7 @@ import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LocalStorage from "./components/localStorage"; // Utility to manage local storage
+import FormResponses from "./pages/FormResponses"; // ✅ Import FormResponses
 
 function App() {
   const location = useLocation();
@@ -44,7 +45,7 @@ function App() {
 
         <div className="main-layout">
           {/* Show Sidebar only for relevant pages */}
-          {["/myforms", "/responses", "/notifications", "/profile"].includes(location.pathname) && <Sidebar />}
+          {["/myforms", "/responses", "/notifications", "/profile", "/form-responses"].includes(location.pathname) && <Sidebar />}
 
           <Routes>
             <Route path="/" element={<Home />} />
@@ -59,18 +60,10 @@ function App() {
               }
             />
             <Route
-              path="/responses"
+              path="/responses/:formId"
               element={
                 <ProtectedRoute authToken={authToken}>
                   <Responses />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/responses/:responseId"
-              element={
-                <ProtectedRoute authToken={authToken}>
-                  <ResponseDetails />
                 </ProtectedRoute>
               }
             />
@@ -114,21 +107,27 @@ function App() {
                 </ProtectedRoute>
               }
             />
-                         <Route
-  path="/response-details/:id"
-  element={
-    <ProtectedRoute authToken={authToken}>
-      <ResponseDetails />
-    </ProtectedRoute>
-  }
-/>
-
-
+            <Route
+              path="/response-details/:id"
+              element={
+                <ProtectedRoute authToken={authToken}>
+                  <ResponseDetails />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/profile"
               element={
                 <ProtectedRoute authToken={authToken}>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/form-responses"
+              element={
+                <ProtectedRoute authToken={authToken}>
+                  <FormResponses forms={forms} setForms={setForms} />
                 </ProtectedRoute>
               }
             />

@@ -132,7 +132,6 @@
         { header: "Date Created", accessorKey: "created_at", cell: ({ getValue }) => new Date(getValue()).toLocaleDateString() },
         { header: "Date Modified", accessorKey: "updated_at", cell: ({ getValue }) => new Date(getValue()).toLocaleString() },
         { header: "Status", accessorKey: "is_active", cell: ({ getValue }) => <span className={getValue() ? "chudd-status-active" : "chudd-status-deactivated"}>{getValue() ? "Activated" : "Deactivated"}</span> },
-        { header: "Responses", accessorKey: "responses_count", cell: ({ getValue }) => getValue() || "0" }
 
       ],
       [archivedView]

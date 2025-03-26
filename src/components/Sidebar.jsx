@@ -32,7 +32,7 @@ const Sidebar = () => {
         <FaWpforms className="sb-icon" />
         <span>My Forms</span>
       </div>
-      <div className="sb-menu-item" onClick={() => navigate("/responses")}>
+      <div className="sb-menu-item" onClick={() => navigate("/form-responses")}>
         <FaRegFileAlt className="sb-icon" />
         <span>Responses</span>
       </div>
