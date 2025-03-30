@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react"; 
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import {
   useReactTable,
   getCoreRowModel,
@@ -18,6 +17,16 @@ const FormResponses = ({ forms, setForms }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const token = LocalStorage.getToken();
+  const formsPerPage = 5;
+
+  // ✅ Store & Retrieve `pageIndex` Properly
+  const [pageIndex, setPageIndex] = useState(() => {
+    return Number(localStorage.getItem("formResponsesPageIndex")) || 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("formResponsesPageIndex", pageIndex);
+  }, [pageIndex]);
 
   useEffect(() => {
     if (!token) {
@@ -26,7 +35,7 @@ const FormResponses = ({ forms, setForms }) => {
     } else {
       fetchUserForms();
       const interval = setInterval(fetchUserForms, 5000); // Fetch every 5 seconds
-      return () => clearInterval(interval); // Cleanup interval on component unmount
+      return () => clearInterval(interval);
     }
   }, []);
 
@@ -43,7 +52,6 @@ const FormResponses = ({ forms, setForms }) => {
         (a, b) => new Date(b.updated_at) - new Date(a.updated_at)
       );
 
-      // Update forms state directly with new sorted data
       setForms(sortedForms);
     } catch (error) {
       console.error("API error:", error.response?.data || error.message);
@@ -108,7 +116,8 @@ const FormResponses = ({ forms, setForms }) => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: 5 } },
+    state: { pagination: { pageIndex, pageSize: formsPerPage } },
+    manualPagination: false,
   });
 
   return (
@@ -168,28 +177,35 @@ const FormResponses = ({ forms, setForms }) => {
         </div>
 
         <div className="form-responses-pagination">
-          <button onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()}>
+          <button onClick={() => setPageIndex(0)} disabled={pageIndex === 0}>
             {"<<"}
           </button>
-          <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+
+          <button onClick={() => setPageIndex((prev) => Math.max(prev - 1, 0))} disabled={pageIndex === 0}>
             {"<"}
           </button>
+
           {Array.from({ length: table.getPageCount() }, (_, index) => (
             <button
               key={index}
-              onClick={() => table.setPageIndex(index)}
+              onClick={() => setPageIndex(index)}
               className={`form-responses-page-number ${
-                table.getState().pagination.pageIndex === index ? "active" : ""
+                pageIndex === index ? "active" : ""
               }`}
             >
               {index + 1}
             </button>
           ))}
-          <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+
+          <button
+            onClick={() => setPageIndex((prev) => Math.min(prev + 1, table.getPageCount() - 1))}
+            disabled={pageIndex >= table.getPageCount() - 1}
+          >
             {">"}
           </button>
-          <button onClick={() => table.lastPage()} disabled={!table.getCanNextPage()}>
-            {" >> "}
+
+          <button onClick={() => setPageIndex(table.getPageCount() - 1)} disabled={pageIndex >= table.getPageCount() - 1}>
+            {">>"}
           </button>
         </div>
       </div>

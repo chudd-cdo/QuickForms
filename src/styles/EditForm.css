@@ -380,3 +380,58 @@ input{
     color: red;
     transform: scale(1.1);
 }
+
+
+/* File Upload */
+.create-file-upload {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.file-upload-label {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    background-color: #f3f3f3;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.file-upload-label:hover {
+    background-color: #e0e0e0;
+}
+
+.file-name {
+    font-size: 12px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    border: solid 1px #ccc;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Dropdown */
+.scrollable {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+}
+
+.add-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin: 5px 0;
+}
+

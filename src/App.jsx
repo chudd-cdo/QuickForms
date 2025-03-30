@@ -60,7 +60,7 @@ function App() {
               }
             />
             <Route
-              path="/responses/:formId"
+              path="/responses"
               element={
                 <ProtectedRoute authToken={authToken}>
                   <Responses />

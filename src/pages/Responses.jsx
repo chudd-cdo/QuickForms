@@ -7,50 +7,44 @@ import {
   getPaginationRowModel,
   flexRender,
 } from "@tanstack/react-table";
-import { FaSearch } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import "../styles/Responses.css";
+import Select from "react-select";
 
 const Responses = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [responses, setResponses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const responsesPerPage = 5;
   const navigate = useNavigate();
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedForms, setSelectedForms] = useState([]);
 
+  // ✅ Store & Retrieve `pageIndex` Properly
   const [pageIndex, setPageIndex] = useState(() => {
-    return Number(localStorage.getItem("responsesPageIndex")) || 0;
+    return Number(localStorage.getItem("formResponsesPageIndex")) || 0;
   });
 
-  // Fetch responses from API
-
-  
-  
   useEffect(() => {
-    // Retrieve stored page index if available
-    const storedPageIndex = localStorage.getItem("responsesPageIndex");
-    if (storedPageIndex) {
-      setPageIndex(Number(storedPageIndex));
-    }
-  
+    localStorage.setItem("formResponsesPageIndex", pageIndex);
+  }, [pageIndex]);
+
+  const formsPerPage = 5; // Adjust this for page size
+
+  // Fetch responses from API
+  useEffect(() => {
     const fetchResponses = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const formId = localStorage.getItem("selectedFormId"); // Get selected form ID
-        
-        if (!formId) {
-          console.warn("No form ID selected. Responses cannot be filtered.");
-          return;
-        }
-    
+        const formId = localStorage.getItem("selectedFormId");
+
+        const params = formId ? { form_id: formId } : {}; // Fetch all if no form is selected
+
         const response = await api.get(`/responses`, {
           headers: { Authorization: `Bearer ${token}` },
-          params: { form_id: formId }, // Send form_id as a query parameter
+          params, // Send form_id only if it exists
         });
-    
+
         console.log("API Response Data:", response.data);
-    
+
         const formattedResponses = response.data.map((res) => ({
           id: res.id || null,
           avatar: res.avatar || "/default-avatar.png",
@@ -61,45 +55,47 @@ const Responses = () => {
             ? new Date(res.submission_time).toLocaleString()
             : "N/A",
         }));
-    
+
         setResponses(formattedResponses);
       } catch (error) {
         console.error("Error fetching responses:", error);
-      } finally {
-        setLoading(false);
       }
     };
-    
-  
+
     fetchResponses();
-  
+
     const intervalId = setInterval(fetchResponses, 5000);
     return () => clearInterval(intervalId);
   }, []);
-  
 
-  // Optimized filtering
+  // Filter responses when user or form is selected
   const filteredResponses = useMemo(() => {
-    return responses.filter(
-      (response) =>
-        response.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        response.formName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [responses, searchQuery]);
+    return responses.filter((response) => {
+      const matchesUser =
+        selectedUsers.length === 0 ||
+        selectedUsers.some((user) => user.value === response.userName);
+
+      const matchesForm =
+        selectedForms.length === 0 ||
+        selectedForms.some((form) => form.value === response.formName);
+
+      return matchesUser && matchesForm;
+    });
+  }, [responses, selectedUsers, selectedForms]);
 
   const handleRowClick = useCallback(
     (row) => {
-      localStorage.setItem("responsesPageIndex", pageIndex); // ✅ Save current page
-      console.log("Navigating to:", row.original.id);
-      if (row.original.id) {
-        navigate(`/response-details/${row.original.id}`);
-      } else {
-        console.warn("Invalid ID for navigation:", row.original.id);
+      const responseId = row.original.id;
+      if (!responseId || responseId === "null" || responseId === "undefined") {
+        console.warn("Invalid ID for navigation:", responseId);
+        return;
       }
+
+      console.log("Navigating to:", responseId);
+      navigate(`/response-details/${responseId}`);
     },
-    [navigate, pageIndex]
+    [navigate]
   );
-  
 
   const columns = [
     {
@@ -107,14 +103,20 @@ const Responses = () => {
       header: " ",
       cell: ({ row }) => (
         <div className="responses-avatar-container">
-          <img src={row.original.avatar} alt="User Avatar" className="responses-avatar" />
+          <img
+            src={row.original.avatar}
+            alt="User Avatar"
+            className="responses-avatar"
+          />
         </div>
       ),
     },
     {
       accessorKey: "userName",
       header: "User Name",
-      cell: ({ row }) => <span className="responses-user">{row.original.userName}</span>,
+      cell: ({ row }) => (
+        <span className="responses-user">{row.original.userName}</span>
+      ),
     },
     {
       accessorKey: "formName",
@@ -126,7 +128,9 @@ const Responses = () => {
       cell: ({ row }) => (
         <span
           className={
-            row.original.status === "Active" ? "responses-status-active" : "responses-status-deactivated"
+            row.original.status === "Active"
+              ? "responses-status-active"
+              : "responses-status-deactivated"
           }
         >
           {row.original.status}
@@ -144,22 +148,22 @@ const Responses = () => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    state: { pagination: { pageIndex, pageSize: responsesPerPage } },
+    state: { pagination: { pageIndex, pageSize: formsPerPage } },
     manualPagination: false,
-    onPaginationChange: (updater) => {
-      setPageIndex((prev) => {
-        const newPageIndex = typeof updater === "function" ? updater(prev).pageIndex : updater.pageIndex;
-        
-        if (newPageIndex !== undefined) {
-          localStorage.setItem("responsesPageIndex", newPageIndex); // ✅ Corrected
-          return newPageIndex;
-        }
-        
-        return prev;
-      });
-    },
   });
-  
+
+  const uniqueUsers = useMemo(() => {
+    const userSet = new Set(responses.map((response) => response.userName));
+    return Array.from(userSet);
+  }, [responses]);
+
+  const uniqueForms = useMemo(() => {
+    const formSet = new Set(responses.map((response) => response.formName));
+    return Array.from(formSet);
+  }, [responses]);
+
+  const userOptions = uniqueUsers.map((user) => ({ value: user, label: user }));
+  const formOptions = uniqueForms.map((form) => ({ value: form, label: form }));
 
   return (
     <div className="responses-container">
@@ -171,18 +175,27 @@ const Responses = () => {
             <h1>User Responses</h1>
           </div>
 
-          <div className="responses-search-bar-container">
-            <div className="responses-search-bar">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <FaSearch className="responses-search-icon" />
-            </div>
+          <div className="responses-filters">
+            <Select
+              isMulti
+              options={userOptions}
+              value={selectedUsers}
+              onChange={setSelectedUsers}
+              placeholder="Filter by User"
+              className="multi-select-dropdown"
+            />
+
+            <Select
+              isMulti
+              options={formOptions}
+              value={selectedForms}
+              onChange={setSelectedForms}
+              placeholder="Filter by Form"
+              className="multi-select-dropdown"
+            />
           </div>
 
+          {/* Table */}
           <div className="responses-table-wrapper">
             <div className="responses-table-container">
               <table className="responses-table">
@@ -198,14 +211,20 @@ const Responses = () => {
                 <tbody>
                   {table.getRowModel().rows.length > 0 ? (
                     table.getRowModel().rows.map((row) => (
-                      <tr 
-                        key={row.id} 
-                        onClick={() => handleRowClick(row)}
-                        style={{ cursor: "pointer" }} 
+                      <tr
+                        key={row.id}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleRowClick(row);
+                        }}
+                        style={{ cursor: "pointer" }}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <td key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
                           </td>
                         ))}
                       </tr>
@@ -222,45 +241,41 @@ const Responses = () => {
             </div>
           </div>
 
-          <div className="chudd-pagination">
-            <button 
-              onClick={() => table.firstPage()} 
-              disabled={!table.getCanPreviousPage()}
-            >
+          {/* Pagination UI */}
+          <div className="form-responses-pagination">
+            <button onClick={() => setPageIndex(0)} disabled={pageIndex === 0}>
               {"<<"}
             </button>
-            
-            <button 
-              onClick={() => table.previousPage()} 
-              disabled={!table.getCanPreviousPage()}
+
+            <button
+              onClick={() => setPageIndex((prev) => Math.max(prev - 1, 0))}
+              disabled={pageIndex === 0}
             >
               {"<"}
             </button>
 
-            {/* Page Number Buttons */}
             {Array.from({ length: table.getPageCount() }, (_, index) => (
               <button
                 key={index}
-                onClick={() => table.setPageIndex(index)}
-                className={`chudd-page-number ${
-                  table.getState().pagination.pageIndex === index ? "active" : "" 
-                } ${!table.getCanNextPage() && !table.getCanPreviousPage() ? "disabled" : ""}`}
+                onClick={() => setPageIndex(index)}
+                className={`form-responses-page-number ${
+                  pageIndex === index ? "active" : ""
+                }`}
               >
                 {index + 1}
               </button>
             ))}
 
-            <button 
-              onClick={() => table.nextPage()} 
-              disabled={!table.getCanNextPage()}
+            <button
+              onClick={() =>
+                setPageIndex((prev) => Math.min(prev + 1, table.getPageCount() - 1))
+              }
+              disabled={pageIndex >= table.getPageCount() - 1}
             >
               {">"}
             </button>
 
-            <button 
-              onClick={() => table.lastPage()} 
-              disabled={!table.getCanNextPage()}
-            >
+            <button onClick={() => setPageIndex(table.getPageCount() - 1)} disabled={pageIndex >= table.getPageCount() - 1}>
               {">>"}
             </button>
           </div>
