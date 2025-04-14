@@ -474,13 +474,35 @@ const EditForm = () => {
     </div>
   )}
 
-  {/* ✅ Dropdown Options */}
-  {question.question_type === "dropdown" && (
-    <div className="dropdown-container">
-      <div className={`dropdown-options ${question.options.length > 10 ? "scrollable" : ""}`}>
-        {question.options.length > 0 ? (
-          question.options.map((option, oIndex) => (
-            <div key={oIndex} className="option-group">
+  {/* ✅ Dropdown Options with Search Bar Inside the Options Container */}
+{question.question_type === "dropdown" && (
+  <div className="dropdown-container">
+    <div className={`dropdown-options ${question.options.length > 10 ? "scrollable" : ""}`}>
+      
+      {/* ✅ Search Bar inside the dropdown options container */}
+      <div className="dropdown-search-container">
+        <input
+          type="text"
+          className="dropdown-search"
+          placeholder="Search option..."
+          value={question.searchTerm || ""}
+          onChange={(e) => {
+            const updatedQuestions = [...questions];
+            updatedQuestions[qIndex].searchTerm = e.target.value;
+            setQuestions(updatedQuestions);
+          }}
+        />
+      </div>
+
+      {/* ✅ Display options normally but apply filter without changing the actual index */}
+      {question.options.length > 0 ? (
+        question.options.map((option, oIndex) => {
+          const isVisible =
+            !question.searchTerm ||
+            option.toLowerCase().includes(question.searchTerm.toLowerCase());
+
+          return (
+            <div key={oIndex} className="option-group" style={{ display: isVisible ? "flex" : "none" }}>
               <input
                 type="text"
                 className="dropdown-input"
@@ -496,11 +518,16 @@ const EditForm = () => {
                 }}
               />
             </div>
-          ))
-        ) : (
-          <p>No options available.</p>
-        )}
-      </div>
+          );
+        })
+      ) : (
+        <p>No options available.</p>
+      )}
+    </div>
+
+    
+
+
 
       {/* ✅ Add Option Button (Only for Dropdown) */}
       <div className="option-group add-option" onClick={() => addOption(qIndex)}>
@@ -528,6 +555,8 @@ const EditForm = () => {
     <span className="toggle-slider"></span>
   </label>
 </div>
+
+
 
                       </div>
                     )}

@@ -253,55 +253,79 @@ button, .create-user-icon-btn, .create-add-question-btn {
     transform: scale(1.1);
 }
 
-/* File Upload */
-.create-file-upload {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-}
-
-.file-upload-label {
-    display: inline-flex;
-    width: 28px;
-    height: 28px;
-    background-color: #f3f3f3;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.file-upload-label:hover {
-    background-color: #e0e0e0;
-}
-
-.file-name {
-    font-size: 12px;
-    color: #333;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100px;
-    border: solid 1px #ccc;
-    padding: 5px;
-    border-radius: 5px;
-}
-
-/* Dropdown */
+/* ✅ Dropdown container (including search bar) */
 .scrollable {
     max-height: 250px;
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 5px;
+    background: #fff;
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
+/* ✅ Search Bar Inside Dropdown */
+.dropdown-search {
+    width: calc(30% - 10px);
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #f9f9f9;
+    position: sticky;
+    top: 0;
+    z-index: 10; /* Keeps search bar visible when scrolling */
+    align-self: flex-end; /* Aligns the search bar to the right */
+    margin-left: auto; /* Pushes the search bar to the right */
+}
+
+/* ✅ Option Group */
+.option-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;
+    width: 50%;
+}
+
+/* ✅ Option Input */
+.create-answer-input {
+    flex-grow: 1;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* ✅ Trash Icon */
+.create-icon-trash {
+    cursor: pointer;
+    color: red;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.create-icon-trash:hover {
+    color: darkred;
+}
+
+/* ✅ Add Option */
 .add-option {
     display: flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
     margin: 5px 0;
+    color: #007bff;
+    font-size: 14px;
 }
+
+.add-option:hover {
+    text-decoration: underline;
+}
+
+

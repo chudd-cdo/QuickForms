@@ -310,7 +310,6 @@ const CreateForm = () => {
                             <option value="file">Upload File</option> 
                           </select>
                         </div>
-
                         <div className="create-answer-container">
   {question.type === "short" && (
     <input type="text" className="create-answer-input" placeholder="Short answer text" disabled />
@@ -324,29 +323,51 @@ const CreateForm = () => {
 
   {(question.type === "multiple" || question.type === "checkbox" || question.type === "dropdown") && (
     <div>
-      {/* ✅ Scrollable container for dropdown options */}
+      {/* ✅ Scrollable container for options (includes search bar inside) */}
       <div className={`options-container ${question.type === "dropdown" ? "scrollable" : ""}`}>
-        {question.options.map((option, oIndex) => (
-          <div key={oIndex} className="option-group">
-            {question.type !== "dropdown" ? (
-              <input type={question.type === "multiple" ? "radio" : "checkbox"} name={`question-${question.id}`} />
-            ) : null}
-            <input
-              type="text"
-              className="create-answer-input"
-              value={option}
-              onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
-            />
-            <IoRemoveCircleSharp
-              className="create-icon-trash create-delete"
-              onClick={() => {
-                const updatedQuestions = [...questions];
-                updatedQuestions[qIndex].options.splice(oIndex, 1);
-                setQuestions(updatedQuestions);
-              }}
-            />
-          </div>
-        ))}
+        {/* ✅ Search Bar Inside the Dropdown Container */}
+        {question.type === "dropdown" && (
+          <input
+            type="text"
+            className="dropdown-search"
+            placeholder="Search option..."
+            value={question.searchTerm || ""}
+            onChange={(e) => {
+              const updatedQuestions = [...questions];
+              updatedQuestions[qIndex].searchTerm = e.target.value;
+              setQuestions(updatedQuestions);
+            }}
+          />
+        )}
+
+        {/* ✅ Filtered options displayed below the search bar */}
+        {question.options
+          .filter((option) =>
+            question.type === "dropdown"
+              ? option.toLowerCase().includes((question.searchTerm || "").toLowerCase())
+              : true
+          )
+          .map((option, oIndex) => (
+            <div key={oIndex} className="option-group">
+              {question.type !== "dropdown" ? (
+                <input type={question.type === "multiple" ? "radio" : "checkbox"} name={`question-${question.id}`} />
+              ) : null}
+              <input
+                type="text"
+                className="create-answer-input"
+                value={option}
+                onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+              />
+              <IoRemoveCircleSharp
+                className="create-icon-trash create-delete"
+                onClick={() => {
+                  const updatedQuestions = [...questions];
+                  updatedQuestions[qIndex].options.splice(oIndex, 1);
+                  setQuestions(updatedQuestions);
+                }}
+              />
+            </div>
+          ))}
       </div>
 
       <div className="option-group add-option" onClick={() => addOption(qIndex)}>
@@ -356,7 +377,7 @@ const CreateForm = () => {
         <span className="add-option">Add option</span>
       </div>
 
-      {/* ✅ File upload input will ONLY appear if question.type is "dropdown" */}
+      {/* ✅ File upload input for dropdown */}
       {question.type === "dropdown" && (
         <div className="file-upload">
           <input
@@ -389,6 +410,8 @@ const CreateForm = () => {
     </div>
   )}
 </div>
+
+
 
 
                         <div className="create-question-actions">
