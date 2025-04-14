@@ -1,15 +1,18 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaUserCircle, FaFileAlt, FaTimes } from "react-icons/fa";
+import { FaArrowLeft, FaUserCircle, FaFileAlt, FaTimes, FaDownload } from "react-icons/fa";
+import html2pdf from "html2pdf.js";
 import api from "../api";
 import "../styles/ResponseDetails.css";
+import logo from "../assets/logo.jpg";
+import logo1 from "../assets/logo1.png";
 
 const ResponseDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [responseData, setResponseData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [previewFile, setPreviewFile] = useState(null); // State to track the file preview
+  const [previewFile, setPreviewFile] = useState(null);
 
   useEffect(() => {
     if (!id || id === "null") {
@@ -24,8 +27,6 @@ const ResponseDetails = () => {
         const response = await api.get(`/responses/details/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("Fetched Response Data:", response.data);
 
         setResponseData({
           id: response.data.response_id,
@@ -45,6 +46,47 @@ const ResponseDetails = () => {
     fetchResponseDetails();
   }, [id]);
 
+  const handleDownloadPDF = () => {
+    const element = document.getElementById("pdf-content");
+    const opt = {
+      margin: 0.5,
+      filename: `${responseData.formName || "form"}_response.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+    };
+
+    html2pdf().set(opt).from(element).save();
+  };
+
+  const renderAnswer = (answer) => {
+    if (answer.file) {
+      const fileName = answer.file.split("/").pop();
+      return (
+        <div className="file-preview">
+          <FaFileAlt className="file-icon" />
+          <button
+            className="file-button"
+            onClick={() => setPreviewFile(answer.file)}
+            aria-label={`Preview file ${fileName}`}
+          >
+            {fileName}
+          </button>
+        </div>
+      );
+    } else if (answer.response) {
+      return (
+        <p className="response-details-answer-text">
+          {Array.isArray(answer.response)
+            ? answer.response.join(", ")
+            : String(answer.response)}
+        </p>
+      );
+    } else {
+      return <p className="response-details-no-answer">No answer provided</p>;
+    }
+  };
+
   if (loading) {
     return <p className="loading-message">Loading response details...</p>;
   }
@@ -57,7 +99,11 @@ const ResponseDetails = () => {
     <div className="response-details-wrapper">
       <header className="response-details-header">
         <div className="response-details-header-left">
-          <FaArrowLeft className="response-details-back-icon" onClick={() => navigate(-1)} />
+          <FaArrowLeft
+            className="response-details-back-icon"
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+          />
           <h2 className="response-details-title">Response Details</h2>
         </div>
 
@@ -65,53 +111,76 @@ const ResponseDetails = () => {
           <div className="response-details-user-info">
             <span className="response-details-user-name">{responseData.userName}</span>
             <FaUserCircle className="response-details-avatar" />
+            <FaDownload
+              className="download-icon"
+              onClick={handleDownloadPDF}
+              title="Download as PDF"
+              style={{ cursor: "pointer", marginLeft: "1rem" }}
+            />
           </div>
         </div>
       </header>
 
-      <div className="response-details-content">
-        <h1 className="response-details-form-title">{responseData.formName}</h1>
-        <p className="response-details-form-description">{responseData.formDescription}</p>
-        <p className="response-details-submission-time">
-          Submitted: {new Date(responseData.submission_time).toLocaleString()}
-        </p>
-
-        {responseData.answers.length > 0 ? (
-          responseData.answers.map((answer, index) => (
-            <div key={index} className="response-details-question">
-              <p className="response-details-question-text">{answer.question_text}</p>
-              <div className="response-details-answer">
-                {answer.file ? (
-                  <div className="file-preview">
-                    <FaFileAlt className="file-icon" />
-                    <button
-                      className="file-button"
-                      onClick={() => setPreviewFile(answer.file)}
-                    >
-                      {answer.file.split("/").pop()} {/* Display only filename */}
-                    </button>
-                  </div>
-                ) : answer.response ? (
-                  <p className="response-details-answer-text">
-                    {Array.isArray(answer.response) ? answer.response.join(", ") : String(answer.response)}
-                  </p>
-                ) : (
-                  <p className="response-details-no-answer">No answer provided</p>
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="response-details-no-data">No answers provided.</p>
-        )}
+      <div id="pdf-content">
+  <div className="response-details-content">
+    <div className="govt-form-header">
+      <div className="govt-header-row">
+        <img src={logo} alt="City Logo" className="govt-logo left-logo" />
+        <div className="govt-text-header">
+          <p>Republic of the Philippines</p>
+          <p>City of Cagayan de Oro</p>
+          <p className="dept-name">
+            CITY HOUSING AND<br />URBAN DEVELOPMENT DEPARTMENT
+          </p>
+        </div>
+        <img src={logo1} alt="CDO Logo" className="govt-logo right-logo" />
       </div>
 
-      {/* File Preview Modal */}
+      <div className="form-details-text">
+        <p className="form-response-title">FORM RESPONSE</p>
+        <p className="form-title">{responseData.formName}</p>
+        <p className="form-description">{responseData.formDescription}</p>
+        <p className="submission-time">
+          Submitted: {new Date(responseData.submission_time).toLocaleString()}
+        </p>
+      </div>
+    </div>
+
+    {responseData.answers.length > 0 ? (
+      responseData.answers.map((answer, index) => (
+        <div key={index} className="response-details-question">
+          <p className="response-details-question-text">
+            {answer.question_text || <em>No question text</em>}
+          </p>
+          <div className="response-details-answer">{renderAnswer(answer)}</div>
+        </div>
+      ))
+    ) : (
+      <p className="response-details-no-data">No answers provided.</p>
+    )}
+     <div className="response-details-footer" style={{ marginTop: "30px" }}>
+    <p>GF Floor, South Wing, Administrative and Legislative Building</p>
+    <p>City Hall Compound, Capistrano-Hayes Street</p>
+    <p>Cagayan de Oro City, Philippines</p>
+    <p>www.cagayandeoro.gov.ph</p>
+    <p>Telephone Number: +63 88 880 9698, Email: chudd.cdeo@gmail.com</p>
+  </div>
+  </div>
+
+</div>
+
+
+      
+
       {previewFile && (
-        <div className="file-modal">
+        <div className="file-modal" role="dialog" aria-modal="true">
           <div className="file-modal-content">
-            <FaTimes className="close-icon" onClick={() => setPreviewFile(null)} />
-            {previewFile.match(/\.(jpeg|jpg|png|gif)$/) ? (
+            <FaTimes
+              className="close-icon"
+              onClick={() => setPreviewFile(null)}
+              aria-label="Close file preview"
+            />
+            {/\.(jpeg|jpg|png|gif)$/i.test(previewFile) ? (
               <img src={previewFile} alt="Preview" className="file-preview-image" />
             ) : (
               <iframe

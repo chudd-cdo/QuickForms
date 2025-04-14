@@ -16,6 +16,7 @@
     "date-fns": "^4.1.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
+    "html2pdf.js": "^0.10.3",
     "lodash": "^4.17.21",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",

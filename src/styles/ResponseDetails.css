@@ -1,14 +1,19 @@
-/* Wrapper */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Layout Wrapper */
 .response-details-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   background: #5fff79;
   min-height: 100vh;
-  overflow: hidden;
-  max-height: calc(100vh - 80px);
+  margin-top: 20px;
   overflow-y: auto;
-  margin-top: 60px;
+  max-height: calc(100vh - 100px);
 }
 
 /* Header */
@@ -22,13 +27,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background: #ffffff;
-  color: #000000;
+  background: #fff;
+  color: #000;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Back button & title */
 .response-details-header-left {
   display: flex;
   align-items: center;
@@ -40,7 +44,6 @@
   margin-right: 12px;
 }
 
-/* User Info */
 .response-details-header-right {
   display: flex;
   align-items: center;
@@ -65,56 +68,80 @@
   font-size: 24px;
 }
 
+/* Download PDF Icon */
+.download-icon {
+  font-size: 1.25rem;
+  color: #007bff;
+  cursor: pointer;
+  transition: transform 0.2s;
+  margin-left: 10px;
+}
+
+.download-icon:hover {
+  transform: scale(1.1);
+  color: #0056b3;
+}
+
 /* Content */
 .response-details-content {
   width: 100%;
   max-width: 800px;
   margin: 50px auto 80px;
-  padding: 24px;
-  background: #ffffff;
+  padding: 24px 16px;
+  background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  min-height: 600px;
+  overflow-y: hidden;
 }
 
-/* Title */
+/* Title & Description */
 .response-details-form-title {
   font-size: 28px;
   font-weight: bold;
-  text-align: left;
   margin-left: 10px;
+  text-align: left;
 }
 
-/* Description */
 .response-details-form-description {
   font-size: 16px;
+  color: #000;
+  margin: 0 0 10px 10px;
   text-align: left;
-  color: #000000;
-  margin-bottom: 20px;
-  margin-left: 10px;
 }
 
-/* Submission Time */
 .response-details-submission-time {
   font-size: 14px;
   color: #555;
-  margin-bottom: 20px;
-}
-
-/* Question */
-.response-details-question {
-  width: 92%;
-  padding: 20px;
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Answer */
-.response-details-question-text {
-  font-weight: bold;
   margin-bottom: 10px;
+  text-align: left;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+/* Questions Container */
+.response-details-question {
+  width: 100%;
+  padding: 12px 16px;
+  margin: 10px 0;
+  background: #f9f9f9;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-family: 'Arial', sans-serif;
+}
+
+.response-details-question-text {
+  font-weight: 600;
+  font-size: 16px;
+  color: #222;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  display: inline-block;
+  border-bottom: 1px solid #eee;
 }
 
 .response-details-answer {
@@ -122,6 +149,7 @@
 }
 
 .response-details-answer-text {
+  font-size: 15px;
   color: #333;
 }
 
@@ -137,7 +165,7 @@
   margin-top: 20px;
 }
 
-/* Loading & Error */
+/* Feedback messages */
 .loading-message,
 .error-message {
   font-size: 16px;
@@ -146,10 +174,13 @@
   margin-top: 20px;
 }
 
+/* File Preview */
 .file-preview {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+  word-break: break-word;
 }
 
 .file-icon {
@@ -165,61 +196,183 @@
   text-decoration: underline;
   font-size: 16px;
   font-weight: bold;
-  width: 100px;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .file-button:hover {
   color: #0056b3;
 }
 
-/* Modal Background */
+/* Modal */
 .file-modal {
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 1000;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Modal Content */
 .file-modal-content {
-  background: white;
+  background: #fff;
   padding: 15px;
   border-radius: 8px;
-  position: relative;
   max-width: 90%;
   max-height: 90%;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
 }
 
-/* Close Button */
 .close-icon {
   position: absolute;
   top: 10px;
   right: 10px;
-  cursor: pointer;
   font-size: 22px;
   color: red;
+  cursor: pointer;
 }
 
-/* Image Preview */
 .file-preview-image {
   max-width: 100%;
-  max-height: 80vh; /* Ensures full visibility on any screen */
-  object-fit: contain; /* Keeps the whole image visible */
+  max-height: 80vh;
+  object-fit: contain;
 }
 
-/* PDF & Other Files */
 .file-preview-frame {
   width: 100%;
-  height: 80vh; /* Makes sure it fits within the screen */
+  height: 80vh;
   border: none;
 }
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Official-looking Form Header */
+.govt-form-header {
+  font-family: 'Georgia', serif;
+  margin-bottom: 20px;
+  padding-left: 16px;
+}
+
+.govt-logo-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.govt-logo-container img {
+  height: 60px;
+}
+
+.form-response-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  font-family: 'Georgia', serif;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+  margin: 12px 0 4px 0;
+}
+
+.form-description {
+  font-size: 14px;
+  font-style: italic;
+  text-align: left;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.submission-time {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.govt-header-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.govt-logo {
+  height: 60px;
+  width: auto;
+}
+
+.left-logo, .right-logo {
+  height: 60px;
+  width: auto;
+}
+
+.govt-text-header {
+  text-align: left;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.govt-text-header p {
+  margin: 2px 0;
+}
+
+.dept-name {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 15px;
+  margin-top: 5px;
+}
+
+.response-details-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #333;
+  padding: 10px 0;
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+}
+
+#pdf-content {
+    padding-top: 60px;
+    padding-left: 48px;
+    padding-right: 48px;
+    padding-bottom: 64px;
+  }
+  .pdf-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }  
+
+
+
+
+
