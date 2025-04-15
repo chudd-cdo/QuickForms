@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/FormHeader.css";
-import logo from "../assets/chuddlogo.png";
+import logo from "../assets/chudd.png";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 
 const FormHeader = ({ onPreview, onPublish }) => {
@@ -11,7 +11,7 @@ const FormHeader = ({ onPreview, onPublish }) => {
         <input
           type="text"
           className="form-header-title"
-          value="SmartGForm"
+          value="CHUDDGForm"
           readOnly
         />
       </div>

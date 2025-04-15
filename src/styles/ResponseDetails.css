@@ -14,6 +14,7 @@
   margin-top: 20px;
   overflow-y: auto;
   max-height: calc(100vh - 100px);
+  position: relative; 
 }
 
 /* Header */
@@ -94,6 +95,7 @@
   height: 100%;
   min-height: 600px;
   overflow-y: hidden;
+  flex: 1;
 }
 
 /* Title & Description */
@@ -132,6 +134,8 @@
   overflow-wrap: break-word;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   font-family: 'Arial', sans-serif;
+  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .response-details-question-text {
@@ -349,30 +353,52 @@
   font-size: 15px;
   margin-top: 5px;
 }
-
-.response-details-footer {
-  text-align: center;
-  font-size: 12px;
-  color: #333;
-  padding: 10px 0;
-  background-color: #fff;
-  border-top: 1px solid #ccc;
+/* Standard PDF font sizes */
+.response-details-content,
+.response-details-content p,
+.response-details-question,
+.response-details-answer-text,
+.response-details-question-text,
+.response-details-no-answer,
+.response-details-no-data {
+  font-size: 12pt; /* Adjusted for PDF readability */
+  line-height: 1.4;
+  font-family: 'Times New Roman', serif;
 }
 
-#pdf-content {
-    padding-top: 60px;
-    padding-left: 48px;
-    padding-right: 48px;
-    padding-bottom: 64px;
+/* Footer styles for PDF */
+.response-details-footer {
+  font-size: 10pt;
+  text-align: center;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  padding-top: 20px;
+  margin-top: 40px;
+  border-top: 1px solid #ddd;
+  page-break-inside: avoid;
+  margin-top: auto;
+}
+
+/* Ensure it appears on each printed/PDF page */
+@media print {
+  .response-details-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: block;
   }
-  .pdf-content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }  
 
+  body {
+    margin-bottom: 100px; /* Space for footer */
+  }
 
+  .response-details-content {
+    page-break-after: auto;
+  }
 
-
-
+  .response-details-question {
+    page-break-inside: avoid;
+  }
+}

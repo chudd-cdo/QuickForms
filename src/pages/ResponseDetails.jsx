@@ -46,18 +46,32 @@ const ResponseDetails = () => {
     fetchResponseDetails();
   }, [id]);
 
-  const handleDownloadPDF = () => {
-    const element = document.getElementById("pdf-content");
-    const opt = {
-      margin: 0.5,
-      filename: `${responseData.formName || "form"}_response.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-    };
+  
 
-    html2pdf().set(opt).from(element).save();
+  const handleDownloadPDF = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await api.get(`/responses/${responseData.id}/download-pdf`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: "blob", // Required for file downloads
+      });
+  
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Response_${responseData.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Error downloading PDF:", error);
+    }
   };
+  
+  
 
   const renderAnswer = (answer) => {
     if (answer.file) {
@@ -94,6 +108,8 @@ const ResponseDetails = () => {
   if (!responseData) {
     return <p className="error-message">No data found for this response.</p>;
   }
+
+  
 
   return (
     <div className="response-details-wrapper">

@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/EditHeader.css";
-import logo from "../assets/chuddlogo.png";
+import logo from "../assets/chudd.png";
 import { FaEye, FaEllipsisV } from "react-icons/fa";
 
 const EditHeader = ({ onPreview, onUpdate }) => {
@@ -11,7 +11,7 @@ const EditHeader = ({ onPreview, onUpdate }) => {
         <input
           type="text"
           className="edit-header-title"
-          value="SmartGForm"
+          value="CHUDDGForm"
           readOnly
         />
       </div>

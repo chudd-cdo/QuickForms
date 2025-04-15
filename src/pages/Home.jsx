@@ -31,9 +31,9 @@ function Home() {
       <div className="hero-section" style={{ backgroundImage: `url(${bgImage})` }}>
         <div className="hero-content">
           <h1 className="hero-title">
-            Create your <br /> Forms now <br /> with <span className="highlight">SmartGForms!</span>
+            Begin your <br /> Journey <br /> with <span className="highlight">CHUDDGForm!</span>
           </h1>
-          <p className="hero-subtitle">THE SMARTER WAY TO CREATE FORMS.</p>
+          <p className="hero-subtitle">THE WAY TO GET YOUR HOUSE.</p>
           <button className="cta-button" onClick={() => openModal(true)}>
             <span className="cta-text">Get started now</span> <FaArrowRight className="cta-icon" />
           </button>

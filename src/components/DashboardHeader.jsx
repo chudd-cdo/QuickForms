@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/DashboardHeader.css";
-import logo from "../assets/chuddlogo.png";
+import logo from "../assets/chudd.png";
 import { FaUserCircle } from "react-icons/fa";
 import LocalStorage from "../components/localStorage"; // ✅ Ensure correct import
 
@@ -11,7 +11,7 @@ function DashboardHeader() {
     <header className="chudd-dashboard-header">
       <div className="chudd-dashboard-logo-container">
         <img src={logo} alt="SmartGForm Logo" className="chudd-dashboard-logo" />
-        <span className="chudd-dashboard-title">SmartGForm</span>
+        <span className="chudd-dashboard-title">CHUDDGForm</span>
       </div>
 
       {/* ✅ User Profile Info */}
