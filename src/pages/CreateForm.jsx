@@ -21,10 +21,12 @@ const CreateForm = () => {
     const savedQuestions = localStorage.getItem("questions");
     return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "", type: "short", options: [] }];
   });
-
+  const [loading, setLoading] = useState(false); // Loading state
   const [status, setStatus] = useState("Activated");
   const [formId, setFormId] = useState(null);
   const user = LocalStorage.getUserData() || {}; 
+  const [isPublishing, setIsPublishing] = useState(false);
+
 
   useEffect(() => {
     localStorage.setItem("formTitle", formTitle);
@@ -47,10 +49,12 @@ const CreateForm = () => {
   };
 
   const handlePublish = async () => {
+    if (loading) return;
     if (!formTitle.trim()) {
       alert("Please enter a form title before publishing.");
       return;
     }
+    setLoading(true); // Set loading state to true
 
     try {
       const userId = LocalStorage.getUserId();
@@ -91,6 +95,9 @@ const CreateForm = () => {
     } catch (error) {
       console.error("Error publishing form:", error.response?.data || error);
       alert("Error: " + JSON.stringify(error.response?.data));
+    }
+    finally {
+      setLoading(false); // Set loading state to false after operation
     }
   };
 

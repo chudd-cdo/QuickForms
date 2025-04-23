@@ -107,6 +107,8 @@
 
 /* Table Headers */
 .responses-table th {
+  min-width: 100px;  /* Set your own preferred min */
+  max-width: 200px; 
   background: white;
   color: black;
   font-weight: bold;
@@ -114,7 +116,12 @@
   padding: 10px;
   font-size: 14px;
   text-align: center;
-
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* Table Rows */
@@ -158,6 +165,11 @@
 /* Table Cells */
 .responses-table td {
   border: none;
+  max-width: 200px;
+  word-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
+
   font-size: 14px;
   vertical-align: middle;
   padding: 10px;

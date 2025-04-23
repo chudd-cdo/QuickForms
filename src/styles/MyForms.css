@@ -47,10 +47,13 @@
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 5px 12px;
-  max-width: 300px;
+  max-width: 200px; /* Increased max-width for better usability */
+  min-width: 160px;
+  width: 100%;
   background-color: white;
   flex-grow: 1;
-  height: 35px;
+  height: 40px; /* Slightly increased height for better accessibility */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added subtle shadow for better visibility */
 }
 
 /* Search Input */
@@ -61,15 +64,22 @@
   padding: 5px;
   background: transparent;
   font-size: 14px;
+  color: #333; /* Ensures text is visible */
 }
 
 /* Search Icon */
 .chudd-search-icon {
-  font-size: 16px;
+  font-size: 18px; /* Slightly increased size for better visibility */
   color: #666;
-  margin-left: 8px;
   display: flex;
   align-items: center;
+  cursor: pointer; /* Added pointer cursor for better UX */
+  transition: color 0.3s; /* Smooth transition for hover effect */
+  margin-left: -90px;
+}
+
+.chudd-search-icon:hover {
+  color: #007bff; /* Highlight icon on hover */
 }
 
 /* Actions */
@@ -81,12 +91,12 @@
 
 /* Archive Button */
 
-  .chudd-archive-button {
+  .chudd-AssModal-button {
     background-color:white; /* Green background */
     border: none;
     cursor: pointer;
-    width: 50px;
-    height: 50px; /* Ensures it's a perfect square */
+    width: 45px;
+    height: 45px; /* Ensures it's a perfect square */
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -95,7 +105,7 @@
 
   }
 
-.chudd-archive-button:hover {
+.chudd-AssModal-button:hover {
   background-color: #41df46;
 }
 
@@ -124,12 +134,12 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 6px;
-  margin-top: 10px;
+  
 }
 
 .chudd-myforms-table th,
 .chudd-myforms-table td {
-  padding: 12px;
+  padding: 4px;
   text-align: left;
 }
 
@@ -254,4 +264,98 @@
   pointer-events: none;          /* Disable interaction */
   opacity: 0.6;                   /* Slight transparency */
   background-color: #f0f0f0;
+}
+
+
+
+.response-filter-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-start; /* Align filters to the left */
+  align-items: center;
+  padding: 10px 0;
+  flex-wrap: wrap; /* Ensure responsiveness */
+}
+
+.filter-select-dropdown {
+  min-width: 220px;
+  max-width: 218px;
+  width: 100%;
+  font-size: 14px;
+  height: 100%;
+  max-height: 400px;
+
+
+}
+
+.filter-select-dropdown .css-2b097c-container {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .response-filter-controls {
+    flex-direction: column;
+    align-items: stretch; /* Make filters full-width on smaller screens */
+  }
+
+  .filter-select-dropdown {
+    min-width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .responsive-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .responsive-table-inner {
+    width: 100%;
+    min-width: 700px;
+  }
+
+  
+}
+.chudd-responses-button {
+  text-align: center;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #000000;
+  font-weight: bold;
+  margin-left: -30px;
+}
+
+.chudd-responses-button:hover {
+  background-color: #66eb6d;
+
+  transform: scale(1.05); 
+}
+.chudd-table th:nth-child(7), /* Adjust index based on your column structure */
+.chudd-table td:nth-child(7) {
+  text-align: left;
+}
+
+
+.chudd-form-name-cell {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px; /* Adjust as needed */
+}
+
+/* Add this to your MyForms.css */
+.chudd-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-left: 50%;
+  margin-top: 150px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

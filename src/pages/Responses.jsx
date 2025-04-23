@@ -58,10 +58,9 @@ const Responses = () => {
 
         const formatted = (response.data || []).map((res) => ({
           id: res.id || null,
-          avatar: res.avatar || "/default-avatar.png",
           userName: res.userName || "Unknown",
+          saveName: res.saveName || "Unknown",
           formName: res.formName || "Untitled Form",
-          status: res.status === "Active" ? "Active" : "Deactivated",
           submissionTime: res.submission_time
             ? new Date(res.submission_time).toLocaleString()
             : "N/A",
@@ -122,53 +121,29 @@ const Responses = () => {
 
   const columns = [
     {
-      accessorKey: "avatar",
-      header: " ",
-      cell: ({ row }) => (
-        <div className="responses-avatar-container">
-          <img
-            src={row.original.avatar || "/default-avatar.png"}
-            alt="User Avatar"
-            className="responses-avatar"
-            onError={(e) => (e.target.src = "/default-avatar.png")}
-          />
-        </div>
-      ),
+      accessorKey: "formName",
+      header: "Form Name",
     },
     {
       accessorKey: "userName",
-      header: "User Name",
+      header: "User",
       cell: ({ row }) => (
         <span className="responses-user">{row.original.userName}</span>
       ),
     },
     {
-      accessorKey: "formName",
-      header: "Form Name",
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.original.status;
-        return (
-          <span
-            className={
-              status?.toLowerCase() === "active"
-                ? "responses-status-active"
-                : "responses-status-deactivated"
-            }
-          >
-            {status || "Unknown"}
-          </span>
-        );
-      },
+      accessorKey: "saveName", // reused assuming no separate "Name"
+      header: "Name",
+      cell: ({ row }) => (
+        <span className="responses-user">{row.original.userName}</span>
+      ),
     },
     {
       accessorKey: "submissionTime",
       header: "Submission Time",
     },
   ];
+
 
   const table = useReactTable({
     data: filteredResponses,
