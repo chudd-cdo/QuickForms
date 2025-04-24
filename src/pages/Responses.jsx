@@ -127,15 +127,13 @@ const Responses = () => {
     {
       accessorKey: "userName",
       header: "User",
-      cell: ({ row }) => (
-        <span className="responses-user">{row.original.userName}</span>
-      ),
     },
+    
     {
-      accessorKey: "saveName", // reused assuming no separate "Name"
+      accessorKey: "saveName", // <- fixed
       header: "Name",
       cell: ({ row }) => (
-        <span className="responses-user">{row.original.userName}</span>
+        <span className="responses-name">{row.original.saveName}</span>
       ),
     },
     {
@@ -143,6 +141,7 @@ const Responses = () => {
       header: "Submission Time",
     },
   ];
+  
 
 
   const table = useReactTable({

@@ -3,9 +3,10 @@
   display: flex;
   height: 100vh;
   background-color: #e6f7d4;
-  overflow: hidden;
   margin-top: 10px;
+  overflow: hidden;
 }
+
 /* Main Content */
 .responses-main-content {
   flex-grow: 1;
@@ -34,59 +35,14 @@
 /* Search Bar Container */
 .responses-search-bar-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
   justify-content: flex-end;
+  align-items: center;
 }
 
 /* Search Bar */
-.responses-search-bar {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 5px 12px;
-  max-width: 300px;
-  background-color: white;
-  flex-grow: 1;
-  height: 35px; /* Consistent height */
-  line-height: 35px; /* Ensures vertical centering */
-}
+
 
 /* Search Input */
-.responses-search-bar input {
-  border: none;
-    outline: none;
-    flex-grow: 1;
-    padding: 5px;
-    background: transparent;
-    font-size: 14px;
-    height: 100%;
-    vertical-align: middle; /* Ensures proper vertical alignment */
-    margin-top: -2px;
-}
-
-/* Search Icon */
-.responses-search-icon {
-  font-size: 16px;
-  color: #666;
-  margin-left: 8px;
-  display: flex;
-  align-items: center;
-  height: 100%; /* Makes sure it fills the parent height */
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .responses-search-bar-container {
-    justify-content: center; /* Center the search bar on smaller screens */
-  }
-
-  .responses-search-bar {
-    width: 100%;
-    max-width: 300px;
-  }
-}
 
 
 
@@ -100,28 +56,25 @@
 .responses-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 0 6px;
-  text-align: center;
-  
+  border-spacing: 0 4px;
+  text-align: left;
+  table-layout: fixed;
 }
 
 /* Table Headers */
 .responses-table th {
-  min-width: 100px;  /* Set your own preferred min */
-  max-width: 200px; 
+  width: 150px;
+  height: 50px;
   background: white;
   color: black;
   font-weight: bold;
   border-bottom: 2px solid #4CAF50;
   padding: 10px;
   font-size: 14px;
-  text-align: center;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  text-overflow: ellipsis;
-  overflow: hidden;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
 }
 
 /* Table Rows */
@@ -131,60 +84,48 @@
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
 }
 
+.responses-table tbody tr:hover {
+  background-color: #72e25e;
+}
 
-
-/* Rounded Corners for First and Last Cells */
+/* Rounded Corners */
 .responses-table tbody tr td:first-child {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+  text-align: left;
 }
 
 .responses-table tbody tr td:last-child {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  text-align: right;
 }
-
-/* Ensures consistent left alignment for the User Name column */
-.responses-table td:nth-child(2) {
-  text-align: left !important;
-  padding-left: 20px; /* Adjust this as needed */
-  display: flex;
-  align-items: center;
-  min-width: 150px; /* Ensures uniform width */
-}
-
-
-
-/* Use a fixed width for the user name column to maintain alignment */
-.responses-table th:nth-child(2),
-.responses-table td:nth-child(2) {
-  width: 40px; /* Adjust width as necessary */
-}
-
 
 /* Table Cells */
 .responses-table td {
-  border: none;
-  max-width: 200px;
+  width: 150px;
+  height: 50px;
+  font-size: 14px;
+  padding: 10px;
+  vertical-align: middle;
   word-wrap: break-word;
   white-space: normal;
-  overflow-wrap: break-word;
-
-  font-size: 14px;
-  vertical-align: middle;
-  padding: 10px;
-  text-align: center;
-  
 }
 
 /* User Column */
+.responses-table td:nth-child(2) {
+ text-align: left;
+}
+.responses-table td:nth-child(3) {
+  text-align: left;
+ }
+
 .responses-avatar-container {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Avatar Icon */
 .responses-avatar {
   width: 25px;
   height: 25px;
@@ -200,7 +141,7 @@
 }
 
 /* Status Styles */
-.responses-status-active{
+.responses-status-active {
   color: green;
   font-weight: bold;
 }
@@ -210,7 +151,7 @@
   font-weight: bold;
 }
 
-/* ✅ Pagination Container */
+/* Pagination */
 .responses-pagination {
   display: flex;
   justify-content: center;
@@ -223,7 +164,7 @@
   transform: translateX(-50%);
   width: 100%;
 }
-/* ✅ Pagination Buttons */
+
 .responses-pagination button {
   background: none;
   border: none;
@@ -236,54 +177,46 @@
   transition: background 0.3s, color 0.3s;
 }
 
-/* ✅ Button Hover Effect */
 .responses-pagination button:hover {
   background-color: #4fb838;
   color: white;
 }
 
-/* ✅ Disabled Buttons */
 .responses-pagination button:disabled {
-  color: #ccc;                   /* Gray out the button */
-  background-color: #f0f0f0;     /* Light gray background */
-  cursor: not-allowed;           /* Indicate it's not clickable */
-  pointer-events: none;          /* Prevent interaction */
-  box-shadow: none;              /* Remove any shadow effect */
-  opacity: 0.6;                   /* Slight transparency */
+  color: #ccc;
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
-/* ✅ Active Page Number */
 .responses-page-number.active {
   font-size: 18px;
   font-weight: bold;
   color: #fff;
-  background-color: #4fb838;  /* Highlight active page */
+  background-color: #4fb838;
   border-radius: 5px;
-  transition: 0.3s;
 }
 
-/* ✅ Disabled Page Number */
 .responses-page-number.disabled {
-  color: #ccc;                   /* Gray out the page number */
-  font-weight: normal;           /* Remove boldness */
-  pointer-events: none;          /* Disable interaction */
-  opacity: 0.6;                   /* Slight transparency */
+  color: #ccc;
+  font-weight: normal;
+  pointer-events: none;
+  opacity: 0.6;
   background-color: #f0f0f0;
 }
 
-.responses-table tbody tr:hover {
-  background-color: #72e25e;
-}
-
+/* Filters */
 .responses-filters {
   display: flex;
   gap: 15px;
-  justify-content: flex-start; /* Align filters to the left */
+  justify-content: flex-start;
   align-items: center;
   padding: 10px 0;
-  flex-wrap: wrap; /* Ensure responsiveness */
+  flex-wrap: wrap;
 }
 
+/* Dropdowns */
 .multi-select-dropdown {
   min-width: 220px;
   max-width: 300px;
@@ -291,32 +224,32 @@
   font-size: 14px;
 }
 
-.multi-select-dropdown .css-2b097c-container {
-  width: 100%;
-}
-
+/* Responsive */
 @media (max-width: 768px) {
+  .responses-search-bar-container {
+    justify-content: center;
+  }
+
   .responses-filters {
     flex-direction: column;
-    align-items: stretch; /* Make filters full-width on smaller screens */
+    align-items: stretch;
   }
 
   .multi-select-dropdown {
     min-width: 100%;
   }
-}
 
-@media screen and (max-width: 768px) {
   .responsive-table {
     overflow-x: auto;
   }
 
   .responses-table {
     width: 100%;
-    min-width: 700px;
+    border-collapse: collapse;
   }
 }
 
+/* Export Button */
 .export-btn {
   background-color: #007bff;
   color: white;
@@ -328,6 +261,7 @@
   width: 100px;
   display: flex;
 }
+
 .export-btn:hover {
   background-color: #0056b3;
 }
