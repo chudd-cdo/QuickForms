@@ -265,3 +265,18 @@
 .export-btn:hover {
   background-color: #0056b3;
 }
+
+/* No Data Message */
+.no-data-message {
+  text-align: center;      /* Center text inside */
+  display: flex;           /* Use flexbox for centering */
+  justify-content: center; /* Center horizontally */
+  align-items: center;     /* Center vertically */
+  height: 200px;           /* Set a height for proper alignment */
+  font-size: 16px;         /* Adjust font size */
+  color: #555;             /* Add a subtle color */
+  background-color: #f9f9f9; /* Optional: Add a background color */
+  border-radius: 8px;      /* Optional: Add rounded corners */
+  margin: 20px auto;       /* Center the message block */
+  width: 100%;             /* Ensure it spans the full width */
+}

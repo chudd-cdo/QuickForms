@@ -359,3 +359,19 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+.chudd-assigned-users-button{
+  text-align: center;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #000000;
+  font-weight: bold;
+  margin-left: -30px;
+}
+
+.chudd-assigned-users-button:hover {
+  background-color: #66eb6d;
+
+  transform: scale(1.05); 
+}

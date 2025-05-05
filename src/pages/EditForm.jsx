@@ -65,15 +65,13 @@ const EditForm = () => {
           question_text: q.question_text || "Untitled Question",
           question_type: q.question_type ?? "short",
           options: ["multiple_choice", "dropdown", "checkbox"].includes(q.question_type) && q.options
-            ? (() => {
-                try {
-                  return Array.isArray(q.options) ? q.options.map((option) => (typeof option === "object" ? option.text : option)) : q.options.split(',').map(opt => opt.trim());
-                } catch (e) {
-                  return q.options.split(',').map(opt => opt.trim());
-                }
-              })()
+            ? Array.isArray(q.options)
+              ? q.options
+              : q.options.split(',').map(opt => opt.trim())
             : [],
+          required: q.required || false, // Map the required field from the database
         })));
+        
 
         LocalStorage.saveFormPreview(formId, {
           title: name,
@@ -137,6 +135,7 @@ const EditForm = () => {
         question_text: q.question_text || "Untitled Question",
         question_type: q.question_type || "short",
         options: Array.isArray(q.options) ? q.options.filter((opt) => opt.trim()) : [],
+        required: q.required ?? false, // Include the required field
       })),
     };
 
@@ -294,6 +293,14 @@ const EditForm = () => {
               return updated;
           });
       };
+  };
+
+  const handleRequiredChange = (index, value) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[index].required = value;
+      return updated;
+    });
   };
 
   return (
@@ -550,10 +557,16 @@ const EditForm = () => {
   <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />
   <FaTrash className="create-icon create-delete" onClick={() => deleteQuestion(question.id)} />
   <label className="create-required-toggle">
-    Required
-    <input type="checkbox" className="toggle-input" />
-    <span className="toggle-slider"></span>
-  </label>
+  Required
+  <input
+    type="checkbox"
+    className="toggle-input"
+    checked={question.required || false} // Reflect the current state
+    onChange={(e) => handleRequiredChange(qIndex, e.target.checked)}
+    />
+  <span className="toggle-slider"></span>
+</label>
+
 </div>
 
 

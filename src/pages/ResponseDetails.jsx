@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaUserCircle, FaFileAlt, FaTimes, FaDownload } from "react-icons/fa";
 import api from "../api";
@@ -10,7 +10,7 @@ const ResponseDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [responseData, setResponseData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Loading state
   const [previewFile, setPreviewFile] = useState(null);
 
   useEffect(() => {
@@ -38,14 +38,12 @@ const ResponseDetails = () => {
       } catch (error) {
         console.error("Error fetching response details:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false once data is fetched
       }
     };
 
     fetchResponseDetails();
   }, [id]);
-
-  
 
   const handleDownloadPDF = async () => {
     try {
@@ -69,8 +67,6 @@ const ResponseDetails = () => {
       console.error("Error downloading PDF:", error);
     }
   };
-  
-  
 
   const renderAnswer = (answer) => {
     if (answer.file) {
@@ -101,14 +97,18 @@ const ResponseDetails = () => {
   };
 
   if (loading) {
-    return <p className="loading-message">Loading response details...</p>;
+    return (
+      <div className="loading-overlay">
+        <div className="response-spinner-container">
+          <div className="response-chudd-spinner"></div> 
+        </div>
+      </div>
+    );
   }
 
   if (!responseData) {
     return <p className="error-message">No data found for this response.</p>;
   }
-
-  
 
   return (
     <div className="response-details-wrapper">
@@ -137,55 +137,51 @@ const ResponseDetails = () => {
       </header>
 
       <div id="pdf-content">
-  <div className="response-details-content">
-    <div className="govt-form-header">
-      <div className="govt-header-row">
-        <img src={logo} alt="City Logo" className="govt-logo left-logo" />
-        <div className="govt-text-header">
-          <p>Republic of the Philippines</p>
-          <p>City of Cagayan de Oro</p>
-          <p className="dept-name">
-            CITY HOUSING AND<br />URBAN DEVELOPMENT DEPARTMENT
-          </p>
+        <div className="response-details-content">
+          <div className="govt-form-header">
+            <div className="govt-header-row">
+              <img src={logo} alt="City Logo" className="govt-logo left-logo" />
+              <div className="govt-text-header">
+                <p>Republic of the Philippines</p>
+                <p>City of Cagayan de Oro</p>
+                <p className="dept-name">
+                  CITY HOUSING AND<br />URBAN DEVELOPMENT DEPARTMENT
+                </p>
+              </div>
+              <img src={logo1} alt="CDO Logo" className="govt-logo right-logo" />
+            </div>
+
+            <div className="form-details-text">
+              <p className="form-response-title">FORM RESPONSE</p>
+              <p className="form-title">{responseData.formName}</p>
+              <p className="form-description">{responseData.formDescription}</p>
+              <p className="submission-time">
+                Submitted: {new Date(responseData.submission_time).toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          {responseData.answers.length > 0 ? (
+            responseData.answers.map((answer, index) => (
+              <div key={index} className="response-details-question">
+                <p className="response-details-question-text">
+                  {answer.question_text || <em>No question text</em>}
+                </p>
+                <div className="response-details-answer">{renderAnswer(answer)}</div>
+              </div>
+            ))
+          ) : (
+            <p className="response-details-no-data">No answers provided.</p>
+          )}
+          <div className="response-details-footer" style={{ marginTop: "30px" }}>
+            <p>GF Floor, South Wing, Administrative and Legislative Building</p>
+            <p>City Hall Compound, Capistrano-Hayes Street</p>
+            <p>Cagayan de Oro City, Philippines</p>
+            <p>www.cagayandeoro.gov.ph</p>
+            <p>Telephone Number: +63 88 880 9698, Email: chudd.cdeo@gmail.com</p>
+          </div>
         </div>
-        <img src={logo1} alt="CDO Logo" className="govt-logo right-logo" />
       </div>
-
-      <div className="form-details-text">
-        <p className="form-response-title">FORM RESPONSE</p>
-        <p className="form-title">{responseData.formName}</p>
-        <p className="form-description">{responseData.formDescription}</p>
-        <p className="submission-time">
-          Submitted: {new Date(responseData.submission_time).toLocaleString()}
-        </p>
-      </div>
-    </div>
-
-    {responseData.answers.length > 0 ? (
-      responseData.answers.map((answer, index) => (
-        <div key={index} className="response-details-question">
-          <p className="response-details-question-text">
-            {answer.question_text || <em>No question text</em>}
-          </p>
-          <div className="response-details-answer">{renderAnswer(answer)}</div>
-        </div>
-      ))
-    ) : (
-      <p className="response-details-no-data">No answers provided.</p>
-    )}
-     <div className="response-details-footer" style={{ marginTop: "30px" }}>
-    <p>GF Floor, South Wing, Administrative and Legislative Building</p>
-    <p>City Hall Compound, Capistrano-Hayes Street</p>
-    <p>Cagayan de Oro City, Philippines</p>
-    <p>www.cagayandeoro.gov.ph</p>
-    <p>Telephone Number: +63 88 880 9698, Email: chudd.cdeo@gmail.com</p>
-  </div>
-  </div>
-
-</div>
-
-
-      
 
       {previewFile && (
         <div className="file-modal" role="dialog" aria-modal="true">

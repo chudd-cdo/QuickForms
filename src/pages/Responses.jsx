@@ -127,8 +127,10 @@ const Responses = () => {
     {
       accessorKey: "userName",
       header: "User",
+      cell: ({ row }) => (
+        <span className="responses-user">{row.original.userName}</span>
+      ),
     },
-    
     {
       accessorKey: "saveName", // <- fixed
       header: "Name",
@@ -206,30 +208,29 @@ const Responses = () => {
           </div>
 
           <div className="responses-table-wrapper">
-            <div className="responses-table-container responsive-table">
-              <table className="responses-table">
-                <thead>
-                  {table.getHeaderGroups().map((group) => (
-                    <tr key={group.id}>
-                      {group.headers.map((header) => (
-                        <th key={header.id}>
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody>
-                  {table.getRowModel().rows.length > 0 ? (
-                    table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.length > 0 ? (
+              <div className="responses-table-container responsive-table">
+                <table className="responses-table">
+                  <thead>
+                    {table.getHeaderGroups().map((group) => (
+                      <tr key={group.id}>
+                        {group.headers.map((header) => (
+                          <th key={header.id}>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody>
+                    {table.getRowModel().rows.map((row) => (
                       <tr
                         key={row.id}
                         onClick={(e) => {
-                          e.stopPropagation();
-                          handleRowClick(row);
+                          handleRowClick(row.original);
                         }}
                         style={{ cursor: "pointer" }}
                       >
@@ -242,17 +243,13 @@ const Responses = () => {
                           </td>
                         ))}
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={columns.length} className="no-data-message">
-                        No matching results found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="no-data-message">No matching results found</div>
+            )}
           </div>
 
           <div className="form-responses-pagination">
@@ -266,17 +263,22 @@ const Responses = () => {
               {"<"}
             </button>
 
-            {Array.from({ length: table.getPageCount() }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => setPageIndex(index)}
-                className={`form-responses-page-number ${
-                  pageIndex === index ? "active" : ""
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+            {Array.from({ length: table.getPageCount() }, (_, index) => index)
+              .slice(
+                Math.max(0, pageIndex - 1), // Show 2 buttons before the current page
+                Math.min(pageIndex + 5, table.getPageCount()) // Show 2 buttons after the current page
+              )
+              .map((index) => (
+                <button
+                  key={index}
+                  onClick={() => setPageIndex(index)}
+                  className={`form-responses-page-number ${
+                    pageIndex === index ? "active" : ""
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
 
             <button
               onClick={() =>

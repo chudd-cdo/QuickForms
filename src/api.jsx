@@ -1,8 +1,8 @@
 import axios from "axios";
-import LocalStorage from "./components/localStorage"; 
+import LocalStorage from "./components/localStorage";
 
 const api = axios.create({
-  baseURL: "http://192.168.5.64:8000/api", 
+  baseURL: "http://192.168.5.28:8000/api", 
   withCredentials: true, // ✅ Required for Sanctum
 }); 
 

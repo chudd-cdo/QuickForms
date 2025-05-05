@@ -13,12 +13,14 @@ function AuthModal({ isLogin, closeModal, setIsLogin }) {
   const [password, setPassword] = useState("");
   const [dob, setDob] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const apiUrl = isLogin ? "/login" : "/register";
     const payload = { email, password };
@@ -47,6 +49,8 @@ function AuthModal({ isLogin, closeModal, setIsLogin }) {
     } catch (error) {
         setError(error.response?.data?.message || "An error occurred");
         console.error("Auth failed:", error);
+    } finally {
+        setLoading(false);
     }
 };
 
@@ -116,7 +120,9 @@ function AuthModal({ isLogin, closeModal, setIsLogin }) {
             </>
           )}
 
-          <button type="submit" className="auth-button">{isLogin ? "Log In" : "Sign Up"}</button>
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Loading..." : isLogin ? "Log In" : "Sign Up"}
+          </button>
         </form>
 
         <p className="switch-text">

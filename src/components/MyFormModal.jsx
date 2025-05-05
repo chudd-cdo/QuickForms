@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import '../styles/MyFormModal.css';
-import LocalStorage from "../components/localStorage";
+
 import api from "../api"; // Import the API instance
 
 const MyFormModal = ({ isOpen, onClose, users, forms, onSubmit }) => {

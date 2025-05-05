@@ -3,6 +3,7 @@ import api from "../api"; // ✅ Use the axios instance with auth
 import "../styles/AssignUserModal.css";
 import axios from "axios";
 
+
 const AssignUserModal = ({ isOpen, onClose, formId }) => {
     if (!isOpen) return null; // Prevents rendering when modal is closed
 
@@ -20,7 +21,7 @@ const AssignUserModal = ({ isOpen, onClose, formId }) => {
             try {
                 const [usersResponse, assignedResponse] = await Promise.all([
                     api.get("/users", { signal }), // ✅ Use api instance
-                    api.get(`/assigned-users/${formId}`, { signal }) // ✅ Use api instance
+                    api.get(`/assigned-users/assign/${formId}`, { signal }) // ✅ Use api instance
                 ]);
 
                 setUsers(usersResponse.data);

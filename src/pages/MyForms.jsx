@@ -16,6 +16,8 @@ import api from "../api";
 import Select from "react-select";
 import MyFormModal from "../components/MyFormModal";
 import ResponsesModal from "../components/ResponsesModal";
+import ViewAssignedUserModal from "../components/ViewAssignedUserModal";
+
 
 const MyForms = ({ forms, setForms }) => {
   const navigate = useNavigate();
@@ -33,6 +35,9 @@ const MyForms = ({ forms, setForms }) => {
   const [currentFormTitle, setCurrentFormTitle] = useState("");
   const [currentFormId, setCurrentFormId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isAssignedUsersModalOpen, setIsAssignedUsersModalOpen] = useState(false);
+const [selectedAssignedUsers, setSelectedAssignedUsers] = useState([]);
+
   
 
   
@@ -120,6 +125,17 @@ const MyForms = ({ forms, setForms }) => {
     navigate("/create-form");
   };
 
+
+
+  const handleViewAssignedUsers = (form) => {
+    setCurrentFormId(form.id); 
+    setCurrentFormTitle(form.name); 
+    setIsAssignedUsersModalOpen(true);
+  };
+  
+
+  
+
   const handleDeleteForm = async (id) => {
     try {
       await api.delete(`/forms/${id}`, {
@@ -203,9 +219,18 @@ const MyForms = ({ forms, setForms }) => {
         ),
       },
       {
-        header: "Assigned Users",
-        accessorFn: (row) => row.assigned_users_count || 0,
-      },
+  header: "Assigned Users",
+  accessorFn: (row) => row.assigned_users_count || 0,
+  cell: ({ row }) => (
+    <button
+      className="chudd-assigned-users-button"
+      onClick={() => handleViewAssignedUsers(row.original)}
+    >
+      {row.original.assigned_users_count || 0}
+    </button>
+  ),
+},
+
       {
         header: "Total Responses",
         accessorKey: "responses_count",
@@ -363,6 +388,13 @@ const MyForms = ({ forms, setForms }) => {
 <ResponsesModal
   isOpen={isResponsesModalOpen}
   onClose={() => setIsResponsesModalOpen(false)}
+  formId={currentFormId}
+  formTitle={currentFormTitle}
+/>
+
+<ViewAssignedUserModal
+  isOpen={isAssignedUsersModalOpen}
+  onClose={() => setIsAssignedUsersModalOpen(false)}
   formId={currentFormId}
   formTitle={currentFormTitle}
 />

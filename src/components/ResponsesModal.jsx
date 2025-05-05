@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { FaFileAlt, FaTimes } from "react-icons/fa";
+import { IoMdRefresh } from "react-icons/io"; // Refresh Icon
+import { GrDocumentCsv } from "react-icons/gr"; // CSV Icon
+import { FaTrash } from "react-icons/fa"; // Delete Icon
 import api from "../api";
 import "../styles/ResponsesModal.css";
 import Papa from "papaparse";
 import Select from "react-select";
+import ResponseDetailsModal from "./ResponseDetailsModal"; // Import the new modal
 
 Modal.setAppElement("#root");
 
@@ -13,8 +17,12 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
   const [responses, setResponses] = useState([]);
   const [previewFile, setPreviewFile] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [loading, setLoading] = useState(false); // 👈 added
-
+  const [loading, setLoading] = useState(false);
+  const [selectedResponse, setSelectedResponse] = useState(null); // Track selected response
+  const [isResponseDetailsModalOpen, setIsResponseDetailsModalOpen] = useState(false); // Track modal state
+  const [isDeleteMode, setIsDeleteMode] = useState(false); // Toggle delete mode
+  const [selectedRows, setSelectedRows] = useState([]); // Track selected rows
+  
   useEffect(() => {
     if (isOpen && formId) {
       fetchResponses();
@@ -23,7 +31,7 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
 
   const fetchResponses = async () => {
     try {
-      setLoading(true); // 👈 start loading
+      setLoading(true);
       const res = await api.get(`/forms/${formId}/response`);
       const data = res.data || {};
       setQuestions(data.questions || []);
@@ -31,8 +39,18 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
     } catch (error) {
       console.error("Error fetching responses:", error.response?.data || error.message);
     } finally {
-      setLoading(false); // 👈 stop loading
+      setLoading(false);
     }
+  };
+
+  const handleRowClick = (response) => {
+    setSelectedResponse(response); // Set the selected response
+    setIsResponseDetailsModalOpen(true); // Open the modal
+  };
+
+  const closeResponseDetailsModal = () => {
+    setSelectedResponse(null); // Clear the selected response
+    setIsResponseDetailsModalOpen(false); // Close the modal
   };
 
   const columns = [
@@ -70,17 +88,6 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
     return Array.isArray(value) ? value.join(", ") : value;
   };
 
-  const nameSet = new Set();
-  responses.forEach((res) => {
-    const name = res.userName;
-    if (name) nameSet.add(name);
-  });
-
-  const tagOptions = Array.from(nameSet).map((name) => ({
-    value: name,
-    label: name,
-  }));
-
   const filteredResponses = responses.filter((response) => {
     const responseName = response.userName?.toLowerCase();
     return (
@@ -116,6 +123,21 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
     document.body.removeChild(link);
   };
 
+  const handleDeleteSelected = async () => {
+    if (window.confirm("Are you sure you want to delete the selected responses?")) {
+      try {
+        await api.post(`/responses/delete`, { ids: selectedRows }); // Send selected IDs to the backend
+        setResponses((prev) => prev.filter((res) => !selectedRows.includes(res.id))); // Remove deleted rows from state
+        setSelectedRows([]); // Clear selected rows
+        setIsDeleteMode(false); // Exit delete mode
+        alert("Selected responses deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting responses:", error);
+        alert("Failed to delete responses. Please try again.");
+      }
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -130,23 +152,49 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
       </div>
 
       {loading ? (
-        <div className="spinner-container">
-          <div className="chudd-spinner"></div>
+        <div className="res-spinner-container">
+          <div className="res-chudd-spinner"></div>
         </div>
       ) : (
         <>
           <div className="responses-controls">
             <Select
               isMulti
-              options={tagOptions}
+              options={Array.from(new Set(responses.map((res) => res.userName))).map((name) => ({
+                value: name,
+                label: name,
+              }))}
               className="multi-select-dropdown"
               classNamePrefix="select"
               placeholder="Filter by username..."
               value={selectedTags}
               onChange={setSelectedTags}
             />
-            <button className="export-btn" onClick={exportCSV}>Export CSV</button>
+            <div className="icon-buttons-container">
+              <button className="icon-btn" onClick={fetchResponses} title="Refresh">
+                <IoMdRefresh /> {/* Refresh Icon */}
+              </button>
+              <button className="icon-btn" onClick={exportCSV} title="Export CSV">
+                <GrDocumentCsv /> {/* Export CSV Icon */}
+              </button>
+              <button
+  className={`icon-btn ${isDeleteMode ? "trash-active" : "trash-inactive"}`}
+  onClick={() => setIsDeleteMode(!isDeleteMode)} // Toggle delete mode
+  title="Delete"
+>
+  <FaTrash />
+</button>
+            </div>
           </div>
+
+          {isDeleteMode && selectedRows.length > 0 && (
+            <button
+              className="delete-selected-btn"
+              onClick={handleDeleteSelected}
+            >
+              Delete Selected
+            </button>
+          )}
 
           <div className="responses-table-container">
             {filteredResponses.length === 0 ? (
@@ -155,6 +203,7 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
               <table className="responses-table">
                 <thead>
                   <tr>
+                    {isDeleteMode && <th>Select</th>}
                     {columns.map((q, i) => (
                       <th key={q.id || i}>{q.question_text}</th>
                     ))}
@@ -162,9 +211,39 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
                 </thead>
                 <tbody>
                   {filteredResponses.map((response, index) => (
-                    <tr key={index}>
+                    <tr
+                      key={index}
+                      style={{ cursor: isDeleteMode ? "default" : "pointer" }}
+                      onClick={() => {
+                        if (!isDeleteMode) handleRowClick(response); // Only trigger row click if not in delete mode
+                      }}
+                    >
+                      {isDeleteMode && (
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedRows.includes(response.id)}
+                            onChange={(e) => {
+                              e.stopPropagation(); // Prevent row click when checkbox is clicked
+                              if (e.target.checked) {
+                                setSelectedRows((prev) => [...prev, response.id]);
+                              } else {
+                                setSelectedRows((prev) => prev.filter((id) => id !== response.id));
+                              }
+                            }}
+                          />
+                        </td>
+                      )}
                       {columns.map((q, i) => (
-                        <td key={q.id || i}>
+                        <td
+                          key={q.id || i}
+                          onClick={(e) => {
+                            const value = response.answers?.[q.id];
+                            if (typeof value === "string" && value.startsWith("http")) {
+                              e.stopPropagation(); // Prevent row click for file/URL columns
+                            }
+                          }}
+                        >
                           {q.id === "submission_time"
                             ? new Date(response.submission_time).toLocaleString()
                             : renderCell(response, q.id)}
@@ -199,6 +278,14 @@ const ResponsesModal = ({ isOpen, onClose, formId, formTitle }) => {
           </div>
         </div>
       )}
+
+      {/* Render ResponseDetailsModal */}
+      <ResponseDetailsModal
+  isOpen={isResponseDetailsModalOpen}
+  onClose={closeResponseDetailsModal}
+  responseId={selectedResponse?.id}
+/>
+
     </Modal>
   );
 };

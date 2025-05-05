@@ -10,6 +10,20 @@ import "../styles/CreateForm.css";
 import LocalStorage from "../components/localStorage";
 import api from "../api";
 
+const defaultQuestion = {
+  id: "default-1",
+  title: "Full Name",  // Question title updated
+  type: "short",  // Type is fixed as 'short' and cannot be changed
+  options: [],
+  isDefault: true, // This flag indicates it's a default question
+  required: true, // ✅ Add this
+
+};
+
+
+
+
+
 const CreateForm = () => {
   const navigate = useNavigate();
   const initialTitle = "";
@@ -19,7 +33,9 @@ const CreateForm = () => {
   const [formDescription, setFormDescription] = useState(() => localStorage.getItem("formDescription") || initialDescription);
   const [questions, setQuestions] = useState(() => {
     const savedQuestions = localStorage.getItem("questions");
-    return savedQuestions ? JSON.parse(savedQuestions) : [{ id: "1", title: "", type: "short", options: [] }];
+    return savedQuestions
+      ? JSON.parse(savedQuestions)
+      : [defaultQuestion]; // Load the default question by default
   });
   const [loading, setLoading] = useState(false); // Loading state
   const [status, setStatus] = useState("Activated");
@@ -79,6 +95,7 @@ const CreateForm = () => {
         questionData.append(`questions[${index}][form_id]`, newFormId);
         questionData.append(`questions[${index}][question_text]`, q.title);
         questionData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
+        questionData.append(`questions[${index}][is_required]`, q.required ? 1 : 0);  // ✅ Add this line
       
         if (q.options && q.options.length > 0) {
           q.options.forEach((option, optIndex) => {
@@ -86,6 +103,7 @@ const CreateForm = () => {
           });
         }
       });
+      
 
       await api.post("/questions", questionData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -110,6 +128,9 @@ const CreateForm = () => {
   };
 
   const handleTypeChange = (index, value) => {
+    // Prevent type change for default questions
+    if (questions[index].isDefault) return;
+  
     setQuestions((prevQuestions) => {
       const updated = [...prevQuestions];
       updated[index].type = value;
@@ -119,7 +140,10 @@ const CreateForm = () => {
       return updated;
     });
   };
+  
 
+ 
+  
   const addOption = (questionIndex) => {
     setQuestions((prev) => {
       const updated = [...prev];
@@ -129,7 +153,7 @@ const CreateForm = () => {
   };
 
   const addQuestion = () => {
-    setQuestions([...questions, { id: `${questions.length + 1}`, title: "", type: "short", options: [] }]);
+    setQuestions([...questions, { id: `${questions.length + 1}`, title: "", type: "short", options: [], required: false }]);
   };
 
   const duplicateQuestion = (index) => {
@@ -140,8 +164,22 @@ const CreateForm = () => {
   };
 
   const deleteQuestion = (id) => {
+    if (id === "default-1") {
+      alert("This is a default question and cannot be deleted.");
+      return;
+    }
     setQuestions((prev) => prev.filter((q) => q.id !== id));
   };
+  
+  const handleRequiredChange = (index, value) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[index].required = value;
+      return updated;
+    });
+  };
+  
+  
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -296,17 +334,23 @@ const CreateForm = () => {
                           <div className="create-question-group">
                             <label className="create-question-label">Question:</label>
                             <input
-                              type="text"
-                              placeholder="Enter question"
-                              className="create-question-input"
-                              value={question.title}
-                              onChange={(e) => handleTitleChange(qIndex, e.target.value)}
-                            />
+  type="text"
+  placeholder="Enter question"
+  className="create-question-input"
+  value={question.title}
+  onChange={(e) => {
+    if (question.isDefault) return; // Don't allow editing the default question
+    handleTitleChange(qIndex, e.target.value);
+  }}
+  disabled={question.isDefault} // Disable input for default question
+/>
                           </div>
                           <select
                             className="create-question-type"
                             value={question.type}
                             onChange={(e) => handleTypeChange(qIndex, e.target.value)}
+                            disabled={question.isDefault}  // Disable type change for default questions
+
                           >
                             <option value="short">Short Answer</option>
                             <option value="paragraph">Paragraph</option>
@@ -421,15 +465,21 @@ const CreateForm = () => {
 
 
 
-                        <div className="create-question-actions">
-                          <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />
-                          <FaTrash className="create-icon create-delete" onClick={() => deleteQuestion(question.id)} />
-                          <label className="create-required-toggle">
-                            Required
-                            <input type="checkbox" className="toggle-input" />
-                            <span className="toggle-slider"></span>
-                          </label>
-                        </div>
+<div className="create-question-actions">
+  <IoDuplicateOutline className="create-icon duplicate-icon" onClick={() => duplicateQuestion(qIndex)} />
+  <FaTrash className="create-icon create-delete" onClick={() => deleteQuestion(question.id)} />
+  <label className="create-required-toggle">
+    Required
+    <input
+      type="checkbox"
+      className="toggle-input"
+      checked={question.required}
+      onChange={(e) => handleRequiredChange(qIndex, e.target.checked)}
+    />
+    <span className="toggle-slider"></span>
+  </label>
+</div>
+
                       </div>
                     )}
                   </Draggable>
