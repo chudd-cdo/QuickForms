@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table";
 import "../styles/MyForms.css";
 import { FaTrash, FaSearch, FaEdit } from "react-icons/fa";
-import { MdAssignmentAdd } from "react-icons/md";
+import { MdAssignmentAdd, MdAirplanemodeActive, MdAirplanemodeInactive } from "react-icons/md";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
 import LocalStorage from "../components/localStorage";
@@ -17,6 +17,7 @@ import Select from "react-select";
 import MyFormModal from "../components/MyFormModal";
 import ResponsesModal from "../components/ResponsesModal";
 import ViewAssignedUserModal from "../components/ViewAssignedUserModal";
+import AssignUserModal from "../components/AssignUserModal";
 
 
 const MyForms = ({ forms, setForms }) => {
@@ -155,7 +156,34 @@ const [selectedAssignedUsers, setSelectedAssignedUsers] = useState([]);
     setIsResponsesModalOpen(true);
   };
   
+  const handleAssignUser = (form) => {
+    setCurrentFormId(form.id); // Set the current form ID
+    setCurrentFormTitle(form.name); // Set the current form title
+    setIsAssignedUsersModalOpen(true); // Open the modal
+  };
 
+  const handleStatusChange = async (form) => {
+    const updatedStatus = !form.is_active; // Toggle the status
+    try {
+      const response = await api.patch(
+        `/forms/${form.id}/status`, // PATCH instead of PUT
+        { is_active: updatedStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      setForms((prevForms) =>
+        prevForms.map((f) =>
+          f.id === form.id ? { ...f, is_active: updatedStatus } : f
+        )
+      );
+      console.log(`Form status updated: ${response.data}`);
+    } catch (error) {
+      console.error("Error updating form status:", error.response?.data || error.message);
+    }
+  };
+  
   const filteredForms = useMemo(() => {
     return forms
       .filter((form) => {
@@ -185,8 +213,36 @@ const [selectedAssignedUsers, setSelectedAssignedUsers] = useState([]);
         accessorKey: "actions",
         cell: ({ row }) => (
           <div className="chudd-action-icons">
-            <FaEdit className="chudd-edit-icon" onClick={() => handleEdit(row.original.id)}  style={{ fontSize: "1.2rem" , marginLeft: "10px"}} />
-            <FaTrash className="chudd-delete-icon" onClick={() => handleDeleteForm(row.original.id)}   style={{ fontSize: "1rem" }}/>
+            <button
+              className="chudd-action-button chudd-edit-icon"
+              onClick={() => handleEdit(row.original.id)}
+            >
+              <FaEdit />
+            </button>
+            <button
+              className="chudd-action-button chudd-delete-icon"
+              onClick={() => handleDeleteForm(row.original.id)}
+            >
+              <FaTrash />
+            </button>
+            <button
+              className="chudd-action-button chudd-assign-user-icon"
+              onClick={() => handleAssignUser(row.original)}
+            >
+              <MdAssignmentAdd />
+            </button>
+            <button
+              className={`chudd-action-button chudd-status-changer ${
+                row.original.is_active ? "active" : "inactive"
+              }`}
+              onClick={() => handleStatusChange(row.original)}
+            >
+              {row.original.is_active ? (
+                <MdAirplanemodeActive />
+              ) : (
+                <MdAirplanemodeInactive />
+              )}
+            </button>
           </div>
         ),
       },
@@ -399,8 +455,13 @@ const [selectedAssignedUsers, setSelectedAssignedUsers] = useState([]);
   formTitle={currentFormTitle}
 />
 
-
-
+{isAssignedUsersModalOpen && (
+  <AssignUserModal
+    isOpen={isAssignedUsersModalOpen}
+    onClose={() => setIsAssignedUsersModalOpen(false)}
+    formId={currentFormId}
+  />
+)}
 
     </div>
   );

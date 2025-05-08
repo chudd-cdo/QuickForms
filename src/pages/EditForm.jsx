@@ -23,10 +23,11 @@ const EditForm = () => {
   const [questions, setQuestions] = useState([]);
   const [status, setStatus] = useState("Deactivated");
   const [isUserModalOpen, setUserModalOpen] = useState(false);
+  const [deletedQuestionIds, setDeletedQuestionIds] = useState([]);
 
   useEffect(() => {
     if (!formId) return;
-
+  
     const fetchFormData = async () => {
       try {
         const authToken = LocalStorage.getToken();
@@ -35,32 +36,37 @@ const EditForm = () => {
           navigate("/login");
           return;
         }
-
+  
         const response = await api.get(`/forms/${formId}`, {
           headers: { Authorization: `Bearer ${authToken}` },
         });
-
+  
         if (!response.data) {
           console.error("No data received from API");
           return;
         }
-
+  
         const { name, description, is_active, questions } = response.data;
-
+  
         const savedPreview = LocalStorage.getFormPreview(formId);
-        if (savedPreview) {
+        if (savedPreview && (!questions || questions.length === 0)) {
           console.log("Using saved preview data");
           setFormTitle(savedPreview.title || "Untitled Form");
           setFormDescription(savedPreview.description || "");
           setQuestions(savedPreview.questions || []);
           setStatus(savedPreview.status || "Deactivated");
+  
+          console.log(" Loaded (from preview) form data:", JSON.stringify({
+            id: formId,
+            name: savedPreview.title,
+            description: savedPreview.description,
+            is_active: savedPreview.status === "Activated",
+            questions: savedPreview.questions,
+          }, null, 2));
           return;
         }
-
-        setFormTitle(name || "Untitled Form");
-        setFormDescription(description || "");
-        setStatus(is_active ? "Activated" : "Deactivated");
-        setQuestions(questions.map((q) => ({
+  
+        const mappedQuestions = questions.map((q) => ({
           id: q.id,
           question_text: q.question_text || "Untitled Question",
           question_type: q.question_type ?? "short",
@@ -69,17 +75,29 @@ const EditForm = () => {
               ? q.options
               : q.options.split(',').map(opt => opt.trim())
             : [],
-          required: q.required || false, // Map the required field from the database
-        })));
-        
-
+          required: q.required || false,
+        }));
+  
+        setFormTitle(name || "Untitled Form");
+        setFormDescription(description || "");
+        setStatus(is_active ? "Activated" : "Deactivated");
+        setQuestions(mappedQuestions);
+  
+        console.log("📥 Loaded form data:", JSON.stringify({
+          id: formId,
+          name,
+          description,
+          is_active,
+          questions: mappedQuestions,
+        }, null, 2));
+  
         LocalStorage.saveFormPreview(formId, {
           title: name,
           description,
           status: is_active ? "Activated" : "Deactivated",
           questions,
         });
-
+  
       } catch (error) {
         console.error("Error fetching form data:", error.response?.data || error.message);
         if (error.response?.status === 401) {
@@ -88,10 +106,10 @@ const EditForm = () => {
         }
       }
     };
-
+  
     fetchFormData();
   }, [formId, navigate]);
-
+  
   const handlePreview = () => {
     if (!formId) return;
 
@@ -117,14 +135,16 @@ const EditForm = () => {
       alert("Please enter a form title before updating.");
       return;
     }
-
+  
     const token = LocalStorage.getToken();
     if (!token) {
       console.error("No authentication token found. Redirecting to login...");
       navigate("/login");
       return;
     }
-
+  
+    console.log("Preparing updated form data...");
+  
     const updatedForm = {
       id: formId,
       name: formTitle,
@@ -135,10 +155,13 @@ const EditForm = () => {
         question_text: q.question_text || "Untitled Question",
         question_type: q.question_type || "short",
         options: Array.isArray(q.options) ? q.options.filter((opt) => opt.trim()) : [],
-        required: q.required ?? false, // Include the required field
+        required: q.required ?? false,
       })),
+      deleted_questions: deletedQuestionIds,
     };
-
+  
+    console.log("Updated form payload to send:", JSON.stringify(updatedForm, null, 2));
+  
     try {
       const response = await api.put(
         `/forms/${formId}`,
@@ -150,16 +173,21 @@ const EditForm = () => {
           }
         }
       );
-
-      console.log("Form updated:", response.data);
-
-      localStorage.setItem(`previewForm-${formId}`, JSON.stringify({
+  
+      console.log("Form updated successfully. Server response:", response.data);
+  
+      setDeletedQuestionIds([]);
+  
+      const previewData = {
         title: updatedForm.name,
         description: updatedForm.description,
         status: status,
         questions: updatedForm.questions,
-      }));
-
+      };
+  
+      localStorage.setItem(`previewForm-${formId}`, JSON.stringify(previewData));
+      console.log(`Stored preview data in localStorage with key: previewForm-${formId}`);
+  
       navigate("/myforms", {
         state: {
           updatedForm: {
@@ -168,6 +196,7 @@ const EditForm = () => {
           },
         },
       });
+      console.log("Navigated to /myforms with updated form.");
     } catch (error) {
       console.error("Error saving form:", error.response ? error.response.data : error.message);
       if (error.response?.status === 401) {
@@ -177,17 +206,28 @@ const EditForm = () => {
       }
     }
   };
+  
 
   const addQuestion = () => {
     setQuestions([
       ...questions,
       {
-        id: Date.now().toString(),
+        id: null, // New questions will have a null ID
         question_text: "New Question",
         question_type: "short",
         options: [],
+        required: false,
       },
     ]);
+  };
+  const addOption = (qIndex) => {
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q, i) =>
+        i === qIndex
+          ? { ...q, options: [...(q.options || []), `Option ${q.options.length + 1}`] }
+          : q
+      )
+    );
   };
 
   const handleQuestionChange = (index, field, value) => {
@@ -206,6 +246,7 @@ const EditForm = () => {
 
   const deleteQuestion = (id) => {
     setQuestions(questions.filter((q) => q.id !== id));
+    setDeletedQuestionIds((prev) => [...prev, id]); // Track deleted question IDs
   };
 
   const duplicateQuestion = (index) => {
@@ -240,13 +281,7 @@ const EditForm = () => {
   };
   
 
-  const addOption = (qIndex) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((q, i) =>
-        i === qIndex ? { ...q, options: [...(q.options || []), `Option ${q.options.length + 1}`] } : q
-      )
-    );
-  };
+ 
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -371,7 +406,11 @@ const EditForm = () => {
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef}>
                 {questions.map((question, qIndex) => (
-                  <Draggable key={question.id} draggableId={`draggable-${question.id}`} index={qIndex}>
+                  <Draggable
+                  key={question.id || `temp-${qIndex}`} // Use a fallback key if question.id is null
+                  draggableId={`draggable-${question.id || `temp-${qIndex}`}`} // Ensure draggableId is unique
+                  index={qIndex}
+                >
                     {(provided) => (
                       <div
                         className="create-question-card"

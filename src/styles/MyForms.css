@@ -184,26 +184,7 @@
   font-weight: bold;
 }
 
-/* Edit & Delete Icons */
-.chudd-edit-icon,
-.chudd-delete-icon {
-  cursor: pointer;
-  font-size: 14px;
-  color: #666;
-  transition: color 0.3s;
-}
 
-.chudd-edit-icon {
-  margin-right: 8px;
-}
-
-.chudd-edit-icon:hover {
-  color: #007bff;
-}
-
-.chudd-delete-icon:hover {
-  color: red;
-}
 
 /* ✅ Pagination Container */
 .chudd-pagination {
@@ -375,3 +356,58 @@
 
   transform: scale(1.05); 
 }
+.chudd-assign-user-icon {
+  color: #505255; /* Blue color */
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.chudd-assign-user-icon:hover {
+  color: #0056b3; /* Darker blue on hover */
+}
+
+
+
+/* Shared styles for action buttons/icons */
+.chudd-action-button {
+  width: 35px; /* Consistent width */
+  height: 35px; /* Consistent height */
+  background-color: #d1f8c9; /* Default background color */
+  border-radius: 8px; /* Rounded corners */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s; /* Smooth transitions */
+  color: #505255; /* Default icon color */
+  font-size: 1.2rem; /* Default icon size */
+}
+
+/* Hover styles for individual buttons */
+.chudd-edit-icon:hover {
+  background-color: #007bff; /* Blue for edit */
+  color: white;
+}
+
+.chudd-delete-icon:hover {
+  background-color: #dc3545; /* Red for delete */
+  color: white;
+}
+
+.chudd-assign-user-icon:hover {
+  background-color: #ffc107; /* Yellow for assign */
+  color: white;
+}
+
+.chudd-status-changer:hover {
+  background-color: #28a745; /* Green for status */
+  color: white;
+}
+
+/* Align action buttons in a row */
+.chudd-action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align buttons to the left */
+}
+

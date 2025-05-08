@@ -41,7 +41,6 @@ const CreateForm = () => {
   const [status, setStatus] = useState("Activated");
   const [formId, setFormId] = useState(null);
   const user = LocalStorage.getUserData() || {}; 
-  const [isPublishing, setIsPublishing] = useState(false);
 
 
   useEffect(() => {
@@ -70,53 +69,79 @@ const CreateForm = () => {
       alert("Please enter a form title before publishing.");
       return;
     }
+  
     setLoading(true); // Set loading state to true
-
+    console.log("🔄 Starting publish process...");
+  
     try {
       const userId = LocalStorage.getUserId();
       if (!userId) {
         alert("User not authenticated. Please log in again.");
         return;
       }
-
+  
+      console.log("🧾 Preparing form data...");
       const formData = {
         user_id: userId,
         name: formTitle,
         description: formDescription,
         is_active: status === "Activated",
       };
-
+  
+      console.log("📤 Sending form data to backend:", formData);
       const formResponse = await api.post("/forms", formData);
       const newFormId = formResponse.data.id;
+      console.log("✅ Form created with ID:", newFormId);
+  
       setFormId(newFormId);
-
+  
       const questionData = new FormData();
+      console.log("🧩 Preparing question data for form ID:", newFormId);
+  
       questions.forEach((q, index) => {
+        console.log(`➡️ Processing Question #${index + 1}:`, q);
+  
         questionData.append(`questions[${index}][form_id]`, newFormId);
         questionData.append(`questions[${index}][question_text]`, q.title);
         questionData.append(`questions[${index}][question_type]`, typeMapping[q.type] || "short");
-        questionData.append(`questions[${index}][is_required]`, q.required ? 1 : 0);  // ✅ Add this line
-      
+        questionData.append(`questions[${index}][is_required]`, q.required ? 1 : 0);
+  
         if (q.options && q.options.length > 0) {
           q.options.forEach((option, optIndex) => {
             questionData.append(`questions[${index}][options][${optIndex}]`, option);
           });
+          console.log(`   ✅ Options added for Question #${index + 1}:`, q.options);
         }
       });
-      
-
+  
+      console.log("📤 Sending questions to backend...");
       await api.post("/questions", questionData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
+  
+      console.log("✅ Questions submitted successfully.");
       navigate("/myforms");
+      console.log("➡️ Navigated to /myforms after publish.");
     } catch (error) {
-      console.error("Error publishing form:", error.response?.data || error);
+      console.error("❌ Error publishing form:", error.response?.data || error);
       alert("Error: " + JSON.stringify(error.response?.data));
+    } finally {
+      setLoading(false);
+      console.log("✅ Publish process completed. Loading state reset.");
     }
-    finally {
-      setLoading(false); // Set loading state to false after operation
-    }
+  };
+  
+
+  const addOption = (questionIndex) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[questionIndex].options = [...(updated[questionIndex].options || []), `Option ${updated[questionIndex].options.length + 1}`];
+      return updated;
+    });
+  };
+
+  const addQuestion = () => {
+    setQuestions([...questions, { id: `${questions.length + 1}`, title: "", type: "short", options: [], required: false }]);
   };
 
   const handleTitleChange = (index, value) => {
@@ -141,20 +166,6 @@ const CreateForm = () => {
     });
   };
   
-
- 
-  
-  const addOption = (questionIndex) => {
-    setQuestions((prev) => {
-      const updated = [...prev];
-      updated[questionIndex].options = [...(updated[questionIndex].options || []), `Option ${updated[questionIndex].options.length + 1}`];
-      return updated;
-    });
-  };
-
-  const addQuestion = () => {
-    setQuestions([...questions, { id: `${questions.length + 1}`, title: "", type: "short", options: [], required: false }]);
-  };
 
   const duplicateQuestion = (index) => {
     setQuestions((prev) => {
