@@ -7,7 +7,7 @@ import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import FormHeader from "../components/FormHeader";
 import "../styles/CreateForm.css";
-import LocalStorage from "../components/localStorage";
+import LocalStorage from "../components/LocalStorage";
 import api from "../api";
 
 const defaultQuestion = {

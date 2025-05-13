@@ -2,7 +2,7 @@ import React from "react";
 import "../styles/DashboardHeader.css";
 import logo from "../assets/chudd.png";
 import { FaUserCircle } from "react-icons/fa";
-import LocalStorage from "../components/localStorage"; // ✅ Ensure correct import
+import LocalStorage from "../components/LocalStorage"; // ✅ Ensure correct import
 
 function DashboardHeader() {
   const user = LocalStorage.getUserData() || {}; // ✅ Get user data safely

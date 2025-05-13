@@ -11,7 +11,7 @@ import { FaTrash, FaSearch, FaEdit } from "react-icons/fa";
 import { MdAssignmentAdd, MdAirplanemodeActive, MdAirplanemodeInactive } from "react-icons/md";
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
-import LocalStorage from "../components/localStorage";
+import LocalStorage from "../components/LocalStorage";
 import api from "../api";
 import Select from "react-select";
 import MyFormModal from "../components/MyFormModal";

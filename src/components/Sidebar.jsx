@@ -3,7 +3,7 @@ import { FaHome, FaWpforms, FaRegFileAlt, FaBell, FaCogs, FaSignOutAlt } from "r
 import { useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css"; 
 
-import LocalStorage from "../components/localStorage";
+import LocalStorage from "../components/LocalStorage";
 import api from "../api";
 
 

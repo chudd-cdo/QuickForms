@@ -3,7 +3,7 @@ import api from "../api";
 import { FaUser, FaLock, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "../styles/AuthModal.css";
-import LocalStorage from "../components/localStorage";
+import LocalStorage from "../components/LocalStorage";
 
 
 function AuthModal({ isLogin, closeModal, setIsLogin }) {

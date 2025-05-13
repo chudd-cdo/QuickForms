@@ -16,7 +16,7 @@ import EditHeader from "./components/EditHeader";
 import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LocalStorage from "./components/localStorage"; // Utility to manage local storage
+import LocalStorage from "./components/LocalStorage"; // Utility to manage local storage
 import FormResponses from "./pages/FormResponses"; // ✅ Import FormResponses
 
 function App() {

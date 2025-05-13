@@ -7,7 +7,7 @@ import { IoDuplicateOutline, IoRemoveCircleSharp } from "react-icons/io5";
 import { FiPlusCircle } from "react-icons/fi";
 import EditHeader from "../components/EditHeader";
 import AssignUserModal from "../components/AssignUserModal";
-import LocalStorage from "../components/localStorage";
+import LocalStorage from "../components/LocalStorage";
 import api from "../api";
 import ExcelJS from "exceljs";
 

@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import DashboardHeader from "../components/DashboardHeader";
 import Sidebar from "../components/Sidebar";
 import api from "../api";
-import LocalStorage from "../components/localStorage";
+import LocalStorage from "../components/LocalStorage";
 import "../styles/ProfilePage.css";
 import getCroppedImg from "../components/cropImage";
 
