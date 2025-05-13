@@ -2,7 +2,7 @@ import axios from "axios";
 import LocalStorage from "./components/LocalStorage";
 
 const api = axios.create({
-  baseURL: "http://192.168.5.41:8000/api", 
+  baseURL: "https://192.168.2.2:82/chuddapp-backend/api", 
   withCredentials: true, // ✅ Required for Sanctum
 }); 
 
