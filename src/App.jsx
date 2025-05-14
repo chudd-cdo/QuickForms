@@ -39,7 +39,7 @@ function App() {
   return (
     <FormProvider>
       <div>
-        {location.pathname === "/" && <HomeHeader />}
+        {location.pathname === "/chuddforms" && <HomeHeader />}
         {location.pathname === "/myforms" && <HomeHeader />}
         {location.pathname.startsWith("/edit-form/") && <EditHeader />}
 
