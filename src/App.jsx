@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Home from "./pages/Home";
 import MyForms from "./pages/MyForms";
@@ -134,11 +134,4 @@ function App() {
   );
 }
 
-// Wrap the App component with BrowserRouter and set the basename
-export default function Root() {
-  return (
-    <BrowserRouter basename="/chuddforms">
-      <App />
-    </BrowserRouter>
-  );
-}
+export default App;
