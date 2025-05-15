@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Home from "./pages/Home";
 import MyForms from "./pages/MyForms";
 import Responses from "./pages/Responses";
-import ResponseDetails from "./pages/ResponseDetails"; // ✅ Imported ResponseDetails page
+import ResponseDetails from "./pages/ResponseDetails";
 import Notifications from "./pages/Notifications";
 import CreateForm from "./pages/CreateForm";
 import PreviewForm from "./pages/PreviewForm";
 import EditForm from "./pages/EditForm";
 import EditPreview from "./pages/EditPreview";
-import ProfilePage from "./pages/ProfilePage"; // ✅ Import ProfilePage
+import ProfilePage from "./pages/ProfilePage";
 import HomeHeader from "./components/HomeHeader";
 import EditHeader from "./components/EditHeader";
 import Sidebar from "./components/Sidebar";
 import { FormProvider } from "./components/FormContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import LocalStorage from "./components/LocalStorage"; // Utility to manage local storage
-import FormResponses from "./pages/FormResponses"; // ✅ Import FormResponses
+import LocalStorage from "./components/LocalStorage";
+import FormResponses from "./pages/FormResponses";
 
 function App() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [forms, setForms] = useState([]); // Store created forms
+  const [forms, setForms] = useState([]);
   const [authToken, setAuthToken] = useState(LocalStorage.getToken());
 
   useEffect(() => {
-    // Auto-login if token exists in local storage
     if (authToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${authToken}`;
     }
@@ -39,18 +38,15 @@ function App() {
   return (
     <FormProvider>
       <div>
-        {location.pathname === "/chuddforms" && <HomeHeader />}
+        {location.pathname === "/" && <HomeHeader />}
         {location.pathname === "/myforms" && <HomeHeader />}
         {location.pathname.startsWith("/edit-form/") && <EditHeader />}
 
         <div className="main-layout">
-          {/* Show Sidebar only for relevant pages */}
           {["/myforms", "/responses", "/notifications", "/profile", "/form-responses"].includes(location.pathname) && <Sidebar />}
 
           <Routes>
             <Route path="/" element={<Home />} />
-
-            {/* Protected Routes */}
             <Route
               path="/myforms"
               element={
@@ -138,4 +134,11 @@ function App() {
   );
 }
 
-export default App;
+// Wrap the App component with BrowserRouter and set the basename
+export default function Root() {
+  return (
+    <BrowserRouter basename="/chuddforms">
+      <App />
+    </BrowserRouter>
+  );
+}
