@@ -2,7 +2,7 @@ import axios from "axios";
 import LocalStorage from "./components/LocalStorage";
 
 const api = axios.create({
-  baseURL: "http://10.0.2.15:8000/api", // ✅ Update with your API URL
+  baseURL: "http://localhost:8000/api/", // ✅ Update with your API URL
   withCredentials: true, // ✅ Required for Sanctum
 }); 
 
