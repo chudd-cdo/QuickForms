@@ -3,8 +3,9 @@ import LocalStorage from "./components/LocalStorage";
 
 const api = axios.create({
   //putang ina why is the reverse proxy not working for localhost:8001?
-  baseURL: "https://192.168.2.2:82/chuddapp-api/api", // ✅ Update with your API URL
-  withCredentials: true, // ✅ Required for Sanctum
+   baseURL: "https://192.168.2.2:82/chuddapp-api/api", // ✅ Update with your API URL
+   //baseURL: "http://localhost:8001/api/",
+   withCredentials: true, // ✅ Required for Sanctum
 }); 
 
 // ✅ Attach token automatically to every request
